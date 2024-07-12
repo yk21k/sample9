@@ -17,12 +17,12 @@
 
                     </div>
                     <div class="card-body">
-                        <a href="#" class="card-link">Add to Cart</a>
+                        <a href="{{ route('cart.add', $product->id) }}" class="card-link">Add to Cart</a>
                     </div>
                 </div>
             </div>   
         @endforeach
     </div>
-    
+
 </div>
 @endsection

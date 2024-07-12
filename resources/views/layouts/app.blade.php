@@ -36,6 +36,16 @@
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ms-auto">
                         <!-- Authentication Links -->
+
+                        <li class="nav-item">
+                            <a class="nav-link p-0 m-0" href="{{ route('cart.index') }}">
+
+                                <button type="button" class="btn btn-primary">
+                                  Cart <i class="fa fa-shopping-basket fa-2x" style="color:#B6A7A7 ;" aria-hidden="true"></i><span class="badge badge-light">@auth{{ Cart::session(auth()->id())->getContent()->count() }}@else 0 @endauth</span>
+                                </button>
+                            </a>
+                        </li>
+
                         @guest
                             @if (Route::has('login'))
                                 <li class="nav-item">
@@ -72,7 +82,7 @@
             </div>
         </nav>
 
-        <main class="py-4">
+        <main class="py-4 container">
             @yield('content')
         </main>
     </div>
