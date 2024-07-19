@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PayPalController;
+use App\Http\Controllers\ShopController;
 
 
 /*
@@ -36,6 +37,8 @@ Route::get('/cart/checkout', [App\Http\Controllers\CartController::class, 'check
 
 
 Route::resource('orders', OrderController::class)->only('store')->middleware('auth');
+
+Route::resource('shops', ShopController::class);
 
 
 Route::get('paypal/checkout/{order}', [App\Http\Controllers\PayPalController::class, 'getExpressCheckout'])->name('paypal.checkout');

@@ -4,7 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreShopRequest;
 use App\Http\Requests\UpdateShopRequest;
+use Illuminate\Http\Request;
+
 use App\Models\Shop;
+use App\Models\User;
+
+use App\Mail\ShopActivationRequest;
+use Illuminate\Support\Facades\Mail;
 
 class ShopController extends Controller
 {
@@ -21,7 +27,7 @@ class ShopController extends Controller
      */
     public function create()
     {
-        //
+        return view('shops.create');
     }
 
     /**
@@ -29,7 +35,25 @@ class ShopController extends Controller
      */
     public function store(StoreShopRequest $request)
     {
-        //
+        //add validation
+        $request->validate([
+            'name' => 'required'
+        ]);
+
+        //save db
+        $shop = auth()->user()->shop()->create([
+            'name'        => $request->input('name'),
+            'description' => $request->input('description'),
+        ]);
+
+        //send mail to admin
+        $admins = User::whereHas('role', function ($q) {
+            $q->where('name', 'admin');
+        })->get();
+
+        Mail::to($admins)->send(new ShopActivationRequest($shop));
+
+        return redirect()->route('home')->withMessage('Create shop request sent');
     }
 
     /**
@@ -37,7 +61,7 @@ class ShopController extends Controller
      */
     public function show(Shop $shop)
     {
-        //
+        dd($shop->owner->name. ' welcome to your shop named ', $shop->name);
     }
 
     /**
