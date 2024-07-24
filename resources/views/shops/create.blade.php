@@ -20,23 +20,23 @@
     </div>
 
     <div class="form-group">
-        <label for="name"> Representative Name　</label>
-        <input type="text" class="form-control" name="name" id="" aria-describedby="helpId" placeholder="">
+        <label for="representative"> Representative </label>
+        <input type="text" class="form-control" name="representative" id="" aria-describedby="helpId" placeholder="">
     </div>
 
     <div class="form-group">
-        <label for="name"> Administrator　</label>
-        <input type="text" class="form-control" name="name" id="" aria-describedby="helpId" placeholder="">
+        <label for="administrator"> Administrator　</label>
+        <input type="text" class="form-control" name="administrator" id="" aria-describedby="helpId" placeholder="">
     </div>
 
     <div class="form-group">
-        <label for="name"> Location　</label>
-        <input type="text" class="form-control" name="name" id="" aria-describedby="helpId" placeholder="">
+        <label for="location"> Location　</label>
+        <input type="text" class="form-control" name="location" id="" aria-describedby="helpId" placeholder="">
     </div>
 
     <div class="form-group">
-        <label for="name"> Contact Address　</label>
-        <input type="text" class="form-control" name="name" id="" aria-describedby="helpId" placeholder="">
+        <label for="contact-address"> Contact Address　</label>
+        <input type="text" class="form-control" name="contact-address" id="" aria-describedby="helpId" placeholder="">
     </div>
 
     <div> The Others </div>
