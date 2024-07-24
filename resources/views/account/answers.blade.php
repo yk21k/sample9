@@ -21,7 +21,7 @@
     
 
     Your Inquiry<br>
-    <div lass="form-group">{{ $inquiry['created_at'] }}</div>
+    <div lass="form-group">{{ $inquiry['created_at'] }}</div><br>
     <div class="form-group">
         <label for="inq_subject">Subject</label>
         <input type="text" class="form-control" name="inq_subject" value="{{ $inquiry['inq_subject'] }}" id="" aria-describedby="helpId" readonly="">
@@ -31,7 +31,6 @@
         <label for="inquiry_details">Inquiry Detail</label>
         <textarea class="form-control" name="inquiry_details" id="" rows="3" readonly="">{{ $inquiry['inquiry_details'] }}</textarea>
     </div><br>
-    <div lass="form-group">{{ $inquiry['created_at'] }}</div>
     
     @endforeach
 
