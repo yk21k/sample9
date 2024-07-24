@@ -47,4 +47,9 @@ class User extends \TCG\Voyager\Models\User
     {
         return $this->hasOne(Shop::class, 'user_id');
     }
+
+    public function forInq()
+    {
+        return $this->hasOne(CustomerInquiry::class, 'user_id');
+    }
 }

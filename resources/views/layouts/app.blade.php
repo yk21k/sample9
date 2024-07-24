@@ -33,6 +33,10 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('shops.create') }}">Open Your Shop</a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('account.account') }}">Account</a>
+                        </li>
                     </ul>
 
                     <!-- Right Side Of Navbar -->

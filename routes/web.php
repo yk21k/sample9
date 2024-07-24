@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\AccountController;
+use App\Http\Controllers\CustomerInquiryController;
 
 
 /*
@@ -35,10 +37,24 @@ Route::get('/cart/update/{itemId}', [App\Http\Controllers\CartController::class,
 
 Route::get('/cart/checkout', [App\Http\Controllers\CartController::class, 'checkout'])->name('cart.checkout')->middleware('auth');
 
+Route::get('/account', [App\Http\Controllers\AccountController::class, 'index'])->name('account.account')->middleware('auth');
+
+Route::post('/account', [App\Http\Controllers\AccountController::class, 'updateProf'])->name('account.account')->middleware('auth');
+
+Route::get('/cutomer-inquiry', [App\Http\Controllers\CustomerInquiryController::class, 'inquiryForm'])->name('account.inquiry')->middleware('auth');
+
+Route::post('/cutomer-inquiry', [App\Http\Controllers\CustomerInquiryController::class, 'inquiryAnswer'])->name('account.inquiry')->middleware('auth');
+
+Route::get('/cutomer-answers', [App\Http\Controllers\CustomerInquiryController::class, 'answers'])->name('account.answers')->middleware('auth');
+
+
+
+
+
 
 Route::resource('orders', OrderController::class)->only('store')->middleware('auth');
 
-Route::resource('shops', ShopController::class);
+Route::resource('shops', ShopController::class)->middleware('auth');
 
 
 Route::get('paypal/checkout/{order}', [App\Http\Controllers\PayPalController::class, 'getExpressCheckout'])->name('paypal.checkout');
