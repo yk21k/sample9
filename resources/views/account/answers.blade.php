@@ -5,7 +5,10 @@
 <form>
 	@csrf
 	@foreach($inquiries as $inquiry)
-	Answers
+	
+    Answers<br>
+    <div lass="form-group">{{ $inquiry['updated_at'] }}</div><br>
+
     <div class="form-group">
         <label for="ans_subject">Subject</label>
         <input type="text" class="form-control" name="ans_subject" id="" value="{{ $inquiry['ans_subject'] }}" aria-describedby="helpId" readonly="">
@@ -15,9 +18,10 @@
         <label for="answer">Answer</label>
         <textarea class="form-control" name="answer" id="" rows="3" readonly>{{ $inquiry['answers'] }}</textarea>
     </div><br>
-    <div lass="form-group">{{ $inquiry['updated_at'] }}</div>
+    
 
-    Your Inquiry
+    Your Inquiry<br>
+    <div lass="form-group">{{ $inquiry['created_at'] }}</div>
     <div class="form-group">
         <label for="inq_subject">Subject</label>
         <input type="text" class="form-control" name="inq_subject" value="{{ $inquiry['inq_subject'] }}" id="" aria-describedby="helpId" readonly="">
