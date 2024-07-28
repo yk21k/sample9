@@ -58,7 +58,7 @@ use HandlesAuthorization;
      */
     public function add(User $user)
     {
-        return $user->hasRole('seller');
+        return $user->hasRole('seller') || $user->hasRole('seller');
     }
 
     /**
