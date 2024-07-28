@@ -14,6 +14,7 @@
                         <h4 class="card-title">{{ $product->name }}</h4>
                         <p class="card-text">{{ $product->description }}</p>
                         <h4 class="card-title"> ${{ $product->price }} </h4>
+                        <h4 class="card-title">  </h4>
 
                     </div>
                     <div class="card-body">
