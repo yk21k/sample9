@@ -22,13 +22,14 @@ class InquiryObserver
     public function updated(Inquiries $inquiries): void
     {
         // dd($inquiries->status, $inquiries->getOriginal('status'));
+            // dd($inquiries->shop_id);
 
         // Check if active column is changed from inactive to active
 
         if($inquiries->getOriginal('status') == false && $inquiries->status == true){
             // dd('A Store representative has Responded');
             // send to mail customer
-
+            // dd($inquiries);
             Mail::to($inquiries->inqUser)->send(new AnswerInqShopActivated($inquiries));
 
         }else{
