@@ -14,7 +14,10 @@
                         <h4 class="card-title">{{ $product->name }}</h4>
                         <p class="card-text">{{ $product->description }}</p>
                         <h4 class="card-title"> ${{ $product->price }} </h4>
-                        <h4 class="card-title">  </h4>
+
+                        <h4 class="card-title"> {{ $product->shop->name }} </h4>
+                        <a class="" href="{{ route('inquiries.create', ['id'=>$product->shop->id]) }}"><h4>Contact Shop Manager</h4></a>
+
 
                     </div>
                     <div class="card-body">

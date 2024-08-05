@@ -1,12 +1,14 @@
-<x-mail::message>
-# Introduction
+@component('mail::message')
+# Answered
 
-The body of your message.
+You received an answer from the site administrator.
 
-<x-mail::button :url="''">
-Button Text
-</x-mail::button>
+This email will let you know that we have received your answer. We do not reply to this email, so please access the website from the link below and check for replies.
+
+@component('mail::button', ['url' => route('account.answers')])
+Visit the site to check
+@endcomponent
 
 Thanks,<br>
 {{ config('app.name') }}
-</x-mail::message>
+@endcomponent

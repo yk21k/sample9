@@ -7,6 +7,7 @@ use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CustomerInquiryController;
+use App\Http\Controllers\InquiriesController;
 
 
 /*
@@ -48,13 +49,17 @@ Route::post('/cutomer-inquiry', [App\Http\Controllers\CustomerInquiryController:
 Route::get('/cutomer-answers', [App\Http\Controllers\CustomerInquiryController::class, 'answers'])->name('account.answers')->middleware('auth');
 
 
+Route::get('inquiries/{id}', [App\Http\Controllers\InquiriesController::class, 'create'])->name('inquiries.create')->middleware('auth');
 
+Route::post('inquiries/{id}', [App\Http\Controllers\InquiriesController::class, 'store'])->name('inquiries.store')->middleware('auth');
 
+Route::get('/inquiries-answers/{id}', [App\Http\Controllers\InquiriesController::class, 'answers'])->name('inquiries.answers')->middleware('auth');
 
 
 Route::resource('orders', OrderController::class)->only('store')->middleware('auth');
 
 Route::resource('shops', ShopController::class)->middleware('auth');
+
 
 
 Route::get('paypal/checkout/{order}', [App\Http\Controllers\PayPalController::class, 'getExpressCheckout'])->name('paypal.checkout');

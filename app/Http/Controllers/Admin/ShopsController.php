@@ -13,7 +13,7 @@ use TCG\Voyager\Http\Controllers\VoyagerBaseController;
 
 class ShopsController extends VoyagerBaseController
 {
-        //***************************************
+    //***************************************
     //               ____
     //              |  _ \
     //              | |_) |

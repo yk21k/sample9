@@ -9,9 +9,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use TCG\Voyager\Database\Schema\SchemaManager;
-use TCG\Voyager\Http\Controllers\VoyagerBaseController;
 
-class ProductsController extends VoyagerBaseController
+use TCG\Voyager\Http\Controllers\VoyagerBaseController;
+use App\Models\Inquiries;
+
+class InquiryController extends VoyagerBaseController
 {
     //***************************************
     //               ____

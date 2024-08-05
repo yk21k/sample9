@@ -29,4 +29,9 @@ class HomeController extends Controller
 
         return view('home', ['allProducts' => $products]);
     }
+
+    public function inqForm()
+    {
+        
+    }
 }

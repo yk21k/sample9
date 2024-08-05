@@ -60,6 +60,8 @@ class CustomerInquiryController extends Controller
             $q->where('name', 'admin');
         })->get();
 
+        
+
         Mail::to($admins)->send(new InquiryActivationRequest($inquiryAnswers));
 
         return redirect()->route('account.inquiry')->withMessage('We have received your inquiry.');
