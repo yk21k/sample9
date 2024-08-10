@@ -10,19 +10,28 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 use App\Models\Inquiries;
+// use App\Models\User;
 
 class AnswerInqShopActivated extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $inquiries;
-    /**
-     * Create a new message instance.
-     */
-    public function __construct(Inquiries $inquiries)
-    {
-        $this->forInq = $inquiries;
-    }
+    // public $inquiries;
+    // /**
+    //  * Create a new message instance.
+    //  */
+    // public function __construct(Inquiries $inquiries)
+    // {
+    //     // $this->forInq = $inquiries;
+    //     // $this->inqForShop = $inquiries;
+    //     // $this->shop = $inquiries;
+    //     // $this->shopAd = $inquiries;
+    //     // $this->inqUser = $inquiries;
+    //     // $this = $inquiries;
+    // }
+    public function __construct(
+        public Inquiries $inquiries,
+    ) {}
 
     /**
      * Get the message envelope.
