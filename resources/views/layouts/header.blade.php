@@ -60,6 +60,12 @@
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                 @csrf
                             </form>
+                            <a class="dropdown-item" href="{{ route('users.delete_confirm') }}">
+                               
+                                {{ __('Withdraw') }}
+                            </a>
+
+                            
                         </div>
                     </li>
                 @endguest

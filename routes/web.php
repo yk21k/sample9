@@ -8,6 +8,7 @@ use App\Http\Controllers\ShopController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CustomerInquiryController;
 use App\Http\Controllers\InquiriesController;
+use App\Http\Controllers\UsersController;
 
 
 /*
@@ -59,6 +60,13 @@ Route::get('/inquiries-answers/{id}', [App\Http\Controllers\InquiriesController:
 Route::resource('orders', OrderController::class)->only('store')->middleware('auth');
 
 Route::resource('shops', ShopController::class)->middleware('auth');
+
+Route::resource('users',UsersController::class)->middleware('auth');
+
+Route::get('users', [App\Http\Controllers\UsersController::class, 'delete_confirm'])->name('users.delete_confirm');
+
+Route::post('users/{id}', [App\Http\Controllers\UsersController::class, 'destroy'])->name('users.withdraw');
+
 
 
 

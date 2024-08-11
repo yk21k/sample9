@@ -64,7 +64,7 @@ class ShopsController extends VoyagerBaseController
 
             if(auth()->user()->hasRole('seller')){
 
-                $query->where('user_id', auth()->id());
+                $query->where('user_id', auth()->user()->id);
 
             }
 
