@@ -51,6 +51,16 @@ class User extends \TCG\Voyager\Models\User
         return $this->hasOne(Shop::class, 'user_id');
     }
 
+    /**
+     * @return void
+     */
+    public static function booted(): void
+    {
+        static::deleted(function ($user) {
+            $user->shop()->delete();
+        });
+    }
+
     public function forInq()
     {
         return $this->hasOne(CustomerInquiry::class, 'user_id');

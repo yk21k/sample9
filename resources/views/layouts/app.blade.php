@@ -32,5 +32,11 @@
         @include('layouts.footer')
 
     </div>
+
+    <script src="{{ url('front/js/custom1.js') }}"></script>
+    <script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
+    
 </body>
+
+
 </html>

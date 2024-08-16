@@ -61,6 +61,8 @@ Route::resource('orders', OrderController::class)->only('store')->middleware('au
 
 Route::resource('shops', ShopController::class)->middleware('auth');
 
+
+
 Route::resource('users',UsersController::class)->middleware('auth');
 
 Route::get('users', [App\Http\Controllers\UsersController::class, 'delete_confirm'])->name('users.delete_confirm');

@@ -12,6 +12,8 @@ use App\Models\User;
 use App\Mail\ShopActivationRequest;
 use Illuminate\Support\Facades\Mail;
 
+use Illuminate\Support\Facades\Validator;
+
 class ShopController extends Controller
 {
     /**
@@ -34,17 +36,136 @@ class ShopController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(StoreShopRequest $request)
-    {
+    {   
         //add validation
         $request->validate([
-            'name' => 'required'
+            'name' => 'required|between:1, 30|unique:shops,name',
+            // 'email' => 'required|string|email:strict,dns,spoof|max:255',When user register
+            'email' => 'required|string|email|max:255',
+            'telephone' => 'required|regex:/^0[0-9]{1,4}-[0-9]{1,4}-[0-9]{3,4}\z/',
+            'description' => 'required|string|max:2000',
+            'manager' => 'required|between:1, 100|unique:shops,manager',
+            'representative' => 'required|between:1, 100',
+            'product_type' => 'required',
+            'volume' => 'required|numeric|min:1',
+            'note' => 'max:2000',
+
         ]);
+
+        // $shop = new Shop; 
+         // dd($shop);
+
+        $imgName = auth()->user()->email;
+
+
+        if($request->hasFile('photo_1')){
+            $images = $request->file('photo_1');
+
+                $file_name = auth()->user()->email.$request->file('photo_1')->getClientOriginalName();
+                $request->file('photo_1')->storeAs('public', $file_name);
+            
+            
+        }else{
+            $request->photo_1 = "Not uploaded";
+        }
+        if($request->hasFile('photo_2')){
+
+                $file_name = auth()->user()->email.$request->file('photo_2')->getClientOriginalName();
+                $request->file('photo_2')->storeAs('public', $file_name);
+                
+
+        }else{
+            $request->photo_2 = "Not uploaded";
+        }
+        if($request->hasFile('photo_3')){
+
+                $file_name = auth()->user()->email.$request->file('photo_3')->getClientOriginalName();
+                $request->file('photo_3')->storeAs('public', $file_name);
+               
+
+        }else{
+            $request->photo_3 = "Not uploaded";
+        }
+        if($request->hasFile('file_1')){
+
+                $file_name = auth()->user()->email.$request->file('file_1')->getClientOriginalName();
+                $request->file('file_1')->storeAs('public', $file_name);
+            
+
+        }else{
+            $request->file_1 = "Not uploaded";
+        }
+        if($request->hasFile('file_2')){
+            $images = $request->file('file_2');
+
+                $file_name = auth()->user()->email.$request->file('file_2')->getClientOriginalName();
+                $request->file('file_2')->storeAs('public', $file_name);
+            
+
+        }else{
+            $request->file_2 = "Not uploaded";
+        }
+        if($request->hasFile('file_3')){
+
+                $file_name = auth()->user()->email.$request->file('file_3')->getClientOriginalName();
+                $request->file('file_3')->storeAs('public', $file_name);
+            
+             
+
+        }else{
+            $request->file_3 = "Not uploaded";
+        }
+        if($request->hasFile('file_4')){
+
+                $file_name = auth()->user()->email.$request->file('file_4')->getClientOriginalName();
+                $request->file('file_4')->storeAs('public', $file_name);
+
+        }else{
+            $request->file_4 = "Not uploaded";
+        }
+
+         // dd($request->photo_2);
+         // dd($shop);
 
         //save db
         $shop = auth()->user()->shop()->create([
             'name'        => $request->input('name'),
             'description' => $request->input('description'),
+
+            'location_1' => $request->input('location_1'),
+            'location_2' => $request->input('location_2'),
+
+            'telephone' => $request->input('telephone'),
+            'email' => $request->input('email'),
+
+            'identification_1' => $request->input('identification_1'),
+            'identification_2' => $request->input('identification_2'),
+            'identification_3' => $request->input('identification_3'),
+
+            'photo_1' => auth()->user()->email.$request->file('photo_1')->getClientOriginalName(),
+            'photo_2' => auth()->user()->email.$request->file('photo_2')->getClientOriginalName(),
+            'photo_3' => auth()->user()->email.$request->file('photo_3')->getClientOriginalName(),
+            'file_1' => auth()->user()->email.$request->file('file_1')->getClientOriginalName(),
+            'file_2' => auth()->user()->email.$request->file('file_2')->getClientOriginalName(),
+            'file_3' => auth()->user()->email.$request->file('file_3')->getClientOriginalName(),
+            'file_4' => auth()->user()->email.$request->file('file_4')->getClientOriginalName(),
+
+            'representative' => $request->input('representative'),
+            'manager' => $request->input('manager'),
+            'product_type' => $request->input('product_type'),
+            'volume' => $request->input('volume'),
+            'note' => $request->input('note'),
         ]);
+
+        // dd($shop);
+
+        // dd($request->all());
+        // dd($shop);
+        // dd($shop->representative);
+        // dd(auth()->user()->email);
+
+        $shop->save();
+        // dd($shop);
 
         //send mail to admin
         $admins = User::whereHas('role', function ($q) {
@@ -54,6 +175,7 @@ class ShopController extends Controller
         Mail::to($admins)->send(new ShopActivationRequest($shop));
 
         return redirect()->route('home')->withMessage('Create shop request sent');
+            
     }
 
     /**
@@ -62,6 +184,7 @@ class ShopController extends Controller
     public function show(Shop $shop)
     {
         dd($shop->owner->name. ' welcome to your shop named', $shop->name);
+        // Precautions　Terms of use again　Links to contracts　Others　Page
     }
 
     /**
