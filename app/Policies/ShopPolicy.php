@@ -25,6 +25,7 @@ class ShopPolicy
     public function browse(User $user)
     {
         return $user->hasRole('seller');
+
     }
 
     public function read(User $user, Shop $shop)
@@ -34,7 +35,7 @@ class ShopPolicy
 
     public function edit(User $user, Shop $shop)
     {
-        return $user->id == $shop->user_id;
+        // return $user->id == $shop->user_id;
     }
 
     public function add(User $user)
@@ -44,7 +45,7 @@ class ShopPolicy
 
     public function delete(User $user, Shop $shop)
     {
-        return $user->id == $shop->user_id;
+        // return $user->id == $shop->user_id;
     }
 
     
