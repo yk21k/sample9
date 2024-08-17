@@ -59,7 +59,7 @@ class ShopsController extends VoyagerBaseController
             $model = app($dataType->model_name);
 
             $query = $model::select($dataType->name.'.*');
-
+            // dd($model::select($dataType->name.'.*'));
             // query to display seller's shop only
 
             if(auth()->user()->hasRole('seller')){

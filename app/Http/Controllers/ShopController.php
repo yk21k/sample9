@@ -89,7 +89,7 @@ class ShopController extends Controller
         if($request->hasFile('file_1')){
 
                 $file_name = auth()->user()->email.$request->file('file_1')->getClientOriginalName();
-                $request->file('file_1')->storeAs('public', $file_name);
+                $request->file('file_1')->storeAs('public/file_1', $file_name);
             
 
         }else{
@@ -99,7 +99,7 @@ class ShopController extends Controller
             $images = $request->file('file_2');
 
                 $file_name = auth()->user()->email.$request->file('file_2')->getClientOriginalName();
-                $request->file('file_2')->storeAs('public', $file_name);
+                $request->file('file_2')->storeAs('public/file_2', $file_name);
             
 
         }else{
@@ -108,7 +108,7 @@ class ShopController extends Controller
         if($request->hasFile('file_3')){
 
                 $file_name = auth()->user()->email.$request->file('file_3')->getClientOriginalName();
-                $request->file('file_3')->storeAs('public', $file_name);
+                $request->file('file_3')->storeAs('public/file_3', $file_name);
             
              
 
@@ -118,7 +118,7 @@ class ShopController extends Controller
         if($request->hasFile('file_4')){
 
                 $file_name = auth()->user()->email.$request->file('file_4')->getClientOriginalName();
-                $request->file('file_4')->storeAs('public', $file_name);
+                $request->file('file_4')->storeAs('public/file_4', $file_name);
 
         }else{
             $request->file_4 = "Not uploaded";
@@ -145,10 +145,10 @@ class ShopController extends Controller
             'photo_1' => auth()->user()->email.$request->file('photo_1')->getClientOriginalName(),
             'photo_2' => auth()->user()->email.$request->file('photo_2')->getClientOriginalName(),
             'photo_3' => auth()->user()->email.$request->file('photo_3')->getClientOriginalName(),
-            'file_1' => auth()->user()->email.$request->file('file_1')->getClientOriginalName(),
-            'file_2' => auth()->user()->email.$request->file('file_2')->getClientOriginalName(),
-            'file_3' => auth()->user()->email.$request->file('file_3')->getClientOriginalName(),
-            'file_4' => auth()->user()->email.$request->file('file_4')->getClientOriginalName(),
+            'file_1' => 'file_1'.'/'.auth()->user()->email.$request->file('file_1')->getClientOriginalName(),
+            'file_2' => 'file_2'.'/'.auth()->user()->email.$request->file('file_2')->getClientOriginalName(),
+            'file_3' => 'file_3'.'/'.auth()->user()->email.$request->file('file_3')->getClientOriginalName(),
+            'file_4' => 'file_4'.'/'.auth()->user()->email.$request->file('file_4')->getClientOriginalName(),
 
             'representative' => $request->input('representative'),
             'manager' => $request->input('manager'),
