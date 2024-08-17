@@ -172,7 +172,7 @@ class ShopController extends Controller
             $q->where('name', 'admin');
         })->get();
 
-        Mail::to($admins)->send(new ShopActivationRequest($shop));
+        // Mail::to($admins)->send(new ShopActivationRequest($shop));
 
         return redirect()->route('home')->withMessage('Create shop request sent');
             
