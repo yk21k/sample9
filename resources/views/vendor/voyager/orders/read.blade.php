@@ -120,6 +120,7 @@
                                         <a href="{{ Storage::disk(config('voyager.storage.disk'))->url($file->download_link) ?: '' }}">
                                             {{ $file->original_name ?: '' }}
                                         </a>
+
                                         <br/>
                                     @endforeach
                                 @elseif($dataTypeContent->{$row->field})

@@ -61,7 +61,7 @@ class ShopController extends Controller
         if($request->hasFile('photo_1')){
             $images = $request->file('photo_1');
 
-                $file_name = auth()->user()->email.$request->file('photo_1')->getClientOriginalName();
+                $file_name = rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('photo_1')->getClientOriginalName();
                 $request->file('photo_1')->storeAs('public', $file_name);
             
             
@@ -70,7 +70,7 @@ class ShopController extends Controller
         }
         if($request->hasFile('photo_2')){
 
-                $file_name = auth()->user()->email.$request->file('photo_2')->getClientOriginalName();
+                $file_name = rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('photo_2')->getClientOriginalName();
                 $request->file('photo_2')->storeAs('public', $file_name);
                 
 
@@ -79,7 +79,7 @@ class ShopController extends Controller
         }
         if($request->hasFile('photo_3')){
 
-                $file_name = auth()->user()->email.$request->file('photo_3')->getClientOriginalName();
+                $file_name = rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('photo_3')->getClientOriginalName();
                 $request->file('photo_3')->storeAs('public', $file_name);
                
 
@@ -88,7 +88,7 @@ class ShopController extends Controller
         }
         if($request->hasFile('file_1')){
 
-                $file_name = auth()->user()->email.$request->file('file_1')->getClientOriginalName();
+                $file_name = rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_1')->getClientOriginalName();
                 $request->file('file_1')->storeAs('public/file_1', $file_name);
             
 
@@ -98,7 +98,7 @@ class ShopController extends Controller
         if($request->hasFile('file_2')){
             $images = $request->file('file_2');
 
-                $file_name = auth()->user()->email.$request->file('file_2')->getClientOriginalName();
+                $file_name = rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_2')->getClientOriginalName();
                 $request->file('file_2')->storeAs('public/file_2', $file_name);
             
 
@@ -107,7 +107,7 @@ class ShopController extends Controller
         }
         if($request->hasFile('file_3')){
 
-                $file_name = auth()->user()->email.$request->file('file_3')->getClientOriginalName();
+                $file_name = rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_3')->getClientOriginalName();
                 $request->file('file_3')->storeAs('public/file_3', $file_name);
             
              
@@ -117,7 +117,7 @@ class ShopController extends Controller
         }
         if($request->hasFile('file_4')){
 
-                $file_name = auth()->user()->email.$request->file('file_4')->getClientOriginalName();
+                $file_name = rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_4')->getClientOriginalName();
                 $request->file('file_4')->storeAs('public/file_4', $file_name);
 
         }else{
@@ -142,13 +142,13 @@ class ShopController extends Controller
             'identification_2' => $request->input('identification_2'),
             'identification_3' => $request->input('identification_3'),
 
-            'photo_1' => auth()->user()->email.$request->file('photo_1')->getClientOriginalName(),
-            'photo_2' => auth()->user()->email.$request->file('photo_2')->getClientOriginalName(),
-            'photo_3' => auth()->user()->email.$request->file('photo_3')->getClientOriginalName(),
-            'file_1' => 'file_1'.'/'.auth()->user()->email.$request->file('file_1')->getClientOriginalName(),
-            'file_2' => 'file_2'.'/'.auth()->user()->email.$request->file('file_2')->getClientOriginalName(),
-            'file_3' => 'file_3'.'/'.auth()->user()->email.$request->file('file_3')->getClientOriginalName(),
-            'file_4' => 'file_4'.'/'.auth()->user()->email.$request->file('file_4')->getClientOriginalName(),
+            'photo_1' => rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('photo_1')->getClientOriginalName(),
+            'photo_2' => rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('photo_2')->getClientOriginalName(),
+            'photo_3' => rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('photo_3')->getClientOriginalName(),
+            'file_1' => 'file_1'.'/'.rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_1')->getClientOriginalName(),
+            'file_2' => 'file_2'.'/'.rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_2')->getClientOriginalName(),
+            'file_3' => 'file_3'.'/'.rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_3')->getClientOriginalName(),
+            'file_4' => 'file_4'.'/'.rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_4')->getClientOriginalName(),
 
             'representative' => $request->input('representative'),
             'manager' => $request->input('manager'),
