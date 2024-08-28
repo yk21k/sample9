@@ -9,6 +9,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CustomerInquiryController;
 use App\Http\Controllers\InquiriesController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\ProductController;
 
 
 /*
@@ -28,6 +29,10 @@ Route::redirect('/', '/home');
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+
+Route::resource('products', ProductController::class);
+
 
 Route::get('/add-to-cart/{product}', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add')->middleware('auth');
 

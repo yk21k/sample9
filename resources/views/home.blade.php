@@ -1,6 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
+<!-- Side navigation -->
+    <div class="wrapper">
+        @include('layouts.sidebar')
+    </div>  
+
 <div class="container">
 
     <h2>Products</h2>
@@ -17,6 +22,7 @@
 
                     @endif
                     <div class="card-body">
+
                         <h4 class="card-title">{{ $product->name }}</h4>
                         <p class="card-text">{{ $product->description }}</p>
                         <h4 class="card-title"> ${{ $product->price }} </h4>

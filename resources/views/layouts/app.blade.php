@@ -12,25 +12,31 @@
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('front/css/custom1.css') }}">
 
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 <body>
     <div id="app">
+
         <!-- header part -->
-        @include('layouts.header')
+            <div class="wrapper">
+                @include('layouts.header')
+            </div>    
 
-        <!-- Side navigation -->
-        @include('layouts.sidebar')
+          
 
-        <main class="py-4 container">
-            @yield('content')
-        </main>
+            <div class="wrapper" style="margin-left: 300px;">
+                <div class="wrapper">
+                    @yield('content')
+                </div>
+            </div>    
 
         <!-- footer part -->
-        @include('layouts.footer')
-
+            <div class="wrapper"style="margin-left: 300px;">
+                @include('layouts.footer')
+            </div>    
     </div>
 
     <script src="{{ url('front/js/custom1.js') }}"></script>

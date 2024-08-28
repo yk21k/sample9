@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
+use App\Models\Categories;
 
 class ProductController extends Controller
 {
@@ -13,7 +14,21 @@ class ProductController extends Controller
      */
     public function index()
     {
-        //
+        $categoryId = request('category_id');
+        $categoryName = null;
+
+        if($categoryId){
+            $category = Categories::find($categoryId);
+            $categoryName = ucfirst($category->name);
+            // $products = $category->products;
+            $products = $category->allProducts();
+            // dd($products);
+            // dd($category);
+        }else{
+            $products = Product::take(10)->get();
+        }
+
+        return view('products.index', compact('products', 'categoryName'));
     }
 
     /**

@@ -28,6 +28,7 @@ class ProductsController extends VoyagerBaseController
     public function index(Request $request)
     {
         // dd('this is index method');
+        // dd($row->details->table);
 
         // GET THE SLUG, ex. 'posts', 'pages', etc.
         $slug = $this->getSlug($request);
@@ -59,7 +60,7 @@ class ProductsController extends VoyagerBaseController
             $model = app($dataType->model_name);
 
             $query = $model::select($dataType->name.'.*');
-
+            // dd($query);
             // query to display seller's shop only
 
             if(auth()->user()->hasRole('seller')){

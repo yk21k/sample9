@@ -59,7 +59,7 @@ class CategoryController extends VoyagerBaseController
             $model = app($dataType->model_name);
 
             $query = $model::select($dataType->name.'.*');
-
+            // dd($query);
             // query to display seller's shop only
 
             if(auth()->user()->hasRole('seller')){
@@ -104,6 +104,7 @@ class CategoryController extends VoyagerBaseController
             }
 
             $row = $dataType->rows->where('field', $orderBy)->firstWhere('type', 'relationship');
+            
             if ($orderBy && (in_array($orderBy, $dataType->fields()) || !empty($row))) {
                 $querySortOrder = (!empty($sortOrder)) ? $sortOrder : 'desc';
                 if (!empty($row)) {
@@ -116,7 +117,6 @@ class CategoryController extends VoyagerBaseController
                         'joined.'.$row->details->key
                     );
                 }
-
                 $dataTypeContent = call_user_func([
                     $query->orderBy($orderBy, $querySortOrder),
                     $getter,
