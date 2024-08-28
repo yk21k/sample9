@@ -1,10 +1,24 @@
 @extends('layouts.app')
 
 @section('content')
+
+@if(isset($query))
+    <h2>Products Found :: {{ $products->count() }}</h2>
+    <div>
+
+        {{ $products->appends(['query'=>request('query')])->render() }} 
+
+    </div>
+@endif
+
 <h2>{{ $categoryName ?? null }}  Products</h2>  
 
+@if(empty($products))
+    <p>Nothing</p>
+@endif
+
 <div class="row" style="margin-right: 500px;">   
-@foreach($products as $product) 
+@forelse($products as $product) 
 
 <div class="col-4" >
     
@@ -32,7 +46,8 @@
     </div>
     
 </div>
-
-@endforeach
+@empty
+        <p>Nothing</p>
+@endforelse
 </div>
 @endsection

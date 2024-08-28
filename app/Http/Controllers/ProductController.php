@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
@@ -29,6 +31,18 @@ class ProductController extends Controller
         }
 
         return view('products.index', compact('products', 'categoryName'));
+    }
+
+    public function search(Request $request, $query=null)
+    {
+            // dd($request->query);
+            // dd($request->input('query'));
+            $query = $request->input('query');
+            $products = Product::where('name', 'LIKE', "%$query%")->paginate(2);
+            // dd($products); 
+        
+        
+        return view('products.catalog', compact('products', 'query'));
     }
 
     /**

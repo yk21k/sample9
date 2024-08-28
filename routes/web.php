@@ -31,6 +31,8 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 
+Route::get('products/search', [App\Http\Controllers\ProductController::class, 'search'])->name('products.search');
+
 Route::resource('products', ProductController::class);
 
 

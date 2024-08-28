@@ -33,8 +33,5 @@ class HomeController extends Controller
         return view('home', ['allProducts' => $products, 'categories' => $categories]);
     }
 
-    public function inqForm()
-    {
-        
-    }
+
 }

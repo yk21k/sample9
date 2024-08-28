@@ -22,6 +22,12 @@
             <!-- Right Side Of Navbar -->
             <ul class="navbar-nav ms-auto">
                 <!-- Authentication Links -->
+                <li class="nav-item">
+                    <form action="{{ route('products.search') }}" method="get">
+                        <input name="query" placeholder="Enter Your Key Word" type="text">
+                        <button type="submit"> Search </button>
+                    </form>@csrf
+                </li>
 
                 <li class="nav-item">
                     <a class="nav-link p-0 m-0" href="{{ route('cart.index') }}">

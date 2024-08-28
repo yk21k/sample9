@@ -10,6 +10,7 @@ use App\Models\Shop;
 use App\Models\CustomerInquiry;
 use App\Models\Inquiries;
 use TCG\Voyager\Facades\Voyager;
+use Illuminate\Pagination\Paginator;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -32,6 +33,7 @@ class AppServiceProvider extends ServiceProvider
         CustomerInquiry::observe(CustomerInquiryObserver::class);
         Inquiries::observe(InquiryObserver::class);
         Voyager::useModel('Category', \App\Models\Categories::class);
+        Paginator::useBootstrap();
         
     }
 }

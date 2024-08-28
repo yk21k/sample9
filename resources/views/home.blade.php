@@ -1,10 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
+
 <!-- Side navigation -->
-    <div class="wrapper">
-        @include('layouts.sidebar')
-    </div>  
+<div class="wrapper">
+    @include('layouts.sidebar')
+</div>  
 
 <div class="container">
 
