@@ -3,7 +3,7 @@
 @section('content')
 
 @if(isset($query))
-    <h2>Products Found :: {{ $products->count() }}</h2>
+    <h2>Products Found :: {{ $products->total() }}</h2>
     <div>
 
         {{ $products->appends(['query'=>request('query')])->render() }} 
