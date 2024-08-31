@@ -25,8 +25,6 @@
                 @include('layouts.header')
             </div>    
 
-          
-
             <div class="wrapper" style="margin-left: 300px;">
                 <div class="wrapper">
                     @yield('content')

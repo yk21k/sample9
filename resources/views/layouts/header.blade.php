@@ -62,16 +62,22 @@
                                              document.getElementById('logout-form').submit();">
                                 {{ __('Logout') }}
                             </a>
-
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                @csrf
-                            </form>
-                            <a class="dropdown-item" href="{{ route('users.delete_confirm') }}">
-                               
-                                {{ __('Withdraw') }}
-                            </a>
-
                             
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                    @csrf
+                                </form>
+                            @if(Auth::user()->role_id != 3)    
+                                <a class="dropdown-item" href="{{ route('users.delete_confirm') }}">
+                                   
+                                    {{ __('Withdraw') }}
+                                </a>
+                            @else
+                                <a class="dropdown-item" href="{{ route('users.delete_shop') }}">
+                                   
+                                    {{ __('Termination of Membership') }}
+                                </a>
+                                <form id="cancellation-request" action="" method="POST" class="d-none">@csrf</form>
+                            @endif
                         </div>
                     </li>
                 @endguest
