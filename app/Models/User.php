@@ -75,4 +75,9 @@ class User extends \TCG\Voyager\Models\User
     {
         return $this->hasOne(Inquiries::class, 'user_id');
     }
+
+    public function deleteShop()
+    {
+        return $this->hasOne(DeleteShop::class, 'user_id');
+    }
 }

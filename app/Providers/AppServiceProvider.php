@@ -6,9 +6,11 @@ use Illuminate\Support\ServiceProvider;
 use App\Observers\ShopObserver;
 use App\Observers\CustomerInquiryObserver;
 use App\Observers\InquiryObserver;
+use App\Observers\DeleteShopObserver;
 use App\Models\Shop;
 use App\Models\CustomerInquiry;
 use App\Models\Inquiries;
+use App\Models\DeleteShop;
 use TCG\Voyager\Facades\Voyager;
 use Illuminate\Pagination\Paginator;
 
@@ -32,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
         Shop::observe(ShopObserver::class);
         CustomerInquiry::observe(CustomerInquiryObserver::class);
         Inquiries::observe(InquiryObserver::class);
+        DeleteShop::observe(DeleteShopObserver::class);
         Voyager::useModel('Category', \App\Models\Categories::class);
         Paginator::useBootstrap();
         

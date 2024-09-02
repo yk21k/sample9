@@ -16,12 +16,13 @@
 @endif
 
 <div class="container mt-3">
-  <form class="h-adr" action="" method="post" enctype="multipart/form-data">@csrf
+  <form class="h-adr" action="{{route('users.delete_shop')}}" method="post" enctype="multipart/form-data">@csrf
     {{-- {{ csrf_field() }} --}}
 
     <div class="form-group">
-        <label for="description"><h3>Reason</h3></label>
-        <textarea class="form-control" name="description" id="description" rows="3" required></textarea>
+        <input class="" type="hidden" id="user_id" name="user_id" value="{{ Auth::user()->id }}" readonly="">
+        <label for="reason"><h3>Reason</h3></label>
+        <textarea class="form-control" name="reason" id="reason" rows="3" required></textarea>
     </div>
     &nbsp;
 
