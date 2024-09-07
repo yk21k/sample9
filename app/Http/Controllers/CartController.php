@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Storage;
+
 use Illuminate\Http\Request;
 use App\Models\Product;
 
@@ -33,7 +35,15 @@ class CartController extends Controller
     public function index()
     {   
         $cartItems = \Cart::session(auth()->id())->getContent();
-        return view('cart.index', compact('cartItems'));
+        // dd($cartItems);
+        // dd($cartItems->getOriginal('shop_id'));
+        // dd($cartItems->getChanges('shop_id'));
+        // dd($cartItems->getCachingIterator());
+
+        $items = \Cart::getContent();
+        
+        // dd($items);
+        return view('cart.index', compact('cartItems', 'items'));
     }
 
     public function destroy($itemId)

@@ -13,6 +13,8 @@
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('front/css/custom1.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/css/custom2.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/css/custom3.css') }}">
 
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
@@ -38,6 +40,8 @@
     </div>
 
     <script src="{{ url('front/js/custom1.js') }}"></script>
+    <script src="{{ url('front/js/custom2.js') }}"></script>
+    <script src="{{ url('front/js/custom3.js') }}"></script>
     <script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
     
 </body>

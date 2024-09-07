@@ -42,7 +42,7 @@ class ShopController extends Controller
             'name' => 'required|between:1, 30|unique:shops,name',
             // 'email' => 'required|string|email:strict,dns,spoof|max:255',When user register
             'email' => 'required|string|email|max:255',
-            'telephone' => 'required|regex:/^0[0-9]{1,4}-[0-9]{1,4}-[0-9]{3,4}\z/',
+            'telephone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
             'description' => 'required|string|max:2000',
             'manager' => 'required|between:1, 100|unique:shops,manager',
             'representative' => 'required|between:1, 100',
@@ -182,9 +182,11 @@ class ShopController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Shop $shop)
-    {
-        dd($shop->owner->name. ' welcome to your shop named', $shop->name);
+    public function show(string $id)
+    {   
+        $parts = Shop::find($id);
+        // dd($parts);
+        return view('shops.overview', compact('parts'));
         // Precautions　Terms of use again　Links to contracts　Others　Page
     }
 

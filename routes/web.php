@@ -72,6 +72,7 @@ Route::resource('orders', OrderController::class)->only('store')->middleware('au
 
 Route::resource('shops', ShopController::class)->middleware('auth');
 
+Route::get('shops/{id}', [App\Http\Controllers\UsersController::class, 'show'])->name('shops.overview');
 
 
 Route::resource('users',UsersController::class)->middleware('auth');

@@ -4,9 +4,6 @@
 
 	<h2> Your Cart </h2>
 
-
-
-
 	<table class="table">
 		<thead>
 			<tr>
@@ -14,12 +11,15 @@
 				<th>Price</th>
 				<th>Quantity</th>
 				<th>Action</th>
+				<th>Shop Name</th>
+				
 			</tr>
 			
 		</thead>
 
 		<tbody>
 		@foreach($cartItems as $item)
+			
 			<tr>
 				<td>{{ $item->name }}</td>
 				<td>
@@ -38,17 +38,65 @@
 				<td>
 					<a href="{{ route('cart.destroy', $item->id) }}">Delete</a>
 				</td>
-			</tr>
-			
-		@endforeach
+				<td>
+					<a href="{{ route('shops.overview', $item->associatedModel->shop->id) }}">{{ $item->associatedModel->shop->name }}</a>
+					
+				</td>
 
+			</tr>
+			<br>	
+
+		@endforeach
+					
 		</tbody>
 	</table>
+
+
+
+	 <button class="btn btn-danger button modalOpen">Confirm payment details</button>
+	 
+	  <div class="modal">
+	    <div class="modal-inner">
+	    <div class="modal-content">
+
+	      <div class="modal-header">
+	      	<div>
+	      		<h2>Please confirm </h2>
+	      		<div id="modalClose" class="modalClose">
+			      close
+			    </div>
+	        	<h3>Order cancellations cannot be made on this website, so if the item you received does not match your order (type, quantity, etc.), please contact the individual seller. Please note that this website does not guarantee returns or refunds after an inquiry.
+
+				If you agree, please check the checkbox below. You will be able to enter your shipping address and move to the payment page only after checking the checkbox.</h1>
+	      	</div>
+	        			
+	      </div>
+
+	      
+	      <div class="modal-body">
+	      	
+	        <br>
+
+	        <div class="contactAgree">
+			  <label><input type="checkbox" name="agree" value="agreement"> Agree </label>
+			</div>
+	        <p></p>
+	        
+	      </div>
+
+	    </div>
+	    </div>
+	 </div>
+　　　<div class="buffer"></div>
+
+
+
 
 	<h3>
 		Total Price : $ {{ \Cart::session(auth()->id())->getTotal() }}
 	</h3>
-	<a class="btn btn-primary" href="{{ route('cart.checkout') }}" role="button"> Proceed to Checkout </a>
+	<button class="btn btn-primary" id="submitButton" onclick="location.href='{{ route('cart.checkout') }}' " role="button">Proceed to Checkout</button>
+
 
 
 @endsection
