@@ -30,14 +30,17 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
+
 Route::get('/delete_shop', [App\Http\Controllers\UsersController::class, 'index'])->name('users.delete_shop');
 
 Route::post('/delete_shop', [App\Http\Controllers\UsersController::class, 'termination'])->name('users.delete_shop');
 
 
+
 Route::get('products/search', [App\Http\Controllers\ProductController::class, 'search'])->name('products.search');
 
 Route::resource('products', ProductController::class);
+
 
 
 Route::get('/add-to-cart/{product}', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add')->middleware('auth');
@@ -50,15 +53,21 @@ Route::get('/cart/update/{itemId}', [App\Http\Controllers\CartController::class,
 
 Route::get('/cart/checkout', [App\Http\Controllers\CartController::class, 'checkout'])->name('cart.checkout')->middleware('auth');
 
+Route::get('/cart/apply-coupon', [App\Http\Controllers\CartController::class, 'applyCoupon'])->name('cart.coupon')->middleware('auth');
+
+
+
 Route::get('/account', [App\Http\Controllers\AccountController::class, 'index'])->name('account.account')->middleware('auth');
 
 Route::post('/account', [App\Http\Controllers\AccountController::class, 'updateProf'])->name('account.account')->middleware('auth');
+
 
 Route::get('/cutomer-inquiry', [App\Http\Controllers\CustomerInquiryController::class, 'inquiryForm'])->name('account.inquiry')->middleware('auth');
 
 Route::post('/cutomer-inquiry', [App\Http\Controllers\CustomerInquiryController::class, 'inquiryAnswer'])->name('account.inquiry')->middleware('auth');
 
 Route::get('/cutomer-answers', [App\Http\Controllers\CustomerInquiryController::class, 'answers'])->name('account.answers')->middleware('auth');
+
 
 
 Route::get('inquiries/{id}', [App\Http\Controllers\InquiriesController::class, 'create'])->name('inquiries.create')->middleware('auth');
@@ -68,7 +77,9 @@ Route::post('inquiries/{id}', [App\Http\Controllers\InquiriesController::class, 
 Route::get('/inquiries-answers/{id}', [App\Http\Controllers\InquiriesController::class, 'answers'])->name('inquiries.answers')->middleware('auth');
 
 
+
 Route::resource('orders', OrderController::class)->only('store')->middleware('auth');
+
 
 Route::resource('shops', ShopController::class)->middleware('auth');
 

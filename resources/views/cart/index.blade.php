@@ -12,9 +12,7 @@
 				<th>Quantity</th>
 				<th>Action</th>
 				<th>Shop Name</th>
-				
 			</tr>
-			
 		</thead>
 
 		<tbody>
@@ -51,6 +49,12 @@
 		</tbody>
 	</table>
 
+	<div class="coupon">
+		<form action="{{ route('cart.coupon') }}" method="get">
+			<input class="input-text" type="text" id="coupon_code" name="coupon_code" value="" placeholder="Coupon code" required>
+			<input class="button" name="apply_coupon" value="Apply coupon" type="submit">
+		</form>
+	</div>
 
 
 	 <button class="btn btn-danger button modalOpen">Confirm payment details</button>
