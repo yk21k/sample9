@@ -110,20 +110,22 @@
 
                             
                             @php
-                                $attributeOptions = App\Models\Attribute::with('values')->get();
+                                $attributeOptions = \App\Models\Attribute::with('values')->get();
                             @endphp
 
 
                             @foreach($attributeOptions as $attr)
 
 
-                                <div class="form-group" style="">
-                                    <label for="">{{$attr->name}} :</label>
+                                <div class="form-group">
+                                    <label for=""> {{$attr->name}} :</label>
                                     <select class="form-control" name="product_attributes[{{$attr->name}}]" >
                                         <option value=""></option>
                                         @foreach ($attr->values as $val)
 
-                                        <option {{ (!empty($dataTypeContent->product_attributes[$attr->name]) && $dataTypeContent->product_attributes[$attr->name] == $val->value) ? 'selected' : '' }} >{{$val->value}}</option>
+                                        <option {{ (!empty(json_decode($dataTypeContent->product_attributes,true)[$attr->name]) && json_decode($dataTypeContent->product_attributes,true)[$attr->name] == $val->value) ? 'selected' : '' }} >{{$val->value}}</option>
+
+                                        
                                         @endforeach
 
                                     </select>

@@ -12,10 +12,10 @@ class Product extends Model
     protected $guarded = ['id'];
 
 
-    protected $casts = 
-    [
-        'product_attributes'=>'array'
-    ];
+    // protected $casts = 
+    // [
+    //     'product_attributes'=>'array'
+    // ];
 
     protected static function booted()
     {
@@ -23,7 +23,6 @@ class Product extends Model
 
             // dd($request);
             $product->product_attributes = json_encode(request('product_attributes'));
-            $product->save();
         });
     }
 
