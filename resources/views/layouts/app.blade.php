@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="{{ asset('front/css/magnifier.css') }}">
     @stack('css')
     <!-- Scripts -->
-    @vite(['resources/sass/app.scss', 'resources/sass/product-detail.scss', 'resources/js/app.js'])
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 <body ontouchstart=””>
     <div id="app">
