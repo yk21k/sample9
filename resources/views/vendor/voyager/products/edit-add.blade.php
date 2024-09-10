@@ -107,6 +107,28 @@
                                 </div>
                             @endforeach
 
+                            @php
+                                $attributeOptions = \App\Models\Attribute::with('values')->get();
+                            @endphp
+                            @foreach($attributeOptions as $attr)
+
+                            <p>
+
+                                <div class="form-group" style="">
+                                    <label for="">{{$attr->name}} :</label>
+                                    <select class="form-control" name="product_attributes[{{$attr->name}}]" >
+                                        <option value=""></option>
+                                        @foreach ($attr->values as $val)
+
+                                        <option {{ (!empty($dataTypeContent->product_attributes[$attr->name]) && $dataTypeContent->product_attributes[$attr->name] == $val->value) ? 'selected' : '' }} >{{$val->value}}</option>
+                                        @endforeach
+
+                                    </select>
+                                </div>
+                            </p>
+
+                            @endforeach
+
                         </div><!-- panel-body -->
 
                         <div class="panel-footer">

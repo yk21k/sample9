@@ -7,6 +7,7 @@
 	<table class="table">
 		<thead>
 			<tr>
+				<th>Photo</th>
 				<th>Name</th>
 				<th>Price</th>
 				<th>Quantity</th>
@@ -19,6 +20,11 @@
 		@foreach($cartItems as $item)
 			
 			<tr>
+				<td>
+					<img style="width: 96px; height: 65px;" class="card-img-top" src="{{ asset( 'storage/'.$item->associatedModel->cover_img ) }}" alt="Card image cap">
+					
+				</td>
+
 				<td>{{ $item->name }}</td>
 				<td>
 					$ {{ \Cart::session(auth()->id())->get($item->id)->getPriceSum() }}

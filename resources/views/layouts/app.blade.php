@@ -15,13 +15,15 @@
     <link rel="stylesheet" href="{{ asset('front/css/custom1.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom2.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom3.css') }}">
-
+    <link rel="stylesheet" href="{{ asset('front/css/zoomple.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/css/magnifier.css') }}">
+    @stack('css')
     <!-- Scripts -->
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    @vite(['resources/sass/app.scss', 'resources/sass/product-detail.scss', 'resources/js/app.js'])
 </head>
-<body>
+<body ontouchstart=””>
     <div id="app">
-
+        
         <!-- header part -->
             <div class="wrapper">
                 @include('layouts.header')
@@ -42,8 +44,23 @@
     <script src="{{ url('front/js/custom1.js') }}"></script>
     <script src="{{ url('front/js/custom2.js') }}"></script>
     <script src="{{ url('front/js/custom3.js') }}"></script>
+    <script src="{{ url('front/js/Event.js') }}"></script>
+    <script src="{{ url('front/js/Magnifier.js') }}"></script>
+    <script type="text/javascript">
+        var evt = new Event(),
+            m = new Magnifier(evt);
+
+            m.attach({
+                thumb: '#thumb',
+                largeWrapper: 'preview',
+                zoom: 7
+            });
+    </script>
+
+  
     <script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
-    
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 </body>
 
 

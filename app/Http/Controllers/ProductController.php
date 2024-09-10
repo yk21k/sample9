@@ -45,6 +45,14 @@ class ProductController extends Controller
         return view('products.catalog', compact('products', 'query'));
     }
 
+    public function detail($id)
+    {
+        $productDetails = Product::find($id)->toArray();
+        // dd($productDetails);
+        // dd($productDetails['cover_img']);
+        return view('products.detail', compact('productDetails'));
+    }
+
     /**
      * Show the form for creating a new resource.
      */

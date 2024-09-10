@@ -11,7 +11,21 @@ class Product extends Model
 
     protected $guarded = ['id'];
 
-    protected $table = 'products';
+
+    protected $casts = 
+    [
+        'product_attributes'=>'array'
+    ];
+
+    protected static function booted()
+    {
+        static::saving(function($product){
+
+            // dd($request);
+            $product->product_attributes = json_encode(request('product_attributes'));
+            $product->save();
+        });
+    }
 
     public function shop()
     {
@@ -27,6 +41,8 @@ class Product extends Model
     {
         return $this->belongsToMany(Categories::class, 'category_product', 'product_id', 'categories_id');
     }
+
+
 
 
 

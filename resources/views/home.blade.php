@@ -15,13 +15,15 @@
         @foreach($allProducts as $product)
             <div class="col-4">
                 <div class="card">
-                    @if(isset($product->cover_img) && !empty($product->cover_img))
-                        <img class="card-img-top" src="{{ asset( 'storage/'.$product->cover_img ) }}" alt="Card image cap">
+                    <a class="" href="{{ route('products.detail', ['id'=>$product->id]) }}">
 
+                    @if(isset($product->cover_img) && !empty($product->cover_img))
+                        <img class="card-img-top" src="{{ asset( 'storage/'.$product->cover_img ) }}" alt="Card image cap">               
                     @else
                         <img class="card-img-top" src="{{ asset('images/no_image.jpg') }}" alt="Card image cap">
-
                     @endif
+                    </a>
+
                     <div class="card-body">
 
                         <h4 class="card-title">{{ $product->name }}</h4>

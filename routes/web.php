@@ -39,6 +39,9 @@ Route::post('/delete_shop', [App\Http\Controllers\UsersController::class, 'termi
 
 Route::get('products/search', [App\Http\Controllers\ProductController::class, 'search'])->name('products.search');
 
+Route::get('product/{id}', [App\Http\Controllers\ProductController::class, 'detail'])->name('products.detail');
+
+
 Route::resource('products', ProductController::class);
 
 
