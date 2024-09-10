@@ -13,8 +13,6 @@ return new class extends Migration
     {
         Schema::table('products', function (Blueprint $table) {
             $table->json('product_attributes')->nullable();
-            $table->string('cover_img2')->after('cover_img')->nullable();
-            $table->string('cover_img3')->after('cover_img2')->nullable();
         });
     }
 
@@ -25,8 +23,6 @@ return new class extends Migration
     {
         Schema::table('products', function (Blueprint $table) {
             $table->dropColumn('product_attributes');
-            $table->dropColumn('cover_img2');
-            $table->dropColumn('cover_img3');
 
         });
     }

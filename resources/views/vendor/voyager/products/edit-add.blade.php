@@ -106,13 +106,16 @@
                                     @endif
                                 </div>
                             @endforeach
+                            
 
+                            
                             @php
-                                $attributeOptions = \App\Models\Attribute::with('values')->get();
+                                $attributeOptions = App\Models\Attribute::with('values')->get();
                             @endphp
+
+
                             @foreach($attributeOptions as $attr)
 
-                            <p>
 
                                 <div class="form-group" style="">
                                     <label for="">{{$attr->name}} :</label>
@@ -125,9 +128,12 @@
 
                                     </select>
                                 </div>
-                            </p>
 
                             @endforeach
+                                @if( $attributeOptions->isEmpty() )
+                                <p>No attribute</p>
+                            @endif
+                            
 
                         </div><!-- panel-body -->
 
