@@ -13,6 +13,7 @@
 
     <div class="row">
         @foreach($allProducts as $product)
+            
             <div class="col-4">
                 <div class="card">
                     <a class="" href="{{ route('products.detail', ['id'=>$product->id]) }}">
@@ -29,8 +30,17 @@
                         <h4 class="card-title">{{ $product->name }}</h4>
                         <p class="card-text">{{ $product->description }}</p>
                         <h4 class="card-title"> ${{ $product->price }} </h4>
-
+                        @foreach($product_attributes as $attr)
+                            @foreach ($attr->values as $val)
+                                @if((!empty(json_decode($product->product_attributes,true)[$attr->name]) && json_decode($product->product_attributes,true)[$attr->name] == $val->value))
+                            
+                                <h4>{{$attr->name}} : {{$val->value}}</h4>
+                                @endif
+                            @endforeach
+                        @endforeach
+                            
                         <h4 class="card-title"> {{ $product->shop->name }} </h4>
+
                         <a class="" href="{{ route('inquiries.create', ['id'=>$product->shop->id]) }}"><h4>Contact Shop Manager</h4></a>
 
 
@@ -39,8 +49,10 @@
                         <a href="{{ route('cart.add', $product->id) }}" class="card-link">Add to Cart</a>
                     </div>
                 </div>
-            </div>   
+              </div>
         @endforeach
+        
+
     </div>
 
 </div>

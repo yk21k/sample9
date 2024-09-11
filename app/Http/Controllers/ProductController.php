@@ -18,6 +18,7 @@ class ProductController extends Controller
     {
         $categoryId = request('category_id');
         $categoryName = null;
+        
 
         if($categoryId){
             $category = Categories::find($categoryId);
