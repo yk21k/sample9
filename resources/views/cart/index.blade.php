@@ -4,6 +4,12 @@
 
 	<h2> Your Cart </h2>
 
+	@if(session('message'))
+		<div>
+			{{ session('message') }}
+		</div>
+	@endif
+
 	<table class="table">
 		<thead>
 			<tr>

@@ -11,6 +11,7 @@
 
     <h2>Products</h2>
 
+
     <div class="row">
         @foreach($allProducts as $product)
             

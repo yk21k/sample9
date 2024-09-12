@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Coupon;
+use Illuminate\Support\Facades\DB;
+use Session;
 
 class CartController extends Controller
 {
@@ -19,7 +21,6 @@ class CartController extends Controller
     public function add(Product $product)
     {
         // dd($product);
-        
 
         // add the product to cart
         \Cart::session(auth()->id())->add(array(
@@ -32,6 +33,7 @@ class CartController extends Controller
 
         ));
 
+        DB::beginTransaction();
 
         $first_stocks = \Cart::session(auth()->id())->getContent($product->id);
         // dd($first_stocks);
@@ -47,9 +49,18 @@ class CartController extends Controller
             // dd($product_stocks->stock, $first_stock->quantity);
             // dd($first_stock->quantity);
 
-        }
-        $product_stocks->update(['stock' => $product_stocks->stock - $first_stock->quantity]);
+            if($first_stock->quantity > $product_stocks->stock){
+                // dd('stock');
+                \Cart::session(auth()->id())->remove($product->id);
+                DB::rollBack();
 
+                return redirect()->route('cart.index')->with('message', 'Not enough stock for your order');
+            }
+
+        }
+        // $product_stocks->update(['stock' => $product_stocks->stock - $first_stock->quantity]);
+        Product::where('id', '=', $product->id)->update(['stock' => $product_stocks->stock - $first_stock->quantity]);
+        DB::commit();
         // dd($first_stock->quantity);
 
 
