@@ -28,8 +28,9 @@
                     <div class="card-body">
 
                         <h4 class="card-title">{{ $product->name }}</h4>
-                        <p class="card-text">{{ $product->description }}</p>
+                        {{ $product->description }}
                         <h4 class="card-title"> ${{ $product->price }} </h4>
+                        <h4 class="card-title"> Stock : {{ $product->stock }} </h4>
                         @foreach($product_attributes as $attr)
                             @foreach ($attr->values as $val)
                                 @if((!empty(json_decode($product->product_attributes,true)[$attr->name]) && json_decode($product->product_attributes,true)[$attr->name] == $val->value))
