@@ -59,7 +59,7 @@ class CartController extends Controller
 
         }
         // $product_stocks->update(['stock' => $product_stocks->stock - $first_stock->quantity]);
-        Product::where('id', '=', $product->id)->update(['stock' => $product_stocks->stock - $first_stock->quantity]);
+        // Product::where('id', '=', $product->id)->update(['stock' => $product_stocks->stock - $first_stock->quantity]);
         DB::commit();
         // dd($first_stock->quantity);
 
@@ -81,13 +81,29 @@ class CartController extends Controller
         return view('cart.index', compact('cartItems', 'items'));
     }
 
-    public function destroy($itemId)
+    public function destroy(Product $product, $itemId)
     {   
+        // dd($itemId);
+
+        // $first_stocks = \Cart::session(auth()->id())->getContent($itemId);
+        // // dd($first_stocks);
+
+        // foreach($first_stocks as $first_stock)
+        // {
+        //     $first_stock->quantity;
+        //     // dd($first_stock->id);
+        //     $product_stocks = Product::find($itemId);
+        //     // dd($product_stocks->stock, $first_stock->quantity);
+
+        // }
+        // Product::where('id', '=', $itemId)->update(['stock' => $product_stocks->stock + $first_stock->quantity]);
         \Cart::session(auth()->id())->remove($itemId);
+
+        
         return back();
     }
 
-    public function update($rowId)
+    public function update(Product $product, $rowId)
     {
         // 5 + 2 which results to 7 if updated relatively..
         \Cart::session(auth()->id())->update($rowId,[
@@ -96,6 +112,62 @@ class CartController extends Controller
               'value' => request('quantity')
           ),
         ]);
+
+        // \Cart::session(auth()->id())->update($rowId,[
+        //     'quantity' => request('quantity')
+        // ]);
+
+        // \Cart::session(auth()->id())->update($rowId,[
+        //     'quantity' => array(
+        //       'relative' => true,
+        //       'value' => request('quantity')
+        //   ),
+        // ]);
+
+        // \Cart::session(auth()->id())->update($itemId,[
+        //     'quantity' => array(
+        //       'relative' => true,
+        //       'value' => request('quantity')
+        //   ),
+        // ]);
+
+
+        DB::beginTransaction();
+
+        $first_stocks = \Cart::session(auth()->id())->getContent($product->id);
+        // dd($first_stocks);
+
+        foreach($first_stocks as $first_stock)
+        {
+            $first_stock->quantity;
+            // dd($first_stock->quantity);
+            // dd($first_stock->id);
+
+                
+            // item has attribute quantity
+            $product_stocks = Product::find($first_stock->id);
+
+            // dd($product_stocks);
+            // dd($product_stocks->stock, $first_stock->quantity);
+            // dd($product_stocks, $first_stock);
+            // dd($first_stock->quantity);
+
+            if($first_stock->quantity > $product_stocks->stock){
+                // dd('stock');
+                \Cart::session(auth()->id())->remove($product->id);
+                DB::rollBack();
+
+                return redirect()->route('cart.index')->with('message', 'Not enough stock for your order');
+            }    
+
+
+        }
+        // $product_stocks->update(['stock' => $product_stocks->stock - $first_stock->quantity]);
+        // Product::where('id', '=', $first_stock->id)->update(['stock' => $product_stocks->stock - $first_stock->quantity]);
+        DB::commit();
+        // dd($first_stock->quantity);
+
+
         return back();
 
     }

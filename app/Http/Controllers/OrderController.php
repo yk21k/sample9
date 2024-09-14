@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Order;
+use App\Models\Product;
+use App\Models\OrderItem;
+
 
 class OrderController extends Controller
 {
@@ -27,7 +30,7 @@ class OrderController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreOrderRequest $request)
+    public function store(StoreOrderRequest $request, Product $product)
     {
         // dd($request->all());
 
@@ -85,11 +88,58 @@ class OrderController extends Controller
 
         $cartItems = \Cart::session(auth()->id())->getContent();
 
+        // dd($cartItems);
+
         foreach ($cartItems as $item) {
             $order->items()->attach($item->id, ['price' => $item->price, 'quantity' => $item->quantity]);
-        }
 
-        // dd($order);
+            $update_stock = new Product;
+            $update_stock->where('id', '=', $item->id)->decrement('stock', $item->quantity);
+            // $order_goods = \Cart::session(auth()->id())->getContent($item->id);
+            // $order_goods = $item->quantity;
+            // $order_goods = $order->items()->$item->quantity;
+            // dd($order->items()->quantity);
+            // dd($cartItems);
+            // dd($product_stocks->stock);
+            // dd($item->quantity);
+
+        }
+        // dd($order->items());
+        // dd($request->qty);
+        
+
+        // $product_stocks = Product::find($item->id);
+            // Product::where('id', '=', $item->id)->update(['stock' => $product_stocks->stock - $first_stock->quantity]);
+        // Product::where('id', '=', $product->id)->update(['stock' => $product_stocks->stock - $first_stock->quantity]);
+
+        // dd($cartItems->id);
+
+        // $first_stocks = \Cart::session(auth()->id())->getContent($product->id);
+        // dd($first_stocks);
+
+        // foreach($first_stocks as $first_stock)
+        // {
+        //     $first_stock->quantity;
+        //     $product_stocks = Product::find($first_stock->id);
+
+        // }
+        // dd($first_stock->quantity, $product_stocks->stock);
+
+        
+        // $test =[];
+        // $test = $order->items();
+        // dd($test);
+        // dd($order_goods);
+        // dd($order_goods->id);
+        // dd($product_stocks);
+
+        // Product::where('id', '=', $product->id)->update(['stock' => $product_stocks->stock - $first_stock->quantity]);
+
+        // $product_stocks = Product::find($item->id);
+        // $cart_quantity = OrderItem::where('order_id', '=', $order->id)->get();
+        // dd($product_stocks->stock, $cart_quantity->product());
+
+
 
         // payment
         if (request('payment_method') == 'paypal') {
