@@ -5,6 +5,8 @@ const modal = document.getElementsByClassName('modal')[0];
 const buttonClose = document.getElementsByClassName('modalClose')[0];
 const body = document.getElementsByTagName('body')[0];
 
+
+
 // ボタンがクリックされた時
 buttonOpen.addEventListener('mouseenter', function(){
   modal.style.display = 'block';

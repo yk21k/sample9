@@ -1,4 +1,6 @@
+
 const identification_1 = document.getElementById('identification_1');
+
 identification_1.addEventListener('change', (e) => {
   const file_1 = document.getElementById('file_1');
   file_1.innerHTML = e.target.textContent;
@@ -19,6 +21,7 @@ identification_3.addEventListener('change', (e) => {
   file_3.innerHTML = e.target.textContent;
   document.getElementById('output3').textContent = `${e.target.value} *(Compatible with jpg, jpeg, png, pdf)`;
 });
+
 
 
 

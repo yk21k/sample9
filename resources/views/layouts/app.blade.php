@@ -15,8 +15,6 @@
     <link rel="stylesheet" href="{{ asset('front/css/custom1.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom2.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom3.css') }}">
-    <link rel="stylesheet" href="{{ asset('front/css/zoomple.css') }}">
-    <link rel="stylesheet" href="{{ asset('front/css/magnifier.css') }}">
     @stack('css')
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
@@ -41,23 +39,26 @@
             </div>    
     </div>
 
-    <script src="{{ url('front/js/custom1.js') }}"></script>
-    <script src="{{ url('front/js/custom2.js') }}"></script>
+    <!--====== Noscript ======-->
+    <noscript>
+        <div class="app-setting">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="app-setting__wrap">
+                            <h1 class="app-setting__h1">JavaScript is disabled in your browser.</h1>
+                            <span class="app-setting__text">Please enable JavaScript in your browser or upgrade to a JavaScript-capable browser.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </noscript>
+
+    <script src="{{ url('front/js/custom1.js') }}" defer></script>
+    <script src="{{ url('front/js/custom2.js') }}" defer></script>
     <script src="{{ url('front/js/custom3.js') }}"></script>
-    <script src="{{ url('front/js/Event.js') }}"></script>
-    <script src="{{ url('front/js/Magnifier.js') }}"></script>
-    <script type="text/javascript">
-        var evt = new Event(),
-            m = new Magnifier(evt);
 
-            m.attach({
-                thumb: '#thumb',
-                largeWrapper: 'preview',
-                zoom: 7
-            });
-    </script>
-
-  
     <script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
