@@ -1,43 +1,45 @@
-
-// Dom  元画像Box
+// Dom Original Image Box
 let baseImgBox1 = document.querySelector(".base_img_box1");
 
-baseImgBox1.onload = setImgClone();
+if(baseImgBox1){
+    baseImgBox1.onload = setImgClone();
+}
 
 function setImgClone() {
-    // Dom コンテント
+    // DOM Content
     let content1 = document.querySelector(".content-detail1");
+    
+    // Dom Enlarged Image Box (Clone of Original Image Box)
+    let lensImgBox1 = baseImgBox1.cloneNode(true); 
 
-    // Dom 拡大画像Box(元画像Box のクローン)
-    let lensImgBox1 = baseImgBox1.cloneNode(true);
-    // クラス名「lens_img_box」に変更
+    // Changed the class name to "lens_img_box"
     lensImgBox1.className = "lens_img_box1";
 
-    // Dom 拡大画像(lensImgBoxの子要素)
+    // Dom magnified image (child element of lensImgBox)
     let lensImg1 = lensImgBox1.firstElementChild;
-    // クラス名「lens_img」に変更
+    // Changed class name to "lens_img"
     lensImg1.className = "lens_img1";
-    // 二倍に拡大
+    // Double magnification
     lensImg1.style.transform = "scale(2)";
 
-    // 元画像のクローンを配置
+    // Place a clone of the original image
     content1.appendChild(lensImgBox1);
 
-    // Dom  元画像
+    // DOM Original Image
     let baseImg1 = document.querySelector(".base_img1");
 
-    // 拡大比率　今回は2倍
+    // Expansion ratio: 2 times this time
     let ratio = 2;
 
-    // 元画像の上をマウスポインタが通った場合、虫眼鏡を表示
+    // When the mouse pointer hovers over the original image, a magnifying glass is displayed.
     baseImg1.addEventListener("mousemove", function (event) {
 
-        // 拡大画像Box(虫眼鏡...元画像の座標から100引いた値を設定)
+        // Enlarged Image Box (magnifying glass... Set the value of the original image by subtracting 100 from the coordinates)
         lensImgBox1.style.opacity = 1;
         lensImgBox1.style.top = (event.offsetY - 100) + "px";
         lensImgBox1.style.left = (event.offsetX - 100) + "px";
 
-        //　拡大画像 (元画像の座標から反転して100足した値を設定)
+        //　Enlarged image (inverted from the coordinates of the original image and set by adding 100)
         let newLensOffsetY = event.offsetY * ratio * -1 + 100;
         let newLensOffsetX = event.offsetX * ratio * -1 + 100;
 
@@ -46,7 +48,7 @@ function setImgClone() {
 
     }, false);
 
-    // 元画像の上にマウスポインタがない場合、虫眼鏡を非表示
+    // Hide the magnifying glass when there is no mouse pointer over the original image
     baseImg1.addEventListener("mouseout", function () {
 
         lensImgBox1.style.opacity = 0;
@@ -56,45 +58,48 @@ function setImgClone() {
 
 
 
-// Dom  元画像Box
+// Dom Original Image Box
 let baseImgBox2 = document.querySelector(".base_img_box2");
 
-baseImgBox2.onload = setImgClone2();
+if(baseImgBox2){
+    baseImgBox2.onload = setImgClone2();
+}
 
 function setImgClone2() {
-    // Dom コンテント
+    // DOM Content
     let content2 = document.querySelector(".content-detail2");
 
-    // Dom 拡大画像Box(元画像Box のクローン)
+    // Dom Enlarged Image Box (Clone of Original Image Box)
     let lensImgBox2 = baseImgBox2.cloneNode(true);
-    // クラス名「lens_img_box」に変更
+
+    // Changed the class name to "lens_img_box"
     lensImgBox2.className = "lens_img_box2";
 
-    // Dom 拡大画像(lensImgBoxの子要素)
+    // Dom magnified image (child element of lensImgBox)
     let lensImg2 = lensImgBox2.firstElementChild;
-    // クラス名「lens_img」に変更
+    // Changed class name to "lens_img"
     lensImg2.className = "lens_img2";
-    // 二倍に拡大
+    // Double magnification
     lensImg2.style.transform = "scale(2)";
 
-    // 元画像のクローンを配置
+    // Place a clone of the original image
     content2.appendChild(lensImgBox2);
 
-    // Dom  元画像
+    // DOM Original Image
     let baseImg2 = document.querySelector(".base_img2");
 
-    // 拡大比率　今回は2倍
+    // Expansion ratio: 2 times this time
     let ratio = 2;
 
-    // 元画像の上をマウスポインタが通った場合、虫眼鏡を表示
+    // Hide the magnifying glass when there is no mouse pointer over the original image
     baseImg2.addEventListener("mousemove", function (event) {
 
-        // 拡大画像Box(虫眼鏡...元画像の座標から100引いた値を設定)
+        // Enlarged Image Box (magnifying glass... Set the value of the original image by subtracting 100 from the coordinates)
         lensImgBox2.style.opacity = 1;
         lensImgBox2.style.top = (event.offsetY - 100) + "px";
         lensImgBox2.style.left = (event.offsetX - 100) + "px";
 
-        //　拡大画像 (元画像の座標から反転して100足した値を設定)
+        //　Enlarged image (inverted from the coordinates of the original image and set by adding 100)
         let newLensOffsetY = event.offsetY * ratio * -1 + 100;
         let newLensOffsetX = event.offsetX * ratio * -1 + 100;
 
@@ -103,7 +108,7 @@ function setImgClone2() {
 
     }, false);
 
-    // 元画像の上にマウスポインタがない場合、虫眼鏡を非表示
+    // Hide the magnifying glass when there is no mouse pointer over the original image
     baseImg2.addEventListener("mouseout", function () {
 
         lensImgBox2.style.opacity = 0;
@@ -113,45 +118,48 @@ function setImgClone2() {
 
 
 
-// Dom  元画像Box
+// Dom Original Image Box
 let baseImgBox3 = document.querySelector(".base_img_box3");
 
-baseImgBox3.onload = setImgClone3();
+if(baseImgBox3){
+    baseImgBox3.onload = setImgClone3();
+}
 
 function setImgClone3() {
-    // Dom コンテント
+    // DOM Content
     let content3 = document.querySelector(".content-detail3");
 
-    // Dom 拡大画像Box(元画像Box のクローン)
+    // Dom Enlarged Image Box (Clone of Original Image Box)
     let lensImgBox3 = baseImgBox3.cloneNode(true);
-    // クラス名「lens_img_box」に変更
+
+    // Changed the class name to "lens_img_box"
     lensImgBox3.className = "lens_img_box3";
 
-    // Dom 拡大画像(lensImgBoxの子要素)
+    // Dom magnified image (child element of lensImgBox)
     let lensImg3 = lensImgBox3.firstElementChild;
-    // クラス名「lens_img」に変更
+    // Changed class name to "lens_img"
     lensImg3.className = "lens_img3";
-    // 二倍に拡大
+    // Double magnification
     lensImg3.style.transform = "scale(2)";
 
-    // 元画像のクローンを配置
+    // Place a clone of the original image
     content3.appendChild(lensImgBox3);
 
-    // Dom  元画像
+    // DOM Original Image
     let baseImg3 = document.querySelector(".base_img3");
 
-    // 拡大比率　今回は2倍
+    // Expansion ratio: 2 times this time
     let ratio = 2;
 
-    // 元画像の上をマウスポインタが通った場合、虫眼鏡を表示
+    // Hide the magnifying glass when there is no mouse pointer over the original image
     baseImg3.addEventListener("mousemove", function (event) {
 
-        // 拡大画像Box(虫眼鏡...元画像の座標から100引いた値を設定)
+        // Enlarged Image Box (magnifying glass... Set the value of the original image by subtracting 100 from the coordinates)
         lensImgBox3.style.opacity = 1;
         lensImgBox3.style.top = (event.offsetY - 100) + "px";
         lensImgBox3.style.left = (event.offsetX - 100) + "px";
 
-        //　拡大画像 (元画像の座標から反転して100足した値を設定)
+        //　Enlarged image (inverted from the coordinates of the original image and set by adding 100)
         let newLensOffsetY = event.offsetY * ratio * -1 + 100;
         let newLensOffsetX = event.offsetX * ratio * -1 + 100;
 
@@ -160,7 +168,7 @@ function setImgClone3() {
 
     }, false);
 
-    // 元画像の上にマウスポインタがない場合、虫眼鏡を非表示
+    // Hide the magnifying glass when there is no mouse pointer over the original image
     baseImg3.addEventListener("mouseout", function () {
 
         lensImgBox3.style.opacity = 0;

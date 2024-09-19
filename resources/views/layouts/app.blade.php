@@ -57,7 +57,7 @@
 
     <script src="{{ url('front/js/custom1.js') }}" defer></script>
     <script src="{{ url('front/js/custom2.js') }}" defer></script>
-    <script src="{{ url('front/js/custom3.js') }}"></script>
+    <script src="{{ url('front/js/custom3.js') }}" defer></script>
 
     <script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
