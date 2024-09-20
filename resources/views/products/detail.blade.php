@@ -5,7 +5,6 @@
     <link href="{{ asset('front/css/custom3.css') }}" rel="stylesheet">
 @endpush
 
-
 <!-- Slideshow container -->
 <div class="slideshow-container">
 
@@ -17,8 +16,13 @@
 
     	<div class="content-detail1">
     		<div class="base_img_box1">
-		    
-		    	<img class="base_img1" src="{{ asset( 'storage/'.$productDetails['cover_img']  ) }}" style="width:430px; height:430px">
+
+		    	@if($productDetails['cover_img'])
+		    		<img class="base_img1" src="{{ asset( 'storage/'.$productDetails['cover_img']  ) }}" style="width:430px; height:430px">
+		    	@else
+		    		<img class="base_img1" src="{{ asset('images/no_image.jpg') }}" style="width:430px; height:430px">		
+		    	@endif
+
 		    </div>		
     	</div>
   </div>
@@ -29,8 +33,13 @@
 
     	<div class="content-detail2">
     		<div class="base_img_box2">
-		    
-		    	<img class="base_img2" src="{{ asset( 'storage/'.$productDetails['cover_img2']  ) }}" style="width:430px; height:430px">
+
+		    	@if($productDetails['cover_img2'])
+		    		<img class="base_img2" src="{{ asset( 'storage/'.$productDetails['cover_img2']  ) }}" style="width:430px; height:430px">
+		    	@else
+		    		<img class="base_img2" src="{{ asset('images/no_image.jpg') }}" style="width:430px; height:430px">
+		    	@endif
+
 		    </div>		
     	</div>
   </div>
@@ -42,7 +51,12 @@
     	<div class="content-detail3">
     		<div class="base_img_box3">
 		    
-		    	<img class="base_img3" src="{{ asset( 'storage/'.$productDetails['cover_img3']  ) }}" style="width:430px; height:430px">
+		    	@if($productDetails['cover_img3'])
+		    		<img class="base_img3" src="{{ asset( 'storage/'.$productDetails['cover_img3']  ) }}" style="width:430px; height:430px">
+		    	@else
+		    		<img class="base_img3" src="{{ asset('images/no_image.jpg') }}" style="width:430px; height:430px">
+		    	@endif
+
 		    </div>		
     	</div>
   </div>
@@ -60,11 +74,12 @@
   <span class="dot" onclick="currentSlide(3)"></span>
 </div>
 
-
 <br>
-
-
-
+@if(json_decode($product_movies, true))
+	@foreach(json_decode($product_movies, true) as $movie)
+			<video controls width="250" src="{{ asset('storage/'.$movie['download_link']) }}#t=1,2" muted class="contents_width"></video>
+	@endforeach
+@endif	
 
 
 <script>

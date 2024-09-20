@@ -51,7 +51,15 @@ class ProductController extends Controller
         $productDetails = Product::find($id)->toArray();
         // dd($productDetails);
         // dd($productDetails['cover_img']);
-        return view('products.detail', compact('productDetails'));
+
+        $product_movies = [];
+
+        $product_movies = $productDetails['movie'];
+        // dd($product_movies);
+
+        // $product_movies = Product::with('movie', json_decode($productDetails['movie'], true))->get();
+
+        return view('products.detail', compact('productDetails', 'product_movies'));
     }
 
     /**
