@@ -139,7 +139,8 @@ class OrderController extends Controller
         // $cart_quantity = OrderItem::where('order_id', '=', $order->id)->get();
         // dd($product_stocks->stock, $cart_quantity->product());
 
-
+        $order->generateSubOrders();
+        
 
         // payment
         if (request('payment_method') == 'paypal') {
@@ -147,6 +148,7 @@ class OrderController extends Controller
             // redirect pp
             return redirect()->route('paypal.checkout', $order->id);
         }
+
 
 
         // empty cart

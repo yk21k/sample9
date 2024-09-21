@@ -10,7 +10,8 @@ use App\Http\Controllers\CustomerInquiryController;
 use App\Http\Controllers\InquiriesController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\ProductController;
-
+use App\Http\Controllers\Seller\OrdersController;
+use App\Models\Order;
 
 /*
 |--------------------------------------------------------------------------
@@ -96,8 +97,6 @@ Route::get('users', [App\Http\Controllers\UsersController::class, 'delete_confir
 Route::post('users/{id}', [App\Http\Controllers\UsersController::class, 'destroy'])->name('users.withdraw');
 
 
-
-
 Route::get('paypal/checkout/{order}', [App\Http\Controllers\PayPalController::class, 'getExpressCheckout'])->name('paypal.checkout');
 
 
@@ -107,8 +106,21 @@ Route::get('paypal/checkout-success/{order}', [App\Http\Controllers\PayPalContro
 Route::get('paypal/checkout-cancel', [App\Http\Controllers\PayPalController::class, 'cancelPage'])->name('paypal.cancel');
 
 
-
-
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
+});
+
+Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', 'namespace' => 'App\Http\Controllers\Seller'], function () {
+
+    Route::redirect('/','seller/orders');
+
+    Route::resource('/orders',  'OrdersController');
+
+    Route::get('/orders/delivered/{suborder}',  'OrdersController@markDelivered')->name('order.delivered');
+});
+
+Route::get('/test', function(){
+    $o = Order::find(144);
+
+    $o->generateSubOrders();
 });
