@@ -22,6 +22,10 @@
             <!-- Right Side Of Navbar -->
             <ul class="navbar-nav ms-auto">
                 <!-- Authentication Links -->
+
+                <li class="nav-item">
+                    
+                </li>
                 <li class="nav-item">
                     <form action="{{ route('products.search') }}" method="get">
                         <input name="query" placeholder="Enter Your Key Word" type="text">

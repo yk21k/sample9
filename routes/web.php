@@ -11,6 +11,8 @@ use App\Http\Controllers\InquiriesController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Seller\OrdersController;
+use App\Http\Controllers\SubOrderController;
+
 use App\Models\Order;
 
 /*
@@ -30,6 +32,8 @@ Route::redirect('/', '/home');
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::get('/testpage', [App\Http\Controllers\HomeController::class, 'testpage'])->name('testpage');
 
 
 Route::get('/delete_shop', [App\Http\Controllers\UsersController::class, 'index'])->name('users.delete_shop');
@@ -108,15 +112,17 @@ Route::get('paypal/checkout-cancel', [App\Http\Controllers\PayPalController::cla
 
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
+    Route::get('/order/pay/{suborder}', [App\Http\Controllers\SubOrderController::class, 'pay'])->name('order.pay');
+
 });
 
 Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', 'namespace' => 'App\Http\Controllers\Seller'], function () {
 
     Route::redirect('/','seller/orders');
 
-    Route::resource('/orders',  'OrdersController');
+    Route::resource('/orders', 'OrdersController');
 
-    Route::get('/orders/delivered/{suborder}',  'OrdersController@markDelivered')->name('order.delivered');
+    Route::get('/orders/delivered/{suborder}', 'OrdersController@markDelivered')->name('order.delivered');
 });
 
 Route::get('/test', function(){

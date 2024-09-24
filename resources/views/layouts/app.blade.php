@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="{{ asset('front/css/custom1.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom2.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom3.css') }}">
+
     @stack('css')
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
@@ -62,6 +63,8 @@
     <script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+    
 </body>
 
 

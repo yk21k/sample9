@@ -24,7 +24,9 @@
         <div class="row">
 
             <!-- <h2>jfgia:@gaiog:a</h2> -->
-
+            <div>
+                <a href="{{url('/seller/orders')}}" class="">Order Management</a>
+            </div>
             <div class="col-md-12">
 
                 <div class="panel panel-bordered">
@@ -146,7 +148,7 @@
                             @yield('submit-buttons')
                         </div>
                     </form>
-
+                    
                     <div style="display:none">
                         <input type="hidden" id="upload_url" value="{{ route('voyager.upload') }}">
                         <input type="hidden" id="upload_type_slug" value="{{ $dataType->slug }}">

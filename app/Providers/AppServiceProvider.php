@@ -23,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         Voyager::useModel('Category', \App\Models\Categories::class);
+        Voyager::useModel('Menu', \App\Models\Menu::class);
 
     }
 
@@ -36,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
         Inquiries::observe(InquiryObserver::class);
         DeleteShop::observe(DeleteShopObserver::class);
         Voyager::useModel('Category', \App\Models\Categories::class);
+        Voyager::useModel('Menu', \App\Models\Menu::class);
         Paginator::useBootstrap();
         
     }

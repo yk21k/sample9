@@ -286,12 +286,14 @@
                                         @endforeach
 
                                         @if($data->status == 'completed')
-                                            <a  href=" {{route('order.pay', $data)}} "
-                                                class="btn btn-sm btn-primary pull-right">
+                                            <a href="{{ route('order.pay', $data) }}"
+                                                class="btn btn-sm btn-success pull-right" style="margin-right: 5px;">
                                                 <i class="{{ $action->getIcon() }}"></i> <span class="hidden-xs hidden-sm">Pay</span>
                                             </a>
+
                                         @endif
                                     </td>
+
                                 </tr>
                                 @endforeach
                             </tbody>
