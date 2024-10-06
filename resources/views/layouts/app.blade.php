@@ -1,5 +1,7 @@
 <!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
+    <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-bs-theme="{{ Cookie::get('data-bs-theme'); }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,12 +18,14 @@
     <link rel="stylesheet" href="{{ asset('front/css/custom2.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom3.css') }}">
 
+
     @stack('css')
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
+
+
 <body ontouchstart="">
-    <div id="app">
         
         <!-- header part -->
             <div class="wrapper">
@@ -40,6 +44,8 @@
             </div>    
     </div>
 
+
+
     <!--====== Noscript ======-->
     <noscript>
         <div class="app-setting">
@@ -55,14 +61,44 @@
             </div>
         </div>
     </noscript>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <script>
+        $(document).on('click', '#value', function(){
+            var value = $(this).data('value');
+            // console.log(value);
+            $.ajax({
+                headers: { 
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') 
+                },
+                data:$("input[name='value']").val(),
+                url:'/home',
+                type:'post',
+            }).done(function(res) {
+                console.log(res);
+                document.cookie = 'data-bs-theme=dark; path=/; max-age=60';
+                if(document.documentElement.getAttribute('data-bs-theme')=='dark'){
+                
+                document.documentElement.setAttribute('data-bs-theme','light')
+
+                }else{
+                document.documentElement.setAttribute('data-bs-theme','dark')
+                }
+
+            })       
+        })
+
+    </script>
+ 
     <script src="{{ url('front/js/custom1.js') }}" defer></script>
     <script src="{{ url('front/js/custom2.js') }}" defer></script>
     <script src="{{ url('front/js/custom3.js') }}" defer></script>
 
     <script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
-    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
 
     
 </body>

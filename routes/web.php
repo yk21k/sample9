@@ -30,15 +30,14 @@ Route::redirect('/', '/home');
 
 
 Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::match(['get', 'post'], '/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::get('/testpage', [App\Http\Controllers\HomeController::class, 'testpage'])->name('testpage');
 
 
 Route::get('/delete_shop', [App\Http\Controllers\UsersController::class, 'index'])->name('users.delete_shop');
 
-Route::post('/delete_shop', [App\Http\Controllers\UsersController::class, 'termination'])->name('users.delete_shop');
+Route::post('/delete_shop', [App\Http\Controllers\UsersController::class, 'termination'])->name('users.delete_shops');
 
 
 
@@ -65,9 +64,9 @@ Route::get('/cart/apply-coupon', [App\Http\Controllers\CartController::class, 'a
 
 
 
-Route::get('/account', [App\Http\Controllers\AccountController::class, 'index'])->name('account.account')->middleware('auth');
+Route::get('/account/{id}', [App\Http\Controllers\AccountController::class, 'index'])->name('account.account')->middleware('auth');
 
-Route::post('/account', [App\Http\Controllers\AccountController::class, 'updateProf'])->name('account.account')->middleware('auth');
+Route::post('/account/{id}', [App\Http\Controllers\AccountController::class, 'updateProf'])->name('account.accounts')->middleware('auth');
 
 
 Route::get('/cutomer-inquiry', [App\Http\Controllers\CustomerInquiryController::class, 'inquiryForm'])->name('account.inquiry')->middleware('auth');

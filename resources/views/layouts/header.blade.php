@@ -1,6 +1,6 @@
 
 
-<nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+<nav class="navbar navbar-expand-md shadow-sm">
     <div class="container">
         <a class="navbar-brand" href="{{ url('/') }}">
             {{ config('app.name', 'Laravel') }}
@@ -13,10 +13,25 @@
             <!-- Left Side Of Navbar -->
             <ul class="navbar-nav me-auto">
                 
-
+                @if(!empty(Auth::user()->id))
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('account.account') }}">Account</a>
+                    <a class="nav-link" href="{{ route('account.account', ['id'=>Auth::user()->id]) }}">Account</a>
                 </li>
+                @endif
+
+                <button id="value" class="value">
+                    <span id="value" class="value" data-value="dark">Dark</span><input hidden type="text" name="value" value="dark">    
+                </button>
+
+
+                <!--<button onclick="myFunction()">Dark2</button>-->
+                
+                Test 
+                cookie:
+                {{ Cookie::get('data-bs-theme'); }}
+
+
+                
             </ul>
 
             <!-- Right Side Of Navbar -->
@@ -29,7 +44,7 @@
                 <li class="nav-item">
                     <form action="{{ route('products.search') }}" method="get">
                         <input name="query" placeholder="Enter Your Key Word" type="text">
-                        <button type="submit"> Search </button>
+                        <button type="submit" style="background: #fff; color: #535c97;"> Search </button>
                     </form>@csrf
                 </li>
 
@@ -103,4 +118,9 @@
     </div>
 @endif
 
+
+
+
+
+ 
    

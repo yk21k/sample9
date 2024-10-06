@@ -1,4 +1,4 @@
-<div class="sidenav">
+<div class="sidenav shadow-sm">
 
     <h3>Multilevel dropdown</h3>
         <ul class="multilevel-dropdown-menu">
