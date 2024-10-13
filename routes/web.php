@@ -34,6 +34,8 @@ Route::match(['get', 'post'], '/home', [App\Http\Controllers\HomeController::cla
 
 Route::get('/testpage', [App\Http\Controllers\HomeController::class, 'testpage'])->name('testpage');
 
+Route::get('/privacy-policy', [App\Http\Controllers\HomeController::class, 'privacy_policypage'])->name('privacy_policypage');
+
 
 Route::get('/delete_shop', [App\Http\Controllers\UsersController::class, 'index'])->name('users.delete_shop');
 
@@ -71,7 +73,7 @@ Route::post('/account/{id}', [App\Http\Controllers\AccountController::class, 'up
 
 Route::get('/cutomer-inquiry', [App\Http\Controllers\CustomerInquiryController::class, 'inquiryForm'])->name('account.inquiry')->middleware('auth');
 
-Route::post('/cutomer-inquiry', [App\Http\Controllers\CustomerInquiryController::class, 'inquiryAnswer'])->name('account.inquiry')->middleware('auth');
+Route::post('/cutomer-inquiry', [App\Http\Controllers\CustomerInquiryController::class, 'inquiryAnswer'])->name('account.inquiries')->middleware('auth');
 
 Route::get('/cutomer-answers', [App\Http\Controllers\CustomerInquiryController::class, 'answers'])->name('account.answers')->middleware('auth');
 

@@ -76,6 +76,11 @@ class HomeController extends Controller
         return view('test.testpage');
     }
 
+    public function privacy_policypage()
+    {
+        return view('policy.pri-polipage');
+    }
+
 
 
 
