@@ -36,6 +36,8 @@ Route::get('/testpage', [App\Http\Controllers\HomeController::class, 'testpage']
 
 Route::get('/privacy-policy', [App\Http\Controllers\HomeController::class, 'privacy_policypage'])->name('privacy_policypage');
 
+Route::get('/personal-information', [App\Http\Controllers\HomeController::class, 'personal_information'])->name('personal_information');
+
 
 Route::get('/delete_shop', [App\Http\Controllers\UsersController::class, 'index'])->name('users.delete_shop');
 

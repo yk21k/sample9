@@ -81,6 +81,11 @@ class HomeController extends Controller
         return view('policy.pri-polipage');
     }
 
+    public function personal_information()
+    {
+        return view('information.personal-information');
+    }
+
 
 
 
