@@ -19,16 +19,11 @@
                 </li>
                 @endif
 
-                <button id="value" class="value">
-                    <span id="value" class="value" data-value="dark">Dark</span><input hidden type="text" name="value" value="dark">    
-                </button>
+               
 
-
-                <!--<button onclick="myFunction()">Dark2</button>-->
                 
-                Test 
-                cookie:
-                {{ Cookie::get('data-bs-theme'); }}
+                
+                
 
 
                 
