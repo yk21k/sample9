@@ -236,7 +236,13 @@
     <script src="{{ url('front/js/custom3.js') }}" defer></script>
 
     <script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
-
+    <script>
+      var botmanWidget = {
+          aboutText: 'Start the conversation with Hi',
+          introMessage: "WELCOME TO CODE SHOTCUT"
+      };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/js/widget.js"></script>
     
 </body>
 

@@ -12,6 +12,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Seller\OrdersController;
 use App\Http\Controllers\SubOrderController;
+use App\Http\Controllers\BotManController;
 
 use App\Models\Order;
 
@@ -31,6 +32,8 @@ Route::redirect('/', '/home');
 
 Auth::routes();
 Route::match(['get', 'post'], '/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::match(['get', 'post'], '/botman', [App\Http\Controllers\BotManController::class, 'handle'])->name('handle');
 
 Route::get('/testpage', [App\Http\Controllers\HomeController::class, 'testpage'])->name('testpage');
 
