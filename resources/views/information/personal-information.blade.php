@@ -2,7 +2,7 @@
 <html data-bs-theme="auto">
 	<head>
 		<meta charset="utf-8">
-		<title>Privacy Policy</title>
+		<title>Personal Information</title>
 	    
 	</head>
 	<body>

@@ -18,15 +18,7 @@
                     <a class="nav-link" href="{{ route('account.account', ['id'=>Auth::user()->id]) }}">Account</a>
                 </li>
                 @endif
-
-               
-
-                
-                
-                
-
-
-                
+   
             </ul>
 
             <!-- Right Side Of Navbar -->

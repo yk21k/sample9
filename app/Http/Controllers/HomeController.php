@@ -86,6 +86,16 @@ class HomeController extends Controller
         return view('information.personal-information');
     }
 
+    public function terms_of_service()
+    {
+        return view('termofservice.terms_of_service');
+    }
+
+    public function listing_terms()
+    {
+        return view('listingterms.listing_terms');
+    }
+
 
 
 

@@ -38,6 +38,10 @@ Route::get('/privacy-policy', [App\Http\Controllers\HomeController::class, 'priv
 
 Route::get('/personal-information', [App\Http\Controllers\HomeController::class, 'personal_information'])->name('personal_information');
 
+Route::get('/terms-of-service', [App\Http\Controllers\HomeController::class, 'terms_of_service'])->name('terms_of_service');
+
+Route::get('/listing_terms', [App\Http\Controllers\HomeController::class, 'listing_terms'])->name('listing_terms');
+
 
 Route::get('/delete_shop', [App\Http\Controllers\UsersController::class, 'index'])->name('users.delete_shop');
 
