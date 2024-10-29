@@ -1,0 +1,23 @@
+.modal-overlay {
+    display: none;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    width: 100%;
+    height: 100%;
+}
+
+.modal-form {
+    position: absolute;
+    z-index: 2;
+    width: 400px;
+    left: 0;
+    right: 0;
+    margin: auto;
+    top: 100px;
+    padding: 20px;
+    border: 1px solid #888;
+    background-color: white;
+}

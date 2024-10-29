@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="{{ asset('front/css/custom1.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom2.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom3.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/css/custom4.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     @stack('css')
@@ -135,6 +136,7 @@
         })()
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 
@@ -186,6 +188,7 @@
       </ul>
     </div>
 
+
     
 
         <!-- header part -->
@@ -194,6 +197,7 @@
             </div>    
             
 
+
             <div class="wrapper" style="margin-left: 300px;">
                 <div class="wrapper">
                     @yield('content')
@@ -201,12 +205,12 @@
             </div>    
 
         <!-- footer part -->
-            <div class="wrapper"style="margin-left: 300px;">
+            <div class="wrapper" style="margin-left: 300px;">
                 @include('layouts.footer')
 
-            </div>    
-    </div>
+            </div>
 
+   
 
 
     <!--====== Noscript ======-->
@@ -234,8 +238,10 @@
     <script src="{{ url('front/js/custom1.js') }}" defer></script>
     <script src="{{ url('front/js/custom2.js') }}" defer></script>
     <script src="{{ url('front/js/custom3.js') }}" defer></script>
+    <script src="{{ url('front/js/custom4.js') }}" defer></script>
 
     <script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
+    @if(!empty(Auth::user()->id))
     <script>
       var botmanWidget = {
           aboutText: 'Start the conversation with Hi',
@@ -243,7 +249,10 @@
       };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/js/widget.js"></script>
-    
+    @endif
+    <script>
+
+    </script>
 </body>
 
 

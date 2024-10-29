@@ -18,8 +18,11 @@
                     <a class="nav-link" href="{{ route('account.account', ['id'=>Auth::user()->id]) }}">Account</a>
                 </li>
                 @endif
-   
+                <li>
+                    
+                </li>
             </ul>
+
 
             <!-- Right Side Of Navbar -->
             <ul class="navbar-nav ms-auto">
