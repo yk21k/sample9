@@ -1,0 +1,25 @@
+/* HTML: <div class="ribbon">Your text content</div> */
+.ribbon {
+  font-size: 28px;
+  font-weight: bold;
+  color: #fff;
+}
+.ribbon {
+  --r: .4em; /* control the ribbon shape (the radius) */
+  --c: #E3AD40;
+
+  position: absolute;
+  bottom: 20px;
+  right: calc(-1*var(--r));
+  line-height: 1.8; 
+  padding: calc(2*var(--r)) .5em 0;
+  border-radius: 0 var(--r) var(--r) 0;
+  background: 
+    radial-gradient(100% 50% at right,var(--c) 98%,#0000 101%)
+     0 100%/.5lh calc(100% - 2*var(--r)),
+    radial-gradient(100% 50% at left,#0005 98%,#0000 101%) 
+     100% 0/var(--r) calc(2*var(--r)),
+    conic-gradient(at calc(100% - var(--r)) calc(2*var(--r)),var(--c) 75%,#0000 0)
+     100% 0/calc(101% - .5lh) 100%;
+  background-repeat: no-repeat;   
+}

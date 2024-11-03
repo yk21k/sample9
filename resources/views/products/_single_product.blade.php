@@ -38,7 +38,7 @@
         <div class="card-body">
             <h4 class="card-title">{{$product->name}}</h4>
             <p class="card-text">{{$product->description}}</p>
-            <h3>$ {{ $product->price }}</h3>
+            <h3>$$ {{ $product->price }}</h3>
             <h3> {{ $product->shop->name ?? 'Sample9' }}</h3> 
         </div>
         

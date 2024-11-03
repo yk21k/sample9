@@ -25,7 +25,9 @@
 
             <!-- <h2>jfgia:@gaiog:a</h2> -->
 
-            
+            <div>
+                <a href="{{url('/seller/orders')}}" class="">Order Management</a>
+            </div>
 
             <div class="col-md-12">
 

@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="{{ asset('front/css/custom2.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom3.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom4.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/css/custom5.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     @stack('css')
@@ -186,32 +187,23 @@
           </button>
         </li>
       </ul>
-    </div>
-
-
-    
+    </div>    
 
         <!-- header part -->
             <div class="wrapper">
                 @include('layouts.header')      
-            </div>    
-            
-
+            </div>
 
             <div class="wrapper" style="margin-left: 300px;">
                 <div class="wrapper">
                     @yield('content')
                 </div>
             </div>    
-
         <!-- footer part -->
             <div class="wrapper" style="margin-left: 300px;">
                 @include('layouts.footer')
 
             </div>
-
-   
-
 
     <!--====== Noscript ======-->
     <noscript>
@@ -251,6 +243,8 @@
     <script src="https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/js/widget.js"></script>
     @endif
     <script>
+
+
 
     </script>
 </body>

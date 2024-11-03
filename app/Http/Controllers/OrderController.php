@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\OrderItem;
+use App\Models\SubOrder;
 
 
 class OrderController extends Controller
@@ -140,7 +141,7 @@ class OrderController extends Controller
         // dd($product_stocks->stock, $cart_quantity->product());
 
         $order->generateSubOrders();
-        
+
 
         // payment
         if (request('payment_method') == 'paypal') {
@@ -148,8 +149,6 @@ class OrderController extends Controller
             // redirect pp
             return redirect()->route('paypal.checkout', $order->id);
         }
-
-
 
         // empty cart
 
@@ -160,9 +159,6 @@ class OrderController extends Controller
         // take user to thank you
 
         return redirect()->route('home')->withMessage('Order has been placed'); 
-        
-
-
 
     }
 

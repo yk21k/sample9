@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\Shop;
+use App\Models\SubOrder;
 use App\Mail\OrderPaid;
+use App\Mail\toShopOrderPaid;
 use Illuminate\Mail\Mailable;
 use Srmklive\PayPal\Services\ExpressCheckout;
 use Illuminate\Support\Facades\Mail;
@@ -81,7 +84,20 @@ class PayPalController extends Controller
                 $order->is_paid = 1;
                 $order->save();
 
-                //send mail
+                $toShopMail = $order->items;
+                // dd($toShopMail->pluck('shop_id'));
+
+                foreach($toShopMail->pluck('shop_id') as $sId) {
+                    // echo $sId;
+                    $toShopOrderMail = Shop::where('id' ,$sId)->get('email');
+                    // echo $toShopOrderMail;
+
+                    Mail::to($toShopOrderMail)->send(new toShopOrderPaid($order));
+
+                }
+                // dd($test);
+
+                //cart clear
                  \Cart::session(auth()->id())->clear();
                 // send mail
                 Mail::to($order->user->email)->send(new OrderPaid($order));

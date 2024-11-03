@@ -57,7 +57,6 @@
 
     <h2>Products test</h2>
 
-
     <div class="row">
         @foreach($allProducts as $product)
             
@@ -77,7 +76,14 @@
                         <h4 class="card-title">{{ $product->name }}</h4>
                         {{ $product->description }}
                         <h4 class="card-title"> ${{ $product->price }} </h4>
-                        <h4 class="card-title"> Stock : {{ $product->stock }} </h4>
+                        <h4 class="card-title" id="stockQty">
+                         @if($product->stock<0) 
+                            <div class="ribbon">Sold out!! </div>
+                             
+                         @else  
+                            Stock : {{ $product->stock }}
+                         @endif   
+                        </h4>
                         @foreach($product_attributes as $attr)
                             @foreach ($attr->values as $val)
                                 @if((!empty(json_decode($product->product_attributes,true)[$attr->name]) && json_decode($product->product_attributes,true)[$attr->name] == $val->value))
@@ -93,7 +99,7 @@
 
 
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" id="addCart1">
                         <a href="{{ route('cart.add', $product->id) }}" class="card-link">Add to Cart</a>
                     </div>
                 </div>
