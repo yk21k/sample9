@@ -77,7 +77,7 @@
                         {{ $product->description }}
                         <h4 class="card-title"> ${{ $product->price }} </h4>
                         <h4 class="card-title" id="stockQty">
-                         @if($product->stock<0) 
+                         @if($product->stock<=0) 
                             <div class="ribbon">Sold out!! </div>
                              
                          @else  
