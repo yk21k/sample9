@@ -95,7 +95,7 @@ class PayPalController extends Controller
                     // echo $toShopOrderMail->value('email');
                     // $toShopOrderMail->value('email') = $toShopOrderMail->value('email')->fresh();
                     
-                    Mail::to($toShopOrderMail)->send(new toShopOrderPaid($order));
+                    Mail::to($toShopOrderMail->value('email'))->send(new toShopOrderPaid($order));
 
                 }
                 // dd($toShopOrderMail->value('email'));
