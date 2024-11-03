@@ -4,7 +4,6 @@
 
 Please check from the management screen
 
-<!-- Total : {{$order->grand_total}} -->
 
 
 @component('mail::button', ['url' => ''])
