@@ -89,14 +89,18 @@ class PayPalController extends Controller
 
                 $toShopMail = $toShopMail->fresh();
 
-                foreach($toShopMail->pluck('shop_id') as $sId) {
+                $toShopMails = $toShopMail->pluck('shop_id')->toArray();
+
+                $toShopMails2 = array_unique($toShopMails);
+
+                foreach($toShopMails2 as $sId) {
                     // echo $sId;
-                    $toShopOrderMail = Shop::where('id' ,$sId)->get('email');
+                    $toShopOrderMail = Shop::where('id', $sId)->get('email');
                     // echo $toShopOrderMail->value('email');
                     // $toShopOrderMail->value('email') = $toShopOrderMail->value('email')->fresh();
+                   
+                    Mail::to($toShopOrderMail->value('email'))->send(new toShopOrderPaid($order));    
                     
-                    Mail::to($toShopOrderMail->value('email'))->send(new toShopOrderPaid($order));
-
                 }
                 // dd($toShopOrderMail->value('email'));
 
