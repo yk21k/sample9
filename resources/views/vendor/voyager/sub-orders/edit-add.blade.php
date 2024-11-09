@@ -8,7 +8,9 @@
 @section('css')
     <meta name="csrf-token" content="{{ csrf_token() }}">
 @stop
-
+<div>
+    <a href="{{url('/seller/orders')}}" class="">Order Management</a>
+</div>
 @section('page_title', __('voyager::generic.'.($edit ? 'edit' : 'add')).' '.$dataType->getTranslatedAttribute('display_name_singular'))
 
 @section('page_header')

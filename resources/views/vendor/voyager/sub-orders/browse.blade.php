@@ -1,5 +1,8 @@
 @extends('voyager::master')
 
+
+
+
 @section('page_title', __('voyager::generic.viewing').' '.$dataType->getTranslatedAttribute('display_name_plural'))
 
 @section('page_header')
@@ -42,6 +45,9 @@
     @include('voyager::alerts')
     <div class="row">
         <div class="col-md-12">
+            <div>
+    <a href="{{url('/seller/orders')}}" class="">Order Management</a>
+</div>
             <div class="panel panel-bordered">
                 <div class="panel-body">
                     @if ($isServerSide)
@@ -125,16 +131,28 @@
                                     }
                                     @endphp
                                     <td>
+
                                         @if (isset($row->details->view))
+
+                                            
+
                                         @include($row->details->view, ['row' => $row, 'dataType' => $dataType,
                                         'dataTypeContent' => $dataTypeContent, 'content' => $data->{$row->field},
                                         'action' => 'browse', 'view' => 'browse', 'options' => $row->details])
+                                            
+
                                         @elseif($row->type == 'image')
                                         <img src="@if( !filter_var($data->{$row->field}, FILTER_VALIDATE_URL)){{ Voyager::image( $data->{$row->field} ) }}@else{{ $data->{$row->field} }}@endif"
                                             style="width:100px">
                                         @elseif($row->type == 'relationship')
-                                        @include('voyager::formfields.relationship', ['view' => 'browse','options' =>
-                                        $row->details])
+                                            
+                                            
+
+                                                @include('voyager::formfields.relationship', ['view' => 'browse','options' =>
+                                                $row->details])
+
+                                            
+                                            
                                         @elseif($row->type == 'select_multiple')
                                         @if(property_exists($row->details, 'relationship'))
 
@@ -192,8 +210,12 @@
                                         @elseif($row->type == 'color')
                                         <span class="badge badge-lg"
                                             style="background-color: {{ $data->{$row->field} }}">{{ $data->{$row->field} }}</span>
+                                            
                                         @elseif($row->type == 'text')
-                                        @include('voyager::multilingual.input-hidden-bread-browse')
+
+                                                @include('voyager::multilingual.input-hidden-bread-browse')
+                                             
+
                                         <div>
                                             {{ mb_strlen( $data->{$row->field} ) > 200 ? mb_substr($data->{$row->field}, 0, 200) . ' ...' : $data->{$row->field} }}
                                         </div>
