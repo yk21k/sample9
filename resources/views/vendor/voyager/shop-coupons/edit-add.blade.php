@@ -1,6 +1,7 @@
 @php
     $edit = !is_null($dataTypeContent->getKey());
     $add  = is_null($dataTypeContent->getKey());
+    use App\Models\Product;
 @endphp
 
 @extends('voyager::master')
@@ -25,7 +26,6 @@
         <div class="row">
 
             <!-- <h2>jfgia:@gaiog:a</h2> -->
-            
             <div class="col-md-12">
 
                 <div class="panel panel-bordered">
@@ -83,16 +83,36 @@
                                     @elseif (isset($row->details->view))
                                         @include($row->details->view, ['row' => $row, 'dataType' => $dataType, 'dataTypeContent' => $dataTypeContent, 'content' => $dataTypeContent->{$row->field}, 'action' => ($edit ? 'edit' : 'add'), 'view' => ($edit ? 'edit' : 'add'), 'options' => $row->details])
                                     @elseif ($row->type == 'relationship')
-
-                                        <!-- 20240728 add -->
-                                        @if($row->display_name == 'shops' && auth()->user()->hasRole('seller'))
+                                        
+                                        @if($row->display_name == 'Shops' && auth()->user()->hasRole('seller'))
+                                        
                                             {{ auth()->user()->shop->name ?? 'n/a' }}
                                             <input type="hidden" name="shop_id" value="{{ auth()->user()->shop->id }}">
+
+                                        @elseif($row->display_name == 'Products' && auth()->user()->hasRole('seller'))
+
+                                            @php
+                                                $product_shop_coupons = App\Models\Product::where('shop_id', auth()->user()->shop->id)->get()
+                                            @endphp
+                                               
+                                            <select name="product_id">
+                                                @foreach($product_shop_coupons as $pscoupon)
+                                                    
+                                                    <option name="product_id" value="{{ $pscoupon->id }}" id="product_id"  > {{ $pscoupon->name }}</option>
+
+
+                                                @endforeach    
+                                            </select> 
+                                                
+
+                                            
+
                                         @else
+
                                             @include('voyager::formfields.relationship', ['options' => $row->details])
+                                            
                                         @endif
-                                        <!--  end 20240728 add -->    
-                                    
+                            
                                     @else
                                         {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!}
                                     @endif
@@ -114,26 +134,8 @@
                                 $attributeOptions = \App\Models\Attribute::with('values')->get();
                             @endphp
 
-                            <!-- add -->
-                            @foreach($attributeOptions as $attr)
 
 
-                                <div class="form-group">
-                                    <label for=""> {{$attr->name}} :</label>
-                                    <select class="form-control" name="product_attributes[{{$attr->name}}]" >
-                                        <option value=""></option>
-                                        @foreach ($attr->values as $val)
-
-                                        <option {{ (!empty(json_decode($dataTypeContent->product_attributes,true)[$attr->name]) && json_decode($dataTypeContent->product_attributes,true)[$attr->name] == $val->value) ? 'selected' : '' }} >{{$val->value}}</option>
-
-                                        
-                                        @endforeach
-
-                                    </select>
-                                </div>
-
-                            @endforeach
-                             <!-- endadd -->
                             @if( $attributeOptions->isEmpty() )
                                 <p>No attribute</p>
                             @endif

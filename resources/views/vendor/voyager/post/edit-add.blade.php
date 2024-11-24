@@ -8,7 +8,9 @@
 @section('css')
     <meta name="csrf-token" content="{{ csrf_token() }}">
 @stop
-
+<div>
+    <a href="{{url('/seller/orders')}}" class="">Order Management</a>
+</div>
 @section('page_title', __('voyager::generic.'.($edit ? 'edit' : 'add')).' '.$dataType->getTranslatedAttribute('display_name_singular'))
 
 @section('page_header')
@@ -83,9 +85,10 @@
                                     @elseif (isset($row->details->view))
                                         @include($row->details->view, ['row' => $row, 'dataType' => $dataType, 'dataTypeContent' => $dataTypeContent, 'content' => $dataTypeContent->{$row->field}, 'action' => ($edit ? 'edit' : 'add'), 'view' => ($edit ? 'edit' : 'add'), 'options' => $row->details])
                                     @elseif ($row->type == 'relationship')
-
+                                        
                                         <!-- 20240728 add -->
                                         @if($row->display_name == 'shops' && auth()->user()->hasRole('seller'))
+
                                             {{ auth()->user()->shop->name ?? 'n/a' }}
                                             <input type="hidden" name="shop_id" value="{{ auth()->user()->shop->id }}">
                                         @else
@@ -114,7 +117,7 @@
                                 $attributeOptions = \App\Models\Attribute::with('values')->get();
                             @endphp
 
-                            <!-- add -->
+
                             @foreach($attributeOptions as $attr)
 
 
@@ -133,8 +136,7 @@
                                 </div>
 
                             @endforeach
-                             <!-- endadd -->
-                            @if( $attributeOptions->isEmpty() )
+                                @if( $attributeOptions->isEmpty() )
                                 <p>No attribute</p>
                             @endif
                             

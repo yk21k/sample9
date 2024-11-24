@@ -1,3 +1,9 @@
+
+@if(auth()->user()->role_id==2)
+    404 not found 
+@elseif(is_null(auth()->user()->role_id))
+    404 not found
+@else    
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
@@ -123,7 +129,10 @@
                     <div class="list-group">
                         <a href="/seller" class="list-group-item list-group-item-action active">Dashboard</a>
                         <a href=" {{url('/seller/orders')}}  " class="list-group-item list-group-item-action">Orders</a>
+
                         <a href=" {{url('/admin/shops')}} " class="list-group-item list-group-item-action">Go to Shop</a>
+
+                        <a href=" {{url('/seller/orders/shop-coupon')}} " class="list-group-item list-group-item-action">Create Shop Coupon</a>
                     </div>
 
                 </div>
@@ -138,3 +147,5 @@
 </body>
 
 </html>
+
+@endif

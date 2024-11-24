@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\OrderItem;
 use App\Models\SubOrder;
+use Session;
 
 
 class OrderController extends Controller
@@ -71,6 +72,9 @@ class OrderController extends Controller
             $order->billing_phone = $request->input('billing_phone');
             $order->billing_zipcode = $request->input('billing_zipcode');
         }
+        // dd(Session::get('coupon101'));
+
+        $order->coupon_code = Session::get('coupon101');
 
         $order->grand_total = \Cart::session(auth()->id())->getTotal();
         $order->item_count = \Cart::session(auth()->id())->getContent()->count();
@@ -81,6 +85,7 @@ class OrderController extends Controller
             $order->payment_method = 'paypal';
         }
 
+        
 
         $order->save();
 

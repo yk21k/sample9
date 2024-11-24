@@ -11,6 +11,7 @@ use App\Models\Shop;
 use App\Models\CustomerInquiry;
 use App\Models\Inquiries;
 use App\Models\DeleteShop;
+use App\Models\ShopCoupon;
 use TCG\Voyager\Facades\Voyager;
 use Illuminate\Pagination\Paginator;
 

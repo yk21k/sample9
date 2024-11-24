@@ -34,6 +34,8 @@
 				<td>{{ $item->name }}</td>
 				<td>
 					$ {{ \Cart::session(auth()->id())->get($item->id)->getPriceSum() }}
+					aa{{ \Cart::session(auth()->id())->getTotal() }}
+					aa{{ $item->getPriceWithConditions() }}
 				</td>
 				<td>
 
@@ -57,13 +59,22 @@
 			<br>	
 
 		@endforeach
-					
+				
+
 		</tbody>
 	</table>
 
 	<div class="coupon">
 		<form action="{{ route('cart.coupon') }}" method="get">
 			<input class="input-text" type="text" id="coupon_code" name="coupon_code" value="" placeholder="Coupon code" required>
+			<input class="button" name="apply_coupon" value="Apply coupon" type="submit">
+		</form>
+	</div>
+	<br>
+	<br>
+	<div class="shopcoupon">
+		<form action="{{ route('cart.shopcoupon') }}" method="get">
+			<input class="input-text" type="text" id="shopcoupon_code" name="code" value="" placeholder="Shop Original Coupon code" required>
 			<input class="button" name="apply_coupon" value="Apply coupon" type="submit">
 		</form>
 	</div>

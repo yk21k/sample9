@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Coupon;
+use App\Models\ShopCoupon;
+use App\Models\Order;
+
 use Illuminate\Support\Facades\DB;
 use Session;
 
@@ -183,6 +186,7 @@ class CartController extends Controller
 
         $couponData = Coupon::where('code', $couponCode)->first();
 
+
         if(!$couponData) {
             return back()->withMessage('Sorry! Coupon does not exist');
         }
@@ -197,6 +201,76 @@ class CartController extends Controller
 
         \Cart::session(auth()->id())->condition($condition); // for a speicifc user's cart
 
+        return back()->withMessage('coupon applied');
+
+    }
+
+    public function applyShopCoupon()
+    {
+        
+        
+        $shopCouponCode = request('code');
+        // dd($shopCouponCode);
+
+        $shopCouponData = ShopCoupon::where('code', $shopCouponCode)->first();
+        // dd($shopCouponData);
+
+        if(!$shopCouponData) {
+            return back()->withMessage('Sorry! Coupon does not exist');
+        }
+
+        $shopCouponOrder = Order::where('coupon_code', $shopCouponCode)->first();
+        
+        if($shopCouponOrder) {
+            return back()->withMessage('Sorry! This coupon cannot be used as it has already been paid.');
+        }    
+
+        //coupon logic
+        // $saleCondition = new \Darryldecode\Cart\CartCondition(array(
+        //     'name' => $shopCouponData->name,
+        //     'type' => $shopCouponData->type,
+        //     'value' => $shopCouponData->value,
+        // ));
+        // dd($condition);
+
+        $cartItems = \Cart::session(auth()->id())->getContent();
+        $items = \Cart::getContent();
+        // dd($cartItems);
+        // dd($items);
+        // dd($shopCouponData->product_shop_coupon->name);
+
+        $productID = $shopCouponData->product_id;
+        \Cart::clearItemConditions($productID);
+        $coupon101 = new \Darryldecode\Cart\CartCondition(array(
+            'name' => $shopCouponData->name,
+            'code' => $shopCouponData->code,  
+            'type' => $shopCouponData->type,
+            'value' => $shopCouponData->value,
+        ));
+
+        \Cart::addItemCondition($productID, $coupon101);
+
+        Session::put('coupon101', print_r($shopCouponCode, true));
+        
+           
+
+        // dd(\Cart::session(auth()->id())->getContent());
+        // dd(\Cart::session(auth()->id())->getConditions());
+        // $cartItems = array(
+        //     'id' => $shopCouponData->product_id,
+        //     'name' => $shopCouponData->product_shop_coupon->name,
+        //     'price' => $shopCouponData->product_shop_coupon->price,
+        //     'quantity' => 1,
+        //     'conditions' => $saleCondition
+        // );
+
+        // \Cart::add($cartItems);
+        // \Cart::add($saleCondition);
+        // \Cart::session(auth()->id())->condition($saleCondition);
+        // \Cart::condition($saleCondition);
+        // \Cart::addItemCondition($items, $saleCondition);
+
+        // \Cart::session(auth()->id())->condition($saleCondition); // for a speicifc user's cart
 
         return back()->withMessage('coupon applied');
 

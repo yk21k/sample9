@@ -26,5 +26,10 @@ class Shop extends Model
         return $this->hasMany(Categories::class, 'shop_id');
     }
 
+    public function shopCoupon()
+    {
+        return $this->hasMany(ShopCoupon::class, 'shop_id');
+    }
+
 
 }

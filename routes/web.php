@@ -11,6 +11,7 @@ use App\Http\Controllers\InquiriesController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Seller\OrdersController;
+use App\Http\Controllers\ShopCouponsController;
 use App\Http\Controllers\SubOrderController;
 use App\Http\Controllers\BotManController;
 
@@ -73,6 +74,8 @@ Route::get('/cart/checkout', [App\Http\Controllers\CartController::class, 'check
 
 Route::get('/cart/apply-coupon', [App\Http\Controllers\CartController::class, 'applyCoupon'])->name('cart.coupon')->middleware('auth');
 
+Route::get('/cart/apply-shopcoupon', [App\Http\Controllers\CartController::class, 'applyShopCoupon'])->name('cart.shopcoupon')->middleware('auth');
+
 
 
 Route::get('/account/{id}', [App\Http\Controllers\AccountController::class, 'index'])->name('account.account')->middleware('auth');
@@ -124,6 +127,11 @@ Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
     Route::get('/order/pay/{suborder}', [App\Http\Controllers\SubOrderController::class, 'pay'])->name('order.pay');
 
+    Route::get('/shop-coupon-create', [App\Http\Controllers\ShopCouponsController::class, 'makeCouponPage'])->name('order.make_coupon');
+
+    Route::post('/shop-coupon-create', [App\Http\Controllers\ShopCouponsController::class, 'makeCoupon'])->name('order.make_coupon');
+
+
 });
 
 Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', 'namespace' => 'App\Http\Controllers\Seller'], function () {
@@ -133,7 +141,10 @@ Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', '
     Route::resource('/orders', 'OrdersController');
 
     Route::get('/orders/delivered/{suborder}', 'OrdersController@markDelivered')->name('order.delivered');
+    
 });
+
+
 
 Route::get('/test', function(){
     $o = Order::find(144);

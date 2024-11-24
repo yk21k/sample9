@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\SubOrder;
 
 
+
 class SubOrderController extends Controller
 {
     public function pay(SubOrder $suborder)
@@ -18,4 +19,6 @@ class SubOrderController extends Controller
 
         return redirect()->to('/admin/transactions')->withMessage('Transaction Created');
     }
+
+
 }
