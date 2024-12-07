@@ -5,6 +5,8 @@
     <link href="{{ asset('front/css/custom3.css') }}" rel="stylesheet">
 @endpush
 
+
+
 <!-- Slideshow container -->
 <div class="slideshow-container">
 
@@ -77,7 +79,7 @@
 <br>
 @if(json_decode($product_movies, true))
 	@foreach(json_decode($product_movies, true) as $movie)
-			<video controls width="250" src="{{ asset('storage/'.$movie['download_link']) }}#t=0,2" muted class="contents_width"></video>
+			<video controls width="60%" src="{{ asset('storage/'.$movie['download_link']) }}#t=0,2" muted class="contents_width"></video>
 	@endforeach
 @endif	
 

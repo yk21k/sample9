@@ -1,9 +1,9 @@
 
-@if(auth()->user()->role_id==2)
+@if(auth()->user()===null)
     404 not found 
-@elseif(is_null(auth()->user()->role_id))
-    404 not found
-@else    
+@elseif(auth()->user()->role_id===2)
+    <h2>404 because authentication is not possible</h2>
+@else   
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 

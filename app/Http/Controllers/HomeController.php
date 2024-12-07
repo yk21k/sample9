@@ -7,11 +7,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
+use App\Models\Campaign;
 use App\Models\Product;
 use App\Models\Categories;
 use App\Models\Attribute;
 use App\Models\User;
 use Illuminate\Support\Facades\Cookie;
+use Carbon\Carbon;
+
 
 class HomeController extends Controller
 {
@@ -32,6 +35,27 @@ class HomeController extends Controller
      */
     public function index(Request $request)
     {
+        $today = Carbon::today();
+        $capaign_objs = Campaign::where([
+            
+            ['status', 1],
+            ['start_date', '<=', $today],
+            ['end_date', '>=', $today]
+
+        ])->get()->toArray();
+
+        // dd($capaign_objs);
+        // dd($capaingn_obj['items']);
+
+        // $test = $capaingn_objs[0];
+        // $test1 = $capaingn_objs[1];
+        // dd($test['start_date'], $test1['start_date']);
+
+        
+        
+
+
+
         $product_attributes = [];
         $product_attributes = Attribute::with('values')->get();
         // dd($product_attributes);
@@ -66,7 +90,7 @@ class HomeController extends Controller
 
         // dd($products);
         // dd($categories);    
-        return response()->view('home', ['allProducts' => $products, 'product_attributes' => $product_attributes, 'categories' => $categories]);
+        return response()->view('home', ['allProducts' => $products, 'product_attributes' => $product_attributes, 'categories' => $categories, 'capaign_objs' => $capaign_objs]);
     }
 
 

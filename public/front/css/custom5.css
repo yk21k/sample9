@@ -5,21 +5,59 @@
   color: #fff;
 }
 .ribbon {
-  --r: .4em; /* control the ribbon shape (the radius) */
-  --c: #E3AD40;
+  --r: .8em; /* control the ribbon shape */
+  
+  padding-inline: calc(var(--r) + .3em);
+  line-height: 1.8;
+  clip-path: polygon(0 0,100% 0,calc(100% - var(--r)) 50%,100% 100%,0 100%, var(--r) 50%);
+  background: #CC333F; /* the main color */
+  width: fit-content;
+}
 
+
+/* HTML: <div class="ribbon">Your text content</div> */
+.ribbon1 {
+  font-size: 28px;
+  font-weight: bold;
+  color: #fff;
+}
+.ribbon1 {
+  --f: .5em; /* control the folded part */
+  
+  position: absolute;
+  top: 0;
+  right: 0;
+  line-height: 1.8;
+  padding-inline: 1lh;
+  padding-bottom: var(--f);
+  border-image: conic-gradient(#0008 0 0) 51%/var(--f);
+  clip-path: polygon(
+    100% calc(100% - var(--f)),100% 100%,calc(100% - var(--f)) calc(100% - var(--f)),var(--f) calc(100% - var(--f)), 0 100%,0 calc(100% - var(--f)),999px calc(100% - var(--f) - 999px),calc(100% - 999px) calc(100% - var(--f) - 999px));
+  transform: translate(calc((1 - cos(45deg))*100%), -100%) rotate(45deg);
+  transform-origin: 0% 100%;
+  background-color: #BD1550; /* the main color  */
+}
+
+/* HTML: <div class="ribbon">Your text content</div> */
+.ribbon2 {
+  font-size: 28px;
+  font-weight: bold;
+  color: #fff;
+}
+.ribbon2 {
+  --f: .5em; /* control the folded part*/
+  --r: .8em; /* control the ribbon shape */
+  
   position: absolute;
   bottom: 20px;
-  right: calc(-1*var(--r));
-  line-height: 1.8; 
-  padding: calc(2*var(--r)) .5em 0;
-  border-radius: 0 var(--r) var(--r) 0;
-  background: 
-    radial-gradient(100% 50% at right,var(--c) 98%,#0000 101%)
-     0 100%/.5lh calc(100% - 2*var(--r)),
-    radial-gradient(100% 50% at left,#0005 98%,#0000 101%) 
-     100% 0/var(--r) calc(2*var(--r)),
-    conic-gradient(at calc(100% - var(--r)) calc(2*var(--r)),var(--c) 75%,#0000 0)
-     100% 0/calc(101% - .5lh) 100%;
-  background-repeat: no-repeat;   
+  right: calc(-1*var(--f));
+  padding-inline: .25em;
+  line-height: 1.8;
+  background: #2699dc;
+  border-top: var(--f) solid #0005;
+  border-left: var(--r) solid #0000;
+  clip-path: 
+    polygon(var(--r) 100%,100% 100%,100% var(--f),calc(100% - var(--f)) 0,
+      calc(100% - var(--f)) var(--f),var(--r) var(--f),
+      0 calc(50% + var(--f)/2));
 }

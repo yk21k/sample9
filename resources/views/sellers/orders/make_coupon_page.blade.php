@@ -1,5 +1,5 @@
 @if(auth()->user()===null)
-	404 not found 
+	<h2>Page not found. Please check the URL and log in again if necessary.</h2>
 @else
 
 @extends('layouts.seller')

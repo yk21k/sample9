@@ -1,0 +1,97 @@
+.card10 {
+  position: relative;
+  width: 100%;
+}
+
+.card-img-top1 {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.overlay10 {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  transition: .5s ease;
+  background-color: #008CBA;
+}
+
+@media (hover: hover) {
+  .container10:hover .overlay10 {
+    opacity: 1;
+  }
+}
+
+.card.card-skin {
+  border: 13px solid #eee;
+  position: relative;
+  margin: 5px;
+}
+
+.change-border01::after,
+.change-border01::before,
+.change-border01__inner::after,
+.change-border01__inner::before {
+  background-color: #3498db;
+  content: '';
+  display: block;
+  position: absolute;
+  z-index: 10;
+  transition: all .3s ease;
+  -webkit-transition: all .3s ease;
+}
+
+.change-border01::after {
+    width: 0px;
+    height: 13px;
+    top: -13px;
+    left: -13px;
+}
+
+.change-border01::before {
+    width: 0px;
+    height: 13px;
+    right: -13px;
+    bottom: -13px;
+}
+
+.change-border01__inner::after {
+    width: 13px;
+    height: 0px;
+    left: -13px;
+    bottom: -13px;
+}
+
+.change-border01__inner::before {
+    width: 13px;
+    height: 0px;
+    top: -13px;
+    right: -13px;
+}
+
+
+.change-border01:hover::after,
+.change-border01:hover::before {
+  width: 100%;
+  width: calc(100% + 13px);
+}
+.change-border01:hover .change-border01__inner::after,
+.change-border01:hover .change-border01__inner::before {
+  height: 100%;
+  height: calc(100% + 13px);
+}
+
+
+
+
+
+
+
+
+

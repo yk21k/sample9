@@ -19,7 +19,7 @@ search-item {
 
 body,
         .multilevel-dropdown-menu {
-            font-family: Arial, sans-serif;
+            -webkit-text-size-adjust: 100%;
         }
 
         .parent {

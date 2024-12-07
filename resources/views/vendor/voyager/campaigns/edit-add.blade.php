@@ -1,6 +1,7 @@
 @php
     $edit = !is_null($dataTypeContent->getKey());
     $add  = is_null($dataTypeContent->getKey());
+    use App\Models\Product;
 @endphp
 
 @extends('voyager::master')
@@ -24,10 +25,7 @@
     <div class="page-content edit-add container-fluid">
         <div class="row">
 
-            @if (session('error')) 
-                <div class="alert alert-danger">{{ session('error') }}</div>
-            @endif
-            
+            <!-- <h2>jfgia:@gaiog:a</h2> -->
             <div class="col-md-12">
 
                 <div class="panel panel-bordered">
@@ -60,7 +58,7 @@
                             @php
                                 $dataTypeRows = $dataType->{($edit ? 'editRows' : 'addRows' )};
                             @endphp
-
+                            
 
                             @foreach($dataTypeRows as $row)
                                 <!-- GET THE DISPLAY OPTIONS -->
@@ -71,7 +69,6 @@
                                     }
                                 @endphp
                                 
-
                                 @if (isset($row->details->legend) && isset($row->details->legend->text))
                                     <legend class="text-{{ $row->details->legend->align ?? 'center' }}" style="background-color: {{ $row->details->legend->bgcolor ?? '#f0f0f0' }};padding: 5px;">{{ $row->details->legend->text }}</legend>
                                 @endif
@@ -87,26 +84,15 @@
                                     @elseif (isset($row->details->view))
                                         @include($row->details->view, ['row' => $row, 'dataType' => $dataType, 'dataTypeContent' => $dataTypeContent, 'content' => $dataTypeContent->{$row->field}, 'action' => ($edit ? 'edit' : 'add'), 'view' => ($edit ? 'edit' : 'add'), 'options' => $row->details])
                                     @elseif ($row->type == 'relationship')
+                                      
 
-                                        <!-- 20240728 add -->
-                                        @if($row->display_name == 'shops' && auth()->user()->hasRole('seller'))
-                                            {{ auth()->user()->shop->name ?? 'n/a' }}
-                                            <input type="hidden" name="shop_id" value="{{ auth()->user()->shop->id }}">
+                                        @if($row->display_name == 'Shops' && auth()->user()->hasRole('seller'))
+                                            {{auth()->user()->shop->name ?? 'n/a'}}
+                                            <input type="hidden" name="shop_id" value="{{auth()->user()->shop->id}}">
                                         @else
                                             @include('voyager::formfields.relationship', ['options' => $row->details])
                                         @endif
-                                        <!--  end 20240728 add -->    
-
-                                    @elseif($row->display_name == 'Campaigns Rate1' && auth()->user()->hasRole('seller'))
-                                        @php
-                                            $product_camp = App\Models\Product::where('shop_id', auth()->user()->shop->id)
-                                        @endphp
-                                        @if(empty($product_camp))
-                                            {{ $product_camp->campaigns_rate1 }}
-                                        @else
-                                            :　0 if it is a newly registered product, or the setting value after creating a campaign
-                                        @endif
-                                        
+                            
                                     @else
                                         {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!}
                                     @endif
@@ -120,6 +106,7 @@
                                         @endforeach
                                     @endif
                                 </div>
+
                             @endforeach
                             
 
@@ -128,26 +115,8 @@
                                 $attributeOptions = \App\Models\Attribute::with('values')->get();
                             @endphp
 
-                            <!-- add -->
-                            @foreach($attributeOptions as $attr)
 
 
-                                <div class="form-group">
-                                    <label for=""> {{$attr->name}} :</label>
-                                    <select class="form-control" name="product_attributes[{{$attr->name}}]" >
-                                        <option value=""></option>
-                                        @foreach ($attr->values as $val)
-
-                                        <option {{ (!empty(json_decode($dataTypeContent->product_attributes,true)[$attr->name]) && json_decode($dataTypeContent->product_attributes,true)[$attr->name] == $val->value) ? 'selected' : '' }} >{{$val->value}}</option>
-
-                                        
-                                        @endforeach
-
-                                    </select>
-                                </div>
-
-                            @endforeach
-                             <!-- endadd -->
                             @if( $attributeOptions->isEmpty() )
                                 <p>No attribute</p>
                             @endif

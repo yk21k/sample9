@@ -17,7 +17,7 @@
     <p>Nothing</p>
 @endif
 
-<div class="row" style="margin-right: 500px;"> 
+<div class="row" style="margin-right: 20%;"> 
 
 
 @forelse($products as $product) 

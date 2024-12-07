@@ -4,12 +4,15 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, maximum-scale=1.0, user-scalable=yes">
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
+
+    <link rel="stylesheet" href="{{ asset('front/css/custom_mb.css') }}" media="screen and (max-width:480px)">
+
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
@@ -18,6 +21,7 @@
     <link rel="stylesheet" href="{{ asset('front/css/custom3.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom4.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom5.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/css/custom6.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     @stack('css')
@@ -194,13 +198,13 @@
                 @include('layouts.header')      
             </div>
 
-            <div class="wrapper" style="margin-left: 300px;">
+            <div class="wrapper" style="margin-left: 5%;">
                 <div class="wrapper">
                     @yield('content')
                 </div>
             </div>    
         <!-- footer part -->
-            <div class="wrapper" style="margin-left: 300px;">
+            <div class="wrapper" style="margin: 5%;">
                 @include('layouts.footer')
 
             </div>

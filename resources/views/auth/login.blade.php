@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="wrapper" style="margin-right: 300px;">
+<div class="wrapper">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">

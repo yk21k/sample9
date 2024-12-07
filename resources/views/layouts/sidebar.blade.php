@@ -1,3 +1,7 @@
+<style type="text/css">
+@media (max-width: 480px) {display:none;}
+</style>
+
 <div class="sidenav shadow-sm">
 
     <h3>Multilevel dropdown</h3>
@@ -45,4 +49,4 @@
             @endforeach
         </ul>
 
- </div>
+</div>

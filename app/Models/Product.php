@@ -9,6 +9,7 @@ class Product extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['campaigns_rate1'];
     protected $guarded = ['id'];
 
 
