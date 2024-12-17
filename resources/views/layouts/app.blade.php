@@ -198,8 +198,8 @@
                 @include('layouts.header')      
             </div>
 
-            <div class="wrapper" style="margin-left: 5%;">
-                <div class="wrapper">
+            <div class="wrapper" style="margin-left: 3%;">
+                <div class="wrapper" style="margin-left: 8%;">
                     @yield('content')
                 </div>
             </div>    

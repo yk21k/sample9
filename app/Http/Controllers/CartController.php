@@ -9,9 +9,12 @@ use App\Models\Product;
 use App\Models\Coupon;
 use App\Models\ShopCoupon;
 use App\Models\Order;
+use App\Models\DeliveryAddress;
+use Illuminate\Support\Facades\View;
 
 use Illuminate\Support\Facades\DB;
 use Session;
+use Auth;
 
 class CartController extends Controller
 {
@@ -175,9 +178,38 @@ class CartController extends Controller
 
     }
 
-    public function checkout()
+    public function checkout(Request $request)
     {
-        return view('cart.checkout');
+        $deliveryAddresses = DeliveryAddress::where('user_id', Auth::user()->id)->get();
+        // dd($deliveryAddresses);
+        
+
+        $setDeliPlaces = DeliveryAddress::setDeliPlaces();
+        // dd($setDeliPlaces);
+        if(!empty($setDeliPlaces)){
+            $setDeliPlaces;
+        }
+        return view('cart.checkout', compact('deliveryAddresses', 'setDeliPlaces'));
+    }
+
+    public function deliPlace(Request $request)
+    {
+        
+        $data = $request->all();
+        $deliPlaces = DeliveryAddress::where('user_id', Auth::user()->id)->get();
+        foreach($deliPlaces as $deliPlace){
+            if($deliPlace->status==1){
+                $deliPlace->update([
+                    'status' => 0
+                ]);
+            }
+        }
+        $upDeliPlaces = DeliveryAddress::find($data['shipping_id']);
+        $upDeliPlaces->update(['status' => 1]);
+        // dd($setDeliPlace->status);
+        $setDeliPlaces = DeliveryAddress::where('user_id', Auth::user()->id)->get();
+        return back();
+    
     }
 
     public function applyCoupon()

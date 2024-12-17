@@ -9,10 +9,11 @@
             display: none;
         }
     }
+
 </style>
 <div class="sidenav shadow-sm">
 
-    <h3>Multilevel dropdown</h3>
+    <div style="color: black;"><a><h3>Category Menu</h3></a></div>
         <ul class="multilevel-dropdown-menu">
             @foreach($categories as $category)
 

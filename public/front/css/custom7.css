@@ -1,0 +1,13 @@
+
+#hide_button{
+    display: inline-block;
+    background: #b6beff;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+#table_order1{
+    display: none;
+
+    background: #ffaf74;
+}

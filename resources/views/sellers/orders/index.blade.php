@@ -11,6 +11,9 @@
                 <th>Order number</th>
                 <th>Status</th>
                 <th>Item count</th>
+                <th>Shipping Name</th>
+                <th>Shipping Phone</th>
+                <th>Shipping Zipcode</th>
                 <th>Shipping Address</th>
                 <th>Action</th>
             </tr>
@@ -35,6 +38,19 @@
                     </td>
 
                     <td>
+                       {!! $subOrder->order->shipping_fullname !!}
+                    </td>
+                    <td>
+                       {!! $subOrder->order->shipping_phone !!}
+                    </td>
+                    <td>
+                       {!! $subOrder->order->shipping_zipcode !!}
+                    </td>
+                    <td>
+                       {!! $subOrder->order->shipping_state !!}
+                    
+                       {!! $subOrder->order->shipping_city !!}
+                      
                        {!! $subOrder->order->shipping_address !!}
                     </td>
 

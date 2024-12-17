@@ -16,9 +16,9 @@ class OrderController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+
     }
 
     /**
@@ -172,7 +172,7 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        //
+
     }
 
     /**

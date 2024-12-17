@@ -132,7 +132,7 @@
 
                         <a href=" {{url('/admin/shops')}} " class="list-group-item list-group-item-action">Go to Shop</a>
 
-                        <a href=" {{url('/seller/orders/shop-coupon')}} " class="list-group-item list-group-item-action">Create Shop Coupon</a>
+                        <a href=" {{ route('order.make_coupon') }} " class="list-group-item list-group-item-action">Create Shop Coupon</a>
                     </div>
 
                 </div>

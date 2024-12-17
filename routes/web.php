@@ -76,11 +76,18 @@ Route::get('/cart/apply-coupon', [App\Http\Controllers\CartController::class, 'a
 
 Route::get('/cart/apply-shopcoupon', [App\Http\Controllers\CartController::class, 'applyShopCoupon'])->name('cart.shopcoupon')->middleware('auth');
 
+Route::post('/cart/deli-place', [App\Http\Controllers\CartController::class, 'deliPlace'])->name('cart.deli_place')->middleware('auth');
 
 
 Route::get('/account/{id}', [App\Http\Controllers\AccountController::class, 'index'])->name('account.account')->middleware('auth');
 
 Route::post('/account/{id}', [App\Http\Controllers\AccountController::class, 'updateProf'])->name('account.accounts')->middleware('auth');
+
+Route::post('/account_addresses/{id}', [App\Http\Controllers\AccountController::class, 'saveDeliveryAddress'])->name('account.addresses')->middleware('auth');
+
+
+
+
 
 
 Route::get('/cutomer-inquiry', [App\Http\Controllers\CustomerInquiryController::class, 'inquiryForm'])->name('account.inquiry')->middleware('auth');

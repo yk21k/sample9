@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Validator;
 
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\Order;
+use App\Models\DeliveryAddress;
 use Auth;
 
 
@@ -15,8 +17,15 @@ class AccountController extends Controller
     public function index()
     {
         $profiles = User::where('id', Auth::user()->id)->first();
+
+        $order_histories = Order::where('user_id', Auth::user()->id)->get();
+
+        $firstDelis = Order::where('user_id', Auth::user()->id)->latest()->first();
+
+        $savedDelis = DeliveryAddress::where('user_id', Auth::user()->id)->get();
+        // dd($savedDelis);
         
-        return view('account.account', compact('profiles'));
+        return view('account.account', compact('profiles', 'order_histories', 'firstDelis', 'savedDelis'));
     }
 
     public function updateProf(Request $request, $id)
@@ -46,5 +55,46 @@ class AccountController extends Controller
         }
         return redirect()->route('account.account', ['id', $id])->withMessage('Update Profile!!');
 
-    }    
+    }
+
+    public function saveDeliveryAddress(Request $request, $id)
+    {
+        if($request->isMethod('post')){
+            $data = $request->all();
+
+            $rules = [
+                'shipping_fullname' => 'required|between:2, 30',
+                'shipping_zipcode' => 'required|numeric',
+                'shipping_phone' =>  'required|numeric|digits:11'  
+            ];
+
+            $customMessages = [
+                'shipping_fullname' => 'Name is required.',
+                'shipping_zipcode' => 'Zipcode is required. Please enter your postal code within Japan',
+                'shipping_address' => 'Address is required. Please check from the postal code',
+                'shipping_phone' => 'Phone is required'
+            ];
+
+            $this->validate($request, $rules, $customMessages);
+
+            $deliveryAddress = new DeliveryAddress;
+            $deliveryAddress->user_id = Auth::user()->id;
+            $deliveryAddress->shipping_fullname = $data['shipping_fullname'];
+            $deliveryAddress->shipping_address = $data['shipping_address'];
+            $deliveryAddress->shipping_city = $data['shipping_city'];
+            $deliveryAddress->shipping_state = $data['shipping_state'];
+            $deliveryAddress->shipping_zipcode = $data['shipping_zipcode'];
+            $deliveryAddress->shipping_phone = $data['shipping_phone'];
+            $deliveryAddress->status = 0;
+
+
+            $deliveryAddress->save();
+        }
+
+        return redirect()->route('account.accounts', ['id', $id])->withMessage('registered a new address');
+
+
+    }
+
+       
 }        
