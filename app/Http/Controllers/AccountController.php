@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Order;
+use App\Models\SubOrder;
 use App\Models\DeliveryAddress;
 use Auth;
 
@@ -18,7 +19,8 @@ class AccountController extends Controller
     {
         $profiles = User::where('id', Auth::user()->id)->first();
 
-        $order_histories = Order::where('user_id', Auth::user()->id)->get();
+        $order_histories = SubOrder::where('user_id', Auth::user()->id)->get();
+        
 
         $firstDelis = Order::where('user_id', Auth::user()->id)->latest()->first();
 

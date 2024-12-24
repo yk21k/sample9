@@ -27,20 +27,61 @@ class OrdersController extends Controller
         return view('sellers.orders.show', compact('items'));
     }
 
-    public function markDelivered(SubOrder $suborder)
+    public function markAccepted(SubOrder $suborder)
     {
-        $suborder->status = 'completed';
+        $suborder->payment_status = '';
+        $suborder->payment_status = 'accepted';
         $suborder->save();
 
-        //check if all suborders complete
-        $pendingSubOrders = $suborder->order->subOrders()->where('status','!=', 'completed')->count();
+        
+        $suborder->order()->update(['payment_status'=>'accepted']);
+        
 
-        if($pendingSubOrders == 0) {
-            $suborder->order()->update(['status'=>'completed']);
-        }
-
-        return redirect('/seller/orders')->withMessage('Order marked complete');
+        return redirect('/seller/orders')->withMessage('Order marked Accepted　(Pending)');    
     }
 
+    public function markDeliveryCom(SubOrder $suborder, Request $request)
+    {
+        $shipCom = $request->input('shipping_company');
+        $shipInvoice = $request->input('invoice_number');
+
+        $suborder->payment_status ='';
+        $suborder->payment_status = "arranging delivery";
+        
+        $suborder->shipping_company = $shipCom;
+        $suborder->invoice_number = $shipInvoice;
+        $suborder->save();
+
+        return redirect('/seller/orders')->withMessage('Order marked Arranging Delivery (Pending)');    
+    }
+
+    public function markArranged(SubOrder $suborder)
+    {
+        $suborder->payment_status ='';
+        $suborder->status ='';
+        $suborder->status = 'processing';
+        $suborder->payment_status = "delivery arranged";
+        
+        $suborder->save();
+
+        $suborder->order()->update(['status'=>'processing']);
+        $suborder->order()->update(['payment_status'=>'delivery arranged']);
+        
+
+        return redirect('/seller/orders')->withMessage('Order marked Delivery Arranged (Processing)');    
+    }
+
+    public function markDelivered(SubOrder $suborder)
+    {
+        $suborder->payment_status ='';
+        $suborder->status ='';
+        $suborder->status = 'completed';
+        $suborder->save();
+        
+        $suborder->order()->update(['status'=>'completed']);
+        
+
+        return redirect('/seller/orders')->withMessage('Order marked Complete');
+    }
 
 }

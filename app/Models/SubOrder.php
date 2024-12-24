@@ -27,5 +27,9 @@ class SubOrder extends Model
         return $this->hasMany(Transaction::class);
     }
 
+    public function seller_user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
 }

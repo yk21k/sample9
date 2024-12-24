@@ -55,9 +55,11 @@
             	<table class="table table-bordered table-striped" id="table_order1">
 	            	<thead>	
 		        	    <tr>
-		        	    	<td>Status</td>
-					        <td>Order number</td>
-					        <td>Purchase date</td>
+		        	    	<td>Delivery Status</td>
+		        	    	<td>Shipping Company</td>
+		        	    	<td>Invoice Number</td>
+					        <td>Order Number</td>
+					        <td>Purchase Date</td>
 					        <td>Name</td>
 					        <td>Zip-code</td>
 					        <td>Address</td>
@@ -66,8 +68,30 @@
 		        	@foreach($order_histories as $order_history)
 		        	<tbody id="myTable">
 		        		<tr>
-		        			<td>{{ $order_history->status }}</td>
-		        			<td>{{ $order_history->id }}</td>
+		        			@if($order_history->status=="pending" && $order_history->payment_status=="")
+		        				
+		        				<td>*Under preparation</td>
+
+		        			@elseif($order_history->status=="pending" && $order_history->payment_status=="accepted")
+		        				
+		        				<td>**Accepted</td>	
+
+		        			@elseif($order_history->status=="pending" && $order_history->payment_status=="arranging delivery")
+		        				
+		        				<td>⭐　Arranging Delivery</td>
+
+		        			@elseif($order_history->status=="processing" && $order_history->payment_status=="delivery arranged")
+
+		        				<td>⭐⭐️　Delivery Arranged</td>
+
+		        			@elseif($order_history->status=="completed")	
+		        				<td>*Delivered*</td>
+		        			@else
+		        				<td>Details Unknown</td>
+		        			@endif
+		        			<td>-----</td>
+		        			<td>^^^^^^^</td>
+		        			<td>{{ $order_history->order_id }}</td>
 		        			<td>{{ $order_history->created_at }}</td>
 		        			<td>{{ $order_history->shipping_fullname }}</td>
 		        			<td>{{ $order_history->shipping_zipcode }}</td>
@@ -79,6 +103,15 @@
                 
                 <br>
                 
+            </ul>
+        </section>
+
+        <section id="delivery-status" class="section">
+            <h2>Delivery Status</h2>
+            <ul>
+                <li>商品名: XYZ スニーカー - ¥6,000</li>
+                <li>商品名: ABC シャツ - ¥2,500</li>
+                <!-- 他のお気に入り商品 -->
             </ul>
         </section>
 

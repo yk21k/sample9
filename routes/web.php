@@ -148,6 +148,13 @@ Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', '
     Route::resource('/orders', 'OrdersController');
 
     Route::get('/orders/delivered/{suborder}', 'OrdersController@markDelivered')->name('order.delivered');
+
+    Route::get('/orders/delivered-accepted/{suborder}', 'OrdersController@markAccepted')->name('order.delivered_accepted');
+
+    Route::get('/orders/delivered-company/{suborder}', 'OrdersController@markDeliveryCom')->name('order.delivered_company');
+
+    Route::get('/orders/delivered-arranged/{suborder}', 'OrdersController@markArranged')->name('order.delivered_arranged');
+
     
 });
 

@@ -4,13 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Auth;
 
 class Order extends Model
 {
     use HasFactory;
 
     protected $guarded = [];
-
+    
     public function items()
     {
         return $this->belongsToMany(Product::class, 'order_items', 'order_id', 'product_id')->withPivot('quantity', 'price');
@@ -40,13 +41,14 @@ class Order extends Model
     public function generateSubOrders()
     {
         $orderItems = $this->items;
-
+        // dd($this);
         foreach ($orderItems->groupBy('shop_id') as $shopId => $products) {
             $shop = Shop::find($shopId);
 
             $suborder = $this->subOrders()->create([
                 'order_id'=> $this->id,
                 'seller_id'=> $shop->user_id ?? 1,
+                'user_id'=> Auth::user()->id,
                 'grand_total'=> $products->sum('pivot.price'),
                 'item_count'=> $products->count(),
                 'coupon_code'=> $this->coupon_code,

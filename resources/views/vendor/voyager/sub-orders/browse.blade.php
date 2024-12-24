@@ -128,7 +128,8 @@
                                     }
                                     @endphp
                                     <td>
-
+                                        
+                                        
                                         @if (isset($row->details->view))
 
                                             
@@ -143,10 +144,18 @@
                                             style="width:100px">
                                         @elseif($row->type == 'relationship')
                                             
-                                            
+                                            @if($row->display_name == 'Shop Manager')
+                                                @php
+                                                    $seller_id_shop = App\Models\Shop::where('user_id', $data->seller_id)->first();
+                                                @endphp    
+                                                {{ $seller_id_shop->name }}
 
+                                            @else
                                                 @include('voyager::formfields.relationship', ['view' => 'browse','options' =>
                                                 $row->details])
+                                            @endif
+
+                                                
 
                                             
                                             
