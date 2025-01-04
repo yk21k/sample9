@@ -31,7 +31,6 @@
 .card.card-skin {
   border: 13px solid #eee;
   position: relative;
-  margin: 5px;
 }
 
 .change-border01::after,

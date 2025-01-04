@@ -1,11 +1,11 @@
 .wrapper{
-    margin: 1em 2em;
+    margin: 1em 1em;
     width: 200%;    
         
 }
 
 .container {
-	margin: 1em 2em;
+	margin: 1em 1em;
 }
 
 .row{
@@ -15,7 +15,7 @@
 }
 
 .card{
-    width: 200%;    
+    width: 210%;    
 }
 
 .navbar .container{

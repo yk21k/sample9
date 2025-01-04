@@ -4,7 +4,7 @@
     width: 100%;
     line-height: 100px;
     position: absolute;
-    top: 0;
+    top: 50px;
     z-index: 100;
     overflow: hidden;
 }
@@ -33,7 +33,7 @@
     width: 100%;
     line-height: 100px;
     position: absolute;
-    top: 50px;
+    top: 70px;
     z-index: 100;
     overflow: hidden;
 }
@@ -62,7 +62,7 @@
     width: 100%;
     line-height: 100px;
     position: absolute;
-    top: 50px;
+    top: 90px;
     z-index: 100;
     overflow: hidden;
 }
