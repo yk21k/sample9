@@ -1,0 +1,86 @@
+.text-animation1 {
+    display: inline-flex;
+    height: 100px;
+    width: 100%;
+    line-height: 100px;
+    position: absolute;
+    top: 0;
+    z-index: 100;
+    overflow: hidden;
+}
+    
+.text-animation1 p {
+    display: inline-block;
+    color: tomato;
+    font-size: 20px;
+    white-space: nowrap;
+    animation: text_scroll 40s linear infinite;
+    padding-left: 100%;
+}
+
+@keyframes text_scroll {
+    0% {
+        transform: translateX(0)
+    }
+    100% {
+        transform: translateX(-300%)
+    }
+}
+
+.text-animation2 {
+    display: inline-flex;
+    height: 100px;
+    width: 100%;
+    line-height: 100px;
+    position: absolute;
+    top: 50px;
+    z-index: 100;
+    overflow: hidden;
+}
+    
+.text-animation2 p {
+    display: inline-block;
+    color: palevioletred;
+    font-size: 20px;
+    white-space: nowrap;
+    animation: text_scroll 40s linear infinite;
+    padding-left: 100%;
+}
+
+@keyframes text_scroll {
+    0% {
+        transform: translateX(0)
+    }
+    100% {
+        transform: translateX(-300%)
+    }
+}
+
+.text-animation3 {
+    display: inline-flex;
+    height: 100px;
+    width: 100%;
+    line-height: 100px;
+    position: absolute;
+    top: 50px;
+    z-index: 100;
+    overflow: hidden;
+}
+    
+.text-animation3 p {
+    display: inline-block;
+    color: springgreen;
+    font-size: 20px;
+    white-space: nowrap;
+    animation: text_scroll 70s linear infinite;
+    padding-left: 100%;
+}
+
+@keyframes text_scroll {
+    0% {
+        transform: translateX(0)
+    }
+    100% {
+        transform: translateX(-300%)
+    }
+}

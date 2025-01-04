@@ -51,8 +51,6 @@ class User extends \TCG\Voyager\Models\User
         return $this->hasOne(Shop::class, 'user_id');
     }
 
-
-
     /**
      * @return void
      */

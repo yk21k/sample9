@@ -58,14 +58,38 @@
             @endforeach
         </ul>
 </div>
- 
+<div class="text-animation1">  
+    @foreach($holidays as $holiday)
+            <p>Holiday Store: {{ $holiday['shop_name'] }}</p>
+        &nbsp;&nbsp;&nbsp;           
+    @endforeach
+</div>
+
+    @foreach($extra_holidays as $ex_holiday)
+        <div class="text-animation2"> 
+        @if($ex_holiday['date_flag'] === 2) 
+        
+            <p>Stores Temporarily Closed :: {{ $ex_holiday['shop_name'] }}</p>
+        
+        @endif
+        </div> 
+        <div class="text-animation3">     
+        @if($ex_holiday['date_flag'] === 1)
+            
+            <p>Temporary Store :: {{ $ex_holiday['shop_name'] }}</p>
+            
+        @endif 
+        </div>          
+    @endforeach
 
 <div class="container">
 
-    <h2>Products test</h2>
+        
 
     <div class="row">
-               
+
+        <br><br><br>
+        <h2>Products test</h2>
         @foreach($allProducts as $product)
 
                 <div class="col-4">
@@ -138,12 +162,9 @@
                                             @endif
                                         @endforeach
                                     @endforeach
-                                        
                                     <h4 class="card-title"> {{ $product->shop->name }} </h4>
 
-                                    <a class="" href="{{ route('inquiries.create', ['id'=>$product->shop->id]) }}"><h4>Contact Shop Manager</h4></a>
-
-
+                                    <a class="" href="{{ route('inquiries.create', ['id'=>$product->shop->id]) }}"><h4>Contact Shop Manager</h4></a> 
                                 </div>
                                 <div class="card-body change-border01__inner" id="addCart1">
                                     <a href="{{ route('cart.add', $product->id) }}" class="card-link">Add to Cart</a>

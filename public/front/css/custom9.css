@@ -1,0 +1,78 @@
+.day-blank {
+    background-color: #efefef;
+}
+.day-sun .day{
+    color:red;
+}
+.day-sat .day{
+    color: blue;
+}
+
+.day-close .day{
+    background-color: #FF7F50;
+}
+
+.calendar table td {    
+    padding: 3px;
+    border: solid 1px #999;
+}
+.calendar table td:before {
+    display: block;
+    float: left;
+    height: 50px;
+    content: "";
+}
+.calendar table td .day {
+    margin-bottom: 0;
+}
+.calendar table th {
+    text-align: center;
+    border: solid 1px #999;
+}
+
+.calendar table {
+    table-layout: fixed;
+}
+.calendar table .comment{
+    font-size: small;
+}
+
+
+.c-text {
+  overflow: hidden;
+  display: flex;
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+}
+
+.c-text__item {
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-size: 120px;
+
+  &:nth-child(odd) {
+    animation: MoveLeft 24s -12s infinite linear; //24秒かけて-12秒後に無限ループさせる
+  }
+
+  &:nth-child(even) {
+    animation: MoveLeft2 24s infinite linear; //24秒かけて無限ループさせる
+  }
+
+  @keyframes MoveLeft {
+      from {
+        transform: translateX(100%);
+      }
+      to {
+        transform: translateX(-100%);
+      }
+　}
+
+    @keyframes MoveLeft2 {
+      from {
+        transform: translateX(0);
+      }
+      to {
+        transform: translateX(-200%);
+      }
+    }
+}

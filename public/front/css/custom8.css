@@ -3,3 +3,8 @@ body{
     color: $cyan-200;
     background-color: $indigo-900;
 }
+
+.sidebar_fixed{
+    position: sticky;
+    top: 60px;
+}

@@ -26,6 +26,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('front/css/custom8.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/css/custom9.css') }}">
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
@@ -126,16 +127,18 @@
         <main class="py-4 container-fluid bg-secondary text-white">
             <div class="row">
                 <div class="col-3">
+                    <div class="sidebar_fixed">
+                        <div class="list-group">
+                            <a href="/seller" class="list-group-item list-group-item-action active">Dashboard</a>
+                            <a href=" {{url('/seller/orders')}}  " class="list-group-item list-group-item-action">Orders</a>
 
-                    <div class="list-group">
-                        <a href="/seller" class="list-group-item list-group-item-action active">Dashboard</a>
-                        <a href=" {{url('/seller/orders')}}  " class="list-group-item list-group-item-action">Orders</a>
+                            <a href=" {{url('/admin/shops')}} " class="list-group-item list-group-item-action">Go to Shop</a>
 
-                        <a href=" {{url('/admin/shops')}} " class="list-group-item list-group-item-action">Go to Shop</a>
+                            <a href=" {{ route('order.make_coupon') }} " class="list-group-item list-group-item-action">Create Shop Coupon</a>
 
-                        <a href=" {{ route('order.make_coupon') }} " class="list-group-item list-group-item-action">Create Shop Coupon</a>
+                            <a href=" {{url('/seller/calendar')}}" class="list-group-item list-group-item-action">Shop Calendar</a>
+                        </div>
                     </div>
-
                 </div>
 
                 <div class="col-9">

@@ -42,8 +42,8 @@
                             @elseif(($subOrder->status == 'pending') && $subOrder->payment_status=="accepted")
                                 <a href=" {{route('seller.order.delivered_arranged', $subOrder)}} " class="btn btn-success btn-sm disabled" style="margin: 2px;">Mark as Delivery Arranged</button><br>
                                 <a class="btn btn-warning btn-sm" id="hide_bill_button" style="margin: 2px;">Air Waybill</button></a><br> 
-
-                                <form id="form_bill" action=" {{route('seller.order.delivered_company', $subOrder)}} " method="get">@csrf
+                                <div class="form_bill">
+                                <form action=" {{route('seller.order.delivered_company', $subOrder)}} " method="get">@csrf
                                     <label for="shipping_company">Shipping Company</label>
                                     <input type="text" class="form-control" name="shipping_company" id="">
                                     <label for="invoice_number">Invoice Number</label>
@@ -51,7 +51,7 @@
                                     <button type="submit" class="btn btn-primary mb-2 mr-2">Submit</button>
 
                                 </form>    
-
+                                </div>
                             @endif
 
 
@@ -90,10 +90,19 @@
                 @empty
 
                 @endforelse
-
+                {{ $orders->links() }}
 
             </tbody>
         </table>
+        
     </div>
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script>
+        $(function() {
+            $("#hide_bill_button").click(function() {
+                $(".form_bill").slideToggle();
+            });
+        });
+    </script>    
 @endsection

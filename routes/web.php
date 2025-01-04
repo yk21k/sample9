@@ -11,6 +11,10 @@ use App\Http\Controllers\InquiriesController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Seller\OrdersController;
+use App\Http\Controllers\Seller\CalendarController;
+use App\Http\Controllers\Seller\HolidaySettingController;
+use App\Http\Controllers\Seller\ExtraHolidaySettingController;
+
 use App\Http\Controllers\ShopCouponsController;
 use App\Http\Controllers\SubOrderController;
 use App\Http\Controllers\BotManController;
@@ -155,7 +159,17 @@ Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', '
 
     Route::get('/orders/delivered-arranged/{suborder}', 'OrdersController@markArranged')->name('order.delivered_arranged');
 
-    
+    Route::get('/calendar', 'CalendarController@show')->name('seller.calendar');
+
+    //祝日設定
+    Route::get('/holiday_setting', 'HolidaySettingController@form')->name("holiday_setting");
+
+    Route::post('/holiday_setting', 'HolidaySettingController@update')->name("update_holiday_setting");
+
+    //臨時営業設定
+    Route::get('/extra_holiday_setting', 'ExtraHolidaySettingController@form')->name("extra_holiday_setting");
+        
+    Route::post('/extra_holiday_setting', 'ExtraHolidaySettingController@update')->name("update_extra_holiday_setting");
 });
 
 

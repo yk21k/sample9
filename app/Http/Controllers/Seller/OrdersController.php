@@ -14,7 +14,7 @@ class OrdersController extends Controller
     public function index()
     {
         
-        $orders = SubOrder::where('seller_id', auth()->id())->get();
+        $orders = SubOrder::where('seller_id', auth()->id())->latest()->paginate(15);
 
         return view('sellers.orders.index', compact('orders'));
 
