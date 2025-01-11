@@ -1,3 +1,5 @@
+@extends('layouts.app')
+@section('content')
 <!DOCTYPE html>
 <html data-bs-theme="auto">
 	<head>
@@ -181,3 +183,4 @@
 		</div>
 	</body>
 </html>	
+@endsection

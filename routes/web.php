@@ -15,6 +15,7 @@ use App\Http\Controllers\Seller\CalendarController;
 use App\Http\Controllers\Seller\HolidaySettingController;
 use App\Http\Controllers\Seller\ExtraHolidaySettingController;
 
+use App\Http\Controllers\ShopProfController;
 use App\Http\Controllers\ShopCouponsController;
 use App\Http\Controllers\SubOrderController;
 use App\Http\Controllers\BotManController;
@@ -90,6 +91,9 @@ Route::post('/account/{id}', [App\Http\Controllers\AccountController::class, 'up
 Route::post('/account_addresses/{id}', [App\Http\Controllers\AccountController::class, 'saveDeliveryAddress'])->name('account.addresses')->middleware('auth');
 
 
+Route::get('/shop-prof', [App\Http\Controllers\ShopProfController::class, 'index'])->name('shop_prof')->middleware('auth');
+
+
 
 
 
@@ -107,7 +111,6 @@ Route::get('inquiries/{id}', [App\Http\Controllers\InquiriesController::class, '
 Route::post('inquiries/{id}', [App\Http\Controllers\InquiriesController::class, 'store'])->name('inquiries.store')->middleware('auth');
 
 Route::get('/inquiries-answers/{id}', [App\Http\Controllers\InquiriesController::class, 'answers'])->name('inquiries.answers')->middleware('auth');
-
 
 
 Route::resource('orders', OrderController::class)->only('store')->middleware('auth');

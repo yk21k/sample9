@@ -52,6 +52,7 @@ class HomeController extends Controller
         // dd($product_attributes);
 
         $products = Product::take(20)->get();
+        // dd($products);
         $categories = Categories::whereNull('parent_id')->get();
 
         $week = array( "flag_sun", "flag_mon", "flag_tue", "flag_wed", "flag_thu", "flag_fri", "flag_sat" );

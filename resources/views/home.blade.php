@@ -82,7 +82,7 @@
                 <div class="text-animation3">     
                 @if($ex_holiday['date_flag'] === 1)
                     
-                    <p>Temporary Store :: {{ $ex_holiday['shop_name'] }}　</p><br><br><br>
+                    <p>📣📣📣　Temporary Store :: {{ $ex_holiday['shop_name'] }}　📣📣📣</p><br><br><br>
                     
                 @endif 
             </div>          
@@ -129,7 +129,6 @@
                                     <h4 class="card-title">{{ $product->name }}</h4>
                                     {{ $product->description }}
 
-                                     
                                         @foreach($capaign_objs as $obj) 
 
                                             @if($product->shop->id == $obj['shop_id'])
@@ -143,7 +142,6 @@
                                         
                                         <h4 class="card-title"> ${{ $product->price }} </h4>
                                     
-
                                     <h4 class="card-title" id="stockQty">
                                      @if($product->stock<=0) 
                                         <div class="ribbon">Sold out!! </div>
