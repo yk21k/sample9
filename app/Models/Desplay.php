@@ -35,11 +35,5 @@ class Desplay extends Model
 
     }
 
-    // Delete
-    public function deleteSelectStatic(){
-        dd($this);
-        $path = public_path($this->uri);
 
-        @unlink($path. '/' . 'statics/shop_desplay_page'. $this->shop_name .'.html');
-    }
 }

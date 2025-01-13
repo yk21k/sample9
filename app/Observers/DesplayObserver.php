@@ -29,10 +29,7 @@ class DesplayObserver
      */
     public function deleted(Desplay $desplay): void
     {
-        //
-        $path = public_path($desplay->uri);
-        echo print_r($path) ;die;
-        @unlink($path. '/' . 'statics/shop_desplay_page'. $desplay->shop_name .'.html');
+        
     }
 
     public function deleting(Desplay $desplay): void
