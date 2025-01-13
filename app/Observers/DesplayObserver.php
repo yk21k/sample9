@@ -12,6 +12,7 @@ class DesplayObserver
     public function created(Desplay $desplay): void
     {
         //
+        $desplay->generate_static();
     }
 
     /**
@@ -20,7 +21,7 @@ class DesplayObserver
     public function updated(Desplay $desplay): void
     {
         //
-        $desplay->generate_static();
+        
        
     }
 
@@ -29,7 +30,7 @@ class DesplayObserver
      */
     public function deleted(Desplay $desplay): void
     {
-        
+
     }
 
     public function deleting(Desplay $desplay): void
