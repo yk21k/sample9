@@ -137,6 +137,8 @@
                             <a href=" {{ route('order.make_coupon') }} " class="list-group-item list-group-item-action">Create Shop Coupon</a>
 
                             <a href=" {{url('/seller/calendar')}}" class="list-group-item list-group-item-action">Shop Calendar</a>
+
+                            <a href=" {{url('/seller/shop_desplay')}}" class="list-group-item list-group-item-action">Shop Desplay</a>
                         </div>
                     </div>
                 </div>

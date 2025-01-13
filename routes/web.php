@@ -14,6 +14,7 @@ use App\Http\Controllers\Seller\OrdersController;
 use App\Http\Controllers\Seller\CalendarController;
 use App\Http\Controllers\Seller\HolidaySettingController;
 use App\Http\Controllers\Seller\ExtraHolidaySettingController;
+use App\Http\Controllers\Seller\DesplayController;
 
 use App\Http\Controllers\ShopProfController;
 use App\Http\Controllers\ShopCouponsController;
@@ -97,7 +98,6 @@ Route::get('/shop-prof', [App\Http\Controllers\ShopProfController::class, 'index
 
 
 
-
 Route::get('/cutomer-inquiry', [App\Http\Controllers\CustomerInquiryController::class, 'inquiryForm'])->name('account.inquiry')->middleware('auth');
 
 Route::post('/cutomer-inquiry', [App\Http\Controllers\CustomerInquiryController::class, 'inquiryAnswer'])->name('account.inquiries')->middleware('auth');
@@ -139,6 +139,7 @@ Route::get('paypal/checkout-cancel', [App\Http\Controllers\PayPalController::cla
 
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
+
     Route::get('/order/pay/{suborder}', [App\Http\Controllers\SubOrderController::class, 'pay'])->name('order.pay');
 
     Route::get('/shop-coupon-create', [App\Http\Controllers\ShopCouponsController::class, 'makeCouponPage'])->name('order.make_coupon');
@@ -173,6 +174,12 @@ Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', '
     Route::get('/extra_holiday_setting', 'ExtraHolidaySettingController@form')->name("extra_holiday_setting");
         
     Route::post('/extra_holiday_setting', 'ExtraHolidaySettingController@update')->name("update_extra_holiday_setting");
+
+    Route::get('/shop_desplay', 'DesplayController@index')->name('shop_desplay');
+
+    Route::post('/shop_desplay', 'DesplayController@saveSelect')->name('select_desplay');
+
+    Route::post('/delete_shop_desplay', 'DesplayController@deleteSelect')->name('delete_desplay');
 });
 
 

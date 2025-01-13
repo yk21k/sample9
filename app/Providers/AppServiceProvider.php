@@ -8,12 +8,14 @@ use App\Observers\CustomerInquiryObserver;
 use App\Observers\InquiryObserver;
 use App\Observers\DeleteShopObserver;
 use App\Observers\CampaignObserver;
+use App\Observers\DesplayObserver;
 use App\Models\Shop;
 use App\Models\CustomerInquiry;
 use App\Models\Inquiries;
 use App\Models\DeleteShop;
 use App\Models\ShopCoupon;
 use App\Models\Campaign;
+use App\Models\Desplay;
 use TCG\Voyager\Facades\Voyager;
 use Illuminate\Pagination\Paginator;
 
@@ -35,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Desplay::observe(DesplayObserver::class);
         Campaign::observe(CampaignObserver::class);
         Shop::observe(ShopObserver::class);
         CustomerInquiry::observe(CustomerInquiryObserver::class);
