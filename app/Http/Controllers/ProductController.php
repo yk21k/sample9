@@ -8,6 +8,11 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 use App\Models\Categories;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\SubOrder;
+use App\Models\SubOrderItem;
+use App\Models\Fovorite;
 
 class ProductController extends Controller
 {
@@ -59,7 +64,50 @@ class ProductController extends Controller
 
         // $product_movies = Product::with('movie', json_decode($productDetails['movie'], true))->get();
 
-        return view('products.detail', compact('productDetails', 'product_movies'));
+        if(isset(auth()->user()->id)){
+            $search_order_ids = Order::where('user_id', auth()->user()->id)->first('id');
+
+            $search_products = OrderItem::where('order_id', $search_order_ids)->first();
+
+            return response()->view('products.detail', ['productDetails' => $productDetails, 'product_movies' => $product_movies, 'search_order_ids' => $search_order_ids, 'id' => $id]);
+        }
+        return response()->view('products.detail', ['productDetails' => $productDetails, 'product_movies' => $product_movies, 'search_order_ids' => " ", 'id' => $id]);
+
+    }
+
+    public function productFavo(Request $request, $id)
+    {
+        if($request->isMethod('post')){
+            $data = $request->all();
+            // dd($data);
+            $search_products = SubOrderItem::where('product_id', $data['product_id'])->where('user_id', auth()->user()->id)->first();
+            // dd($search_products);
+            
+            $rules = [
+                'review' => 'required|string|max:100'
+            ];
+
+            $customMessages = [
+
+                'review' => 'Too long, less than 100 characters'
+            ];
+
+            $this->validate($request, $rules, $customMessages);
+
+            $data = $request->all();
+            $favorite = new Fovorite;
+
+            $favorite->user_id = $request->user_id;
+            $favorite->shop_id = $request->shop_id;
+            $favorite->product_id = $request->product_id;
+            $favorite->wants = $request->wants;
+            $favorite->store_personnel = $request->store_personnel;
+            $favorite->agree = $request->agree;
+            $favorite->review = $request->review;
+            $favorite->save();
+              
+        }
+        return back()->withMessage('Thank you!!');
     }
 
     /**

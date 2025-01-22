@@ -55,10 +55,14 @@ class Order extends Model
 
             ]);
 
+            // dd($suborder->items());
             // dd($suborder);
+            // dd($products);
+            // dd($products);
+            // dd($orderItems);
 
             foreach($products as $product) {
-                $suborder->items()->attach($product->id, ['price' => $product->pivot->price, 'quantity' => $product->pivot->quantity]);
+                $suborder->items()->attach($product->id, ['user_id' => $suborder->user_id, 'price' => $product->pivot->price, 'quantity' => $product->pivot->quantity]);
             }
 
         }

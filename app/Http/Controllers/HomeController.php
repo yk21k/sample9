@@ -15,6 +15,9 @@ use App\Models\Categories;
 use App\Models\Attribute;
 use App\Models\User;
 use App\Models\Shop;
+use App\Models\Order;
+use App\Models\OrderItem;
+
 use Illuminate\Support\Facades\Cookie;
 use Carbon\Carbon;
 
@@ -79,69 +82,12 @@ class HomeController extends Controller
         // dd($extra_holidays_dex);
 
         $extra_holidays_count = ExtraHoliday::where('date_key', $para_d)->get('shop_name')->count();
-
-        // $test = ExtraHoliday::where('shop_name', '!=', $holidays_dex->shop_name)->get();
-        // $test = $holidays->filter(function($extra_holidays_dex) => $extra_holidays_dex['shopname'] === 'nagano');
         
-        // $test = array_filter($holidays_array, $extra_holidays_dex);    
-        // dd($test);
-        // dd($holidays_array);
-
-        // dd($extra_holidays_array);
-
-        // $holidays_merge = array_merge($holidays_array, $extra_holidays_array);
-        // dd($holidays_merge);
-
         
-
-        // dd($holidays_merge);----
-
-        // dd($holidays, $extra_holidays);
-
-        // dd($extra_holidays);
-        
-        // dd($week[date("w")]);
-        // echo print_r($holidays->user_id) ;die;
-
-        // $extra_holidays = ExtraHoliday::get()->all();
-        // $extra_holidays_sets = $extra_holidays_sets->user_id->owner();
-
-        // dd($capaign_objs);
-        // dd($capaingn_obj['items']);
-
-        // $test = $capaingn_objs[0];
-        // $test1 = $capaingn_objs[1];
-        // dd($test['start_date'], $test1['start_date']);
-        
-
-        // dd($request->cookie());
-        // $test = session()->all();
-        // dd($test);
-
-        // if($request->ajax){
-        //     if(Cookie::get('data-bs-theme')=='dark'){
-        //         Cookie::queue('data-bs-theme', 'light', 3);
-        //         $theme = 'light';
-                
-        //     }
-        //     else{
-        //         Cookie::queue('data-bs-theme', 'dark', 3);
-        //         $theme = 'dark';
-
-        //     }
-
-        //    // dd($values);
-        // }
-        
-        // $theme = 'light';
-        // Cookie::queue('data-bs-theme', $theme, 3);
-        // return view('home');
-        // dd($product_attrs);
-        // dd(json_decode($product_attrs->product_attributes)->value);
-
-        // dd($products);
-        // dd($categories);    
         return response()->view('home', ['allProducts' => $products, 'product_attributes' => $product_attributes, 'categories' => $categories, 'capaign_objs' => $capaign_objs, 'holidays' => $holidays, 'extra_holidays' => $extra_holidays]);
+        
+        
+
     }
 
 

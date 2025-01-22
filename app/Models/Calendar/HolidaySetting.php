@@ -24,7 +24,12 @@ class HolidaySetting extends Model
         "created_at",
         "updated_at"
     ];
-    
+
+    protected $dates = [
+       'created_at',
+       'updated_at'
+    ];
+
     function isOpenMonday(){
         return $this->flag_mon == HolidaySetting::OPEN;
     }

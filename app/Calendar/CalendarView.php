@@ -46,6 +46,9 @@ class CalendarView {
 		//臨時営業日の読み込み
 		$this->holidays = ExtraHoliday::getExtraHolidayWithMonth($this->carbon->format("Ym"));
 
+		$timeHoliday = HolidaySetting::where('shop_id', auth()->user()->shop->id)->first();
+        $timeExtraHoliday = ExtraHoliday::where('shop_id', auth()->user()->shop->id)->latest()->first();
+
 		$html = [];
 		$html[] = '<div class="calendar">';
 		$html[] = '<table class="table">';
@@ -60,6 +63,9 @@ class CalendarView {
 		$html[] = '<th>日</th>';
         
 		$html[] = '</tr>';
+		$html[] = '<a>休日の更新日:'.$timeHoliday->updated_at->format(config('const.format.datetime')).'</a>&nbsp;&nbsp;';
+		$html[] = '<a>臨時休日の更新日:'.$timeExtraHoliday->updated_at->format(config('const.format.datetime')).'</a>';
+
 		$html[] = '</thead>';
 
 		$html[] = '<tbody>';

@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\SubOrder;
+use App\Models\Fovorite;
 use App\Models\DeliveryAddress;
 use Auth;
 
@@ -93,10 +95,12 @@ class AccountController extends Controller
             $deliveryAddress->save();
         }
 
-        return redirect()->route('account.accounts', ['id', $id])->withMessage('registered a new address');
+        return redirect()->route('account.account', ['id', $id])->withMessage('registered a new address');
 
 
     }
+
+
 
        
 }        

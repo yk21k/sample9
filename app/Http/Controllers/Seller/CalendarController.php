@@ -6,6 +6,10 @@ use App\Calendar\CalendarView;
 use App\Http\Controllers\Controller;
 use App\Calendar\Output\CalendarOutputView;
 
+use App\Models\Calendar\ExtraHoliday;
+use App\Models\Calendar\HolidaySetting;
+use Auth;
+
 class CalendarController extends Controller
 {
    public function show(Request $request){
@@ -28,6 +32,9 @@ class CalendarController extends Controller
         //カレンダーに渡す
         $calendar = new CalendarOutputView($date);
         // dd($calendar);
+
+        
+
         return view('sellers.calendar.calendar', [
             "calendar" => $calendar
         ]);

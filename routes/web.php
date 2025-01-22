@@ -63,6 +63,8 @@ Route::get('products/search', [App\Http\Controllers\ProductController::class, 's
 
 Route::get('product/{id}', [App\Http\Controllers\ProductController::class, 'detail'])->name('products.detail');
 
+Route::post('product/favorite/{id}', [App\Http\Controllers\ProductController::class, 'productFavo'])->name('products.favorite');
+
 
 Route::resource('products', ProductController::class);
 
@@ -90,6 +92,10 @@ Route::get('/account/{id}', [App\Http\Controllers\AccountController::class, 'ind
 Route::post('/account/{id}', [App\Http\Controllers\AccountController::class, 'updateProf'])->name('account.accounts')->middleware('auth');
 
 Route::post('/account_addresses/{id}', [App\Http\Controllers\AccountController::class, 'saveDeliveryAddress'])->name('account.addresses')->middleware('auth');
+
+
+
+
 
 
 Route::get('/shop-prof', [App\Http\Controllers\ShopProfController::class, 'index'])->name('shop_prof')->middleware('auth');
