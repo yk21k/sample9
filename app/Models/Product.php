@@ -42,6 +42,14 @@ class Product extends Model
         return $this->belongsToMany(Categories::class, 'category_product', 'product_id', 'categories_id');
     }
 
+    public function fovo_dises()
+    {
+        return $this->hasMany(FavoritesDisplay::class);    
+    }
+
+
+ 
+
 
 
 

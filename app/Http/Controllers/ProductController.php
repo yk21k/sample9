@@ -69,7 +69,10 @@ class ProductController extends Controller
 
             $search_products = OrderItem::where('order_id', $search_order_ids)->first();
 
-            return response()->view('products.detail', ['productDetails' => $productDetails, 'product_movies' => $product_movies, 'search_order_ids' => $search_order_ids, 'id' => $id]);
+            $ableFavos = SubOrderItem::where('user_id', auth()->user()->id)->orderBy('id', 'DESC')->first();
+            // dd($ableFavos);
+
+            return response()->view('products.detail', ['productDetails' => $productDetails, 'product_movies' => $product_movies, 'search_order_ids' => $search_order_ids, 'id' => $id, 'ableFavos' => $ableFavos]);
         }
         return response()->view('products.detail', ['productDetails' => $productDetails, 'product_movies' => $product_movies, 'search_order_ids' => " ", 'id' => $id]);
 
@@ -107,6 +110,8 @@ class ProductController extends Controller
             $favorite->save();
               
         }
+        $favorite->genarateFavoRates();
+        
         return back()->withMessage('Thank you!!');
     }
 

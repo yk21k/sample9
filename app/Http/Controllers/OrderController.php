@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
+
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\OrderItem;
@@ -86,10 +87,7 @@ class OrderController extends Controller
             $order->payment_method = 'paypal';
         }
 
-        
-
         $order->save();
-
 
         // save order items
 
@@ -147,7 +145,8 @@ class OrderController extends Controller
         // dd($product_stocks->stock, $cart_quantity->product());
 
         $order->generateSubOrders();
-
+        $order->generateFavoritesSalesRate();
+        $order->generateFavoritesDisplay();
 
         // payment
         if (request('payment_method') == 'paypal') {

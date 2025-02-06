@@ -86,9 +86,15 @@
 @if(isset(auth()->user()->id))
     @if($search_order_ids)
         <!-- Button trigger modal -->
+        @if($ableFavos->product_id == $id)
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
         Launch Favorite
         </button>
+        @else
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" disabled>
+        Launch Favorite (Please help us by writing reviews about products purchased on This Site.)
+        </button>
+        @endif
         <!-- Modal -->
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <!-- Scrollable modal -->    
@@ -110,12 +116,18 @@
                             <label class="form-check-label" for="autoSizingCheck">Favorite
                             </label>
                             <select class="form-select" id="autoSizingSelect" name="wants">
-                                <option selected>Choose...</option>
-                                <option value="5">Five(like)</option>
-                                <option value="4">Four(I obviously don't hate it)</option>
-                                <option value="3">Three(I don't like it or dislike it.)</option>
-                                <option value="2">Two(Maybe I'm not good at it)</option>
-                                <option value="1">One(dislike)</option>
+                                <option selected>選択してください...</option>
+                                <option value="10">完全に満足しており、友人や同僚に強く薦める。</option>
+                                <option value="9">商品やサービスに非常に満足しており、積極的に薦めたいと感じる。</option>
+                                <option value="8">商品やサービスに非常に満足しており、友人や同僚に薦める意欲が強い。</option>
+                                <option value="7">商品やサービスに満足しており、友人や同僚に薦める可能性がある。</option>
+                                <option value="6">商品やサービスに対して満足しており、薦める可能性が高いが、改善の余地があると感じている。</option>
+                                <option value="5">商品やサービスに満足しているわけではないが、非常に不満でもない。</option>
+                                <option value="4">良くも悪くもないと感じており、特に薦める気にはならない。</option>
+                                <option value="3">商品やサービスにいくつかの問題があり、薦めることに慎重になる。</option>
+                                <option value="2">一部の要素に不満があり、友人や同僚には薦めない。</option>
+                                <option value="1">商品やサービスに対して強い不満があり、友人や同僚に絶対に薦めない。</option>
+                                <option value="0">この商品やサービスに対して非常に不満で、全く薦めたくない。</option>
                             </select>
                             
                         </div>

@@ -96,11 +96,7 @@ Route::post('/account_addresses/{id}', [App\Http\Controllers\AccountController::
 
 
 
-
-
 Route::get('/shop-prof', [App\Http\Controllers\ShopProfController::class, 'index'])->name('shop_prof')->middleware('auth');
-
-
 
 
 

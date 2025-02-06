@@ -76,7 +76,7 @@ class AccountController extends Controller
                 'shipping_fullname' => 'Name is required.',
                 'shipping_zipcode' => 'Zipcode is required. Please enter your postal code within Japan',
                 'shipping_address' => 'Address is required. Please check from the postal code',
-                'shipping_phone' => 'Phone is required'
+                'shipping_phone' => 'Mobile is required'
             ];
 
             $this->validate($request, $rules, $customMessages);

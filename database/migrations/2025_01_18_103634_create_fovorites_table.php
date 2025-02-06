@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('shop_id');
             $table->string('product_id');
-            $table->string('wants');
+            $table->integer('wants');
             $table->string('store_personnel');
             $table->string('agree');
             $table->string('review');

@@ -17,9 +17,15 @@ use App\Models\User;
 use App\Models\Shop;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Fovorite;
+use App\Models\FavoritesSaleRate;
+use App\Models\FavoritesDisplay;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cookie;
 use Carbon\Carbon;
+
+use Illuminate\Support\Str;
 
 
 class HomeController extends Controller
@@ -56,11 +62,23 @@ class HomeController extends Controller
 
         $products = Product::take(20)->get();
         // dd($products);
+
+        // $norm_products = Product::with('fovo_dises')->get();
+        // dd($norm_products);
+
+        $norm_products_pres = Product::with(['fovo_dises' => 
+            function ($query) {
+                $query->orderBy('norm_total', 'desc');
+            }])->get();
+        // dd($norm_products_pres);
+
+        
+
+
         $categories = Categories::whereNull('parent_id')->get();
 
         $week = array( "flag_sun", "flag_mon", "flag_tue", "flag_wed", "flag_thu", "flag_fri", "flag_sat" );
         $holidays = HolidaySetting::where($week[date("w")], '!=' , "1")->get('shop_name');
-
 
         $holidays_count = HolidaySetting::where($week[date("w")], '=' , 2)->get('shop_name')->count();
 
@@ -82,15 +100,10 @@ class HomeController extends Controller
         // dd($extra_holidays_dex);
 
         $extra_holidays_count = ExtraHoliday::where('date_key', $para_d)->get('shop_name')->count();
-        
-        
-        return response()->view('home', ['allProducts' => $products, 'product_attributes' => $product_attributes, 'categories' => $categories, 'capaign_objs' => $capaign_objs, 'holidays' => $holidays, 'extra_holidays' => $extra_holidays]);
-        
-        
 
+        return response()->view('home', ['allProducts' => $products, 'product_attributes' => $product_attributes, 'categories' => $categories, 'capaign_objs' => $capaign_objs, 'holidays' => $holidays, 'extra_holidays' => $extra_holidays, 'norm_products_pres' => $norm_products_pres]);
+        
     }
-
-
 
     public function testpage(Request $request)
     {

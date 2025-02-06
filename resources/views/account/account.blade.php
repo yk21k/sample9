@@ -126,7 +126,7 @@
 
         <section id="addresses" class="section">
             <h2>Shipping address</h2>
-            
+            @if($firstDelis)
             <p>Latest Address: 〒{{ $firstDelis->shipping_zipcode }}
             {{ $firstDelis->shipping_state }}
             {{ $firstDelis->shipping_city }}
@@ -134,6 +134,7 @@
             @foreach($savedDelis as $savedDeli)
             	<p>Other Addresses: 〒{{ $savedDeli->shipping_zipcode }} {{ $savedDeli->shipping_state }} {{ $savedDeli->shipping_city }} {{ $savedDeli->shipping_address }}</p>
             @endforeach
+            @else
             <button type="button" class="btn btn-info" id="hide_button2">Hide/Display Register new address</button><br><br>
 			<form class="h-adr" id="address1" action="{{route('account.addresses', Auth::user()->id)}}" method="post">@csrf
 
@@ -173,6 +174,7 @@
 		    	<button type="submit" class="btn btn-primary mt-3">save address</button>
 
             </form>
+            @endif
         </section>
 
         <section id="payment-methods" class="section">

@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="{{ asset('front/css/custom5.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom6.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom91.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/css/custom93.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     @stack('css')
@@ -236,6 +237,7 @@
     <script src="{{ url('front/js/custom2.js') }}" defer></script>
     <script src="{{ url('front/js/custom3.js') }}" defer></script>
     <script src="{{ url('front/js/custom4.js') }}" defer></script>
+    <script src="{{ url('front/js/custom6.js') }}" defer></script>
 
     <script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
     @if(!empty(Auth::user()->id))

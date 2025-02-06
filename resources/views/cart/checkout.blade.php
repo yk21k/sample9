@@ -4,18 +4,22 @@
 	
 	<div class="container">
 		<h2> Checkout </h2>
-		@foreach($deliveryAddresses as $deliveryAddress)
+		
+			If your shipping address is not displayed, please register from the account page.
 
-			<form action="{{ route('cart.deli_place') }}" method="post">@csrf
-				<input type="text" name="shipping_id" data-addressid="{{ $deliveryAddress->id}}"  value="{{ $deliveryAddress->id}}" style="display:none;">
+			@foreach($deliveryAddresses as $deliveryAddress)
+				
+				<form action="{{ route('cart.deli_place') }}" method="post">@csrf
+					<input type="text" name="shipping_id" data-addressid="{{ $deliveryAddress->id}}"  value="{{ $deliveryAddress->id}}" style="display:none;">
 
-			    <button type="submit" class="btn btn-primary mt-3" onclick="myFunction()"> Select </button>
+				    <button type="submit" class="btn btn-primary mt-3" onclick="myFunction()"> Select </button>
 
-				〒{{ $deliveryAddress->shipping_zipcode }} {{ $deliveryAddress->shipping_state }} {{ $deliveryAddress->shipping_city }} {{ $deliveryAddress->shipping_address }}
+					〒{{ $deliveryAddress->shipping_zipcode }} {{ $deliveryAddress->shipping_state }} {{ $deliveryAddress->shipping_city }} {{ $deliveryAddress->shipping_address }}
 
-			</form>	
-		@endforeach
-			
+				</form>
+					
+			@endforeach
+				
 			@foreach($setDeliPlaces as $setDeliPlace)
 			<form class="h-adr" action="{{route('orders.store')}}" method="post">@csrf
 
@@ -75,7 +79,8 @@
 
 			</form>
 			@endforeach
-	</div>	
-	
+			
+	</div>
+
 
 @endsection
