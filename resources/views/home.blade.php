@@ -87,30 +87,22 @@
                 @endif 
             </div>          
         @endforeach
-        <br><br><br><br><br><br>
-        
-        
-             
+        <br><br><br><br><br><br>   
             
-            @foreach($norm_products_pres as $attr)
-                @foreach($attr->fovo_dises as $n)
-                    @foreach (json_decode($attr->movie, true) as $movie)
-                        @if(null !== $attr->fovo_dises)
-                        Name:{{ $attr->name }}
-                        Price:{{ $attr->price }}
-                        Score:{{ $n->norm_total }} 
-                        <video controls width="60%" src="{{ asset('storage/'.$movie['download_link']) }}#t=0,2" muted class="contents_width"></video>
-                        @else
-                            none
-                        @endif
-                    @endforeach
-                @endforeach    
-            @endforeach 
-
-            
-        
-        
-       
+        @foreach($norm_products_pres as $attr)
+            @foreach($attr->fovo_dises as $n)
+                @foreach (json_decode($attr->movie, true) as $movie)
+                    @if(null !== $attr->fovo_dises)
+                    Name:{{ $attr->name }}
+                    Price:{{ $attr->price }}
+                    Score:{{ $n->norm_total }} 
+                    <video controls width="60%" src="{{ asset('storage/'.$movie['download_link']) }}#t=0,2" muted class="contents_width"></video>
+                    @else
+                        none
+                    @endif
+                @endforeach
+            @endforeach    
+        @endforeach 
 
         <br><br><br>
         @foreach($allProducts as $product)
