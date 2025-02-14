@@ -22,6 +22,8 @@ class AccountController extends Controller
         $profiles = User::where('id', Auth::user()->id)->first();
 
         $order_histories = SubOrder::where('user_id', Auth::user()->id)->get();
+
+        $shipping_names = Order::where('user_id', Auth::user()->id)->get();
         
 
         $firstDelis = Order::where('user_id', Auth::user()->id)->latest()->first();
@@ -29,7 +31,7 @@ class AccountController extends Controller
         $savedDelis = DeliveryAddress::where('user_id', Auth::user()->id)->get();
         // dd($savedDelis);
         
-        return view('account.account', compact('profiles', 'order_histories', 'firstDelis', 'savedDelis'));
+        return view('account.account', compact('profiles', 'order_histories', 'firstDelis', 'savedDelis', 'shipping_names'));
     }
 
     public function updateProf(Request $request, $id)

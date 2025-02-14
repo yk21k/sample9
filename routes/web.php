@@ -15,6 +15,7 @@ use App\Http\Controllers\Seller\CalendarController;
 use App\Http\Controllers\Seller\HolidaySettingController;
 use App\Http\Controllers\Seller\ExtraHolidaySettingController;
 use App\Http\Controllers\Seller\DesplayController;
+use App\Http\Controllers\Auth\RegisterController;
 
 use App\Http\Controllers\ShopProfController;
 use App\Http\Controllers\ShopCouponsController;
@@ -38,6 +39,18 @@ Route::redirect('/', '/home');
 
 
 Auth::routes();
+
+Route::post('register/pre_check', [App\Http\Controllers\Auth\RegisterController::class, 'pre_check'])->name('register.pre_check');
+
+Route::get('register/verify/{token}', [App\Http\Controllers\Auth\RegisterController::class, 'showForm']);
+
+Route::post('register/main_check', [App\Http\Controllers\Auth\RegisterController::class, 'mainCheck'])->name('register.main.check');
+
+Route::post('register/main_register', [App\Http\Controllers\Auth\RegisterController::class, 'mainRegister'])->name('register.main.registered');
+
+
+
+
 Route::match(['get', 'post'], '/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::match(['get', 'post'], '/botman', [App\Http\Controllers\BotManController::class, 'handle'])->name('handle');
@@ -165,6 +178,9 @@ Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', '
 
     Route::get('/orders/delivered-arranged/{suborder}', 'OrdersController@markArranged')->name('order.delivered_arranged');
 
+    Route::get('/orders/shop_mail/{suborder}', 'OrdersController@sendMail')->name('order.shop_mail');
+
+
     Route::get('/calendar', 'CalendarController@show')->name('seller.calendar');
 
     //祝日設定
@@ -182,6 +198,8 @@ Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', '
     Route::post('/shop_desplay', 'DesplayController@saveSelect')->name('select_desplay');
 
     Route::post('/delete_shop_desplay', 'DesplayController@deleteSelect')->name('delete_desplay');
+
+
 });
 
 

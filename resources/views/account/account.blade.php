@@ -89,13 +89,15 @@
 		        			@else
 		        				<td>Details Unknown</td>
 		        			@endif
-		        			<td>-----</td>
+		        			<td>{{ $order_history->shipping_company }}</td>
 		        			<td>^^^^^^^</td>
 		        			<td>{{ $order_history->order_id }}</td>
 		        			<td>{{ $order_history->created_at }}</td>
-		        			<td>{{ $order_history->shipping_fullname }}</td>
-		        			<td>{{ $order_history->shipping_zipcode }}</td>
-		        			<td>{{ $order_history->shipping_state }} {{ $order_history->shipping_city }} {{ $order_history->shipping_address }}</td>
+		        			@foreach($shipping_names as $shipping_name)
+		        			<td>{{ $shipping_name->shipping_fullname }}</td>
+		        			<td>{{ $shipping_name->shipping_zipcode }}</td>
+		        			<td>{{ $shipping_name->shipping_state }} {{ $shipping_name->shipping_city }} {{ $shipping_name->shipping_address }}</td>
+		        			@endforeach
 		        		</tr>
 			        </tbody>
 			        @endforeach

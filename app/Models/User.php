@@ -22,6 +22,8 @@ class User extends \TCG\Voyager\Models\User
         'name',
         'email',
         'password',
+        'email_verified',
+        'email_verify_token',
     ];
 
     /**
@@ -45,6 +47,8 @@ class User extends \TCG\Voyager\Models\User
     ];
 
     protected $dates = ['deleted_at'];
+
+
 
     public function shop()
     {
