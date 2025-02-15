@@ -19,13 +19,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group row">
-                            <label for="name_pronunciation" class="col-md-4 col-form-label text-md-right">フリガナ</label>
-                            <div class="col-md-6">
-                                <span class="">{{$user->name_pronunciation}}</span>
-                                <input type="hidden" name="name_pronunciation" value="{{$user->name_pronunciation}}">
-                            </div>
-                        </div>
+                        
 
                         <div class="form-group row">
                             <label for="birth" class="col-md-4 col-form-label text-md-right">生年月日</label>

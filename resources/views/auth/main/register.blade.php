@@ -34,23 +34,7 @@
                                     </div>
                                 </div>
 
-                                <div class="form-group row">
-                                    <label for="name_pronunciation"
-                                           class="col-md-4 col-form-label text-md-right">フリガナ</label>
-
-                                    <div class="col-md-6">
-                                        <input id="name_pronunciation" type="text"
-                                               class="form-control{{ $errors->has('name_pronunciation') ? ' is-invalid' : '' }}"
-                                               name="name_pronunciation" value="{{ old('name_pronunciation') }}"
-                                               required>
-
-                                        @if ($errors->has('name_pronunciation'))
-                                            <span class="invalid-feedback">
-                                            <strong>{{ $errors->first('name_pronunciation') }}</strong>
-                                            </span>
-                                        @endif
-                                    </div>
-                                </div>
+                                
 
                                 <div class="form-group row">
                                     <label for="name_pronunciation"
