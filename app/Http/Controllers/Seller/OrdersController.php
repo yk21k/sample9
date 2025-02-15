@@ -102,7 +102,7 @@ class OrdersController extends Controller
         // dd(empty($data['coupon_id']));
 
         $user = User::where('id', $data['user_id'])->first();
-        // dd($user->email);
+        dd($user->email);
 
         $mail = new Mails;
         $mail->user_id = $data['user_id'];

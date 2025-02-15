@@ -73,7 +73,7 @@ class RegisterController extends Controller
         //     'email' => $data['email'],
         //     'password' => Hash::make($data['password']),
         // ]);
-
+        // dd($data);
             $user = User::create([
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
@@ -143,6 +143,7 @@ class RegisterController extends Controller
 
         $user = new User();
         $user->name = $request->name;
+        $user->email_token = $request->email_token;
         $user->birth_year = $request->birth_year;
         $user->birth_month = $request->birth_month;
         $user->birth_day = $request->birth_day;
@@ -152,7 +153,9 @@ class RegisterController extends Controller
 
     public function mainRegister(Request $request)
     {
+        // dd($request->all());
         $user = User::where('email_verify_token',$request->email_token)->first();
+        // dd($user);
         $user->status = config('const.USER_STATUS.REGISTER');
         $user->name = $request->name;
         $user->birth_year = $request->birth_year;

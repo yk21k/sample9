@@ -7,11 +7,10 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">本会員登録確認</div>
-
                 <div class="card-body">
                     <form method="POST" action="{{ route('register.main.registered') }}">
                         @csrf
-
+                        <input type="hidden" name="email_token" value="{{ $user->email_token }}">
                         <div class="form-group row">
                             <label for="name" class="col-md-4 col-form-label text-md-right">名前</label>
                             <div class="col-md-6">
