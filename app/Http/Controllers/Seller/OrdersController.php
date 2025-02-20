@@ -11,6 +11,7 @@ use App\Models\Mails;
 use App\Models\ShopCoupon;
 use App\Models\Shop;
 use App\Models\Campaign;
+use DB;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -150,7 +151,19 @@ class OrdersController extends Controller
 
     public function chartPage()
     {
-        return view('sellers.charts.index');
+        $sellerId = auth()->user()->id;
+        // dd($sellerId);
+        // ユーザー数の推移（例えば月ごとのユーザー数）
+        $userCounts = User::select(DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'), DB::raw('count(*) as count'))->groupBy(DB::raw('DATE_FORMAT(created_at, "%Y-%m")'))->orderBy('month')->get();
+        // dd($userCounts);
+
+        // オーダー数の推移（例えば月ごとのオーダー数）
+        $subOrderCounts = SubOrder::where('seller_id', $sellerId )->select(DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'), DB::raw('count(*) as count'))->groupBy(DB::raw('DATE_FORMAT(created_at, "%Y-%m")'))->orderBy('month')
+            ->get();
+        // dd($orderCounts);
+
+
+        return view('sellers.charts.index', compact('userCounts', 'subOrderCounts'));
 
     }
 
