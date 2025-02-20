@@ -47,6 +47,11 @@ class Product extends Model
         return $this->hasMany(FavoritesDisplay::class);    
     }
 
+    public function user_favo()
+    {
+        return $this->hasMany(Fovorite::class);    
+    }
+
 
  
 

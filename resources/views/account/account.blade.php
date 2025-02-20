@@ -10,14 +10,8 @@
         </ul>
     </div>
 @endif
-<div class="wrapper">
-	<div>
-    <header>
-        
-	</header>
-	</div>
-</div>
-<h2> Your Account </h2>
+
+<h2> アカウント　Your Account </h2>
 		<ul class="nav">
 		  <li class="nav-item">
 		    <h3><a class="nav-link link-secondary" href="#">Order History</a></h3>
@@ -48,7 +42,7 @@
 <div class="container">
     <main>
         <section id="order-history" class="section_accocnt">
-            <h2>Order history</h2>
+            <h2>注文履歴　Order history</h2>
             <ul>
             	<h4>Search</h4>
             	<input id="myInput" type="date">&nbsp;&nbsp;&nbsp;<button type="button" class="btn btn-info" id="hide_button">Hide/Display</button><br><br>
@@ -93,11 +87,9 @@
 		        			<td>^^^^^^^</td>
 		        			<td>{{ $order_history->order_id }}</td>
 		        			<td>{{ $order_history->created_at }}</td>
-		        			@foreach($shipping_names as $shipping_name)
-		        			<td>{{ $shipping_name->shipping_fullname }}</td>
-		        			<td>{{ $shipping_name->shipping_zipcode }}</td>
-		        			<td>{{ $shipping_name->shipping_state }} {{ $shipping_name->shipping_city }} {{ $shipping_name->shipping_address }}</td>
-		        			@endforeach
+		        			<td>{{ $order_history->order->shipping_fullname }}</td>
+		        			<td>{{ $order_history->order->shipping_zipcode }}</td>
+		        			<td>{{ $order_history->order->shipping_state }} {{ $order_history->order->shipping_city }} {{ $order_history->order->shipping_address }}</td>
 		        		</tr>
 			        </tbody>
 			        @endforeach
@@ -108,21 +100,33 @@
             </ul>
         </section>
 
-        <section id="delivery-status" class="section">
-            <h2>Delivery Status</h2>
-            <ul>
-                <li>商品名: XYZ スニーカー - ¥6,000</li>
-                <li>商品名: ABC シャツ - ¥2,500</li>
-                <!-- 他のお気に入り商品 -->
-            </ul>
-        </section>
-
-        <section id="wishlist" class="section">
-            <h2>お気に入り</h2>
-            <ul>
-                <li>商品名: XYZ スニーカー - ¥6,000</li>
-                <li>商品名: ABC シャツ - ¥2,500</li>
-                <!-- 他のお気に入り商品 -->
+        <section class="review-list111">
+            <h2>あなたのレビュー</h2>
+            <h4>Search</h4><input id="myInput" type="date">&nbsp;&nbsp;&nbsp;<button type="button" class="btn btn-info" id="hide_button3">Hide/Display</button><br><br>
+            <ul id="foavoriteItems">
+            	@foreach($favaoriteItems as $favaoriteItem)
+            		@foreach($favaoriteItem->user_favo as $favoItem)
+            			@if($favoItem->user_id == auth()->user()->id)
+            			<li>
+            				<div class="review-item111">
+		                        <div class="review-info111">
+		                            <h3>商品名：{{ $favaoriteItem->name }}</h3>
+		                            <p>評価: {{ $favoItem->wants }}</p>
+		                            <p>投稿日: {{ ($favoItem->created_at)->format('Y年n月j日')}}</p>
+		                        </div>
+		                        <div class="review-actions111">
+		                            <button class="edit-btn111">編集</button>
+		                            <button class="delete-btn111">削除</button>
+		                        </div>
+	                        	<p class="review-content111">
+	                        		{{ $favoItem->review }}
+	                        	</p>
+                    		</div>
+            			</li>
+		                @endif
+		                <!-- 他のお気に入り商品 -->
+		            @endforeach    
+                @endforeach
             </ul>
         </section>
 
@@ -233,6 +237,13 @@ $(function() {
         $("#address1").slideToggle("");
     });
 });
+
+$(function() {
+    $("#hide_button3").click(function() {
+        $("#foavoriteItems").slideToggle("");
+    });
+});
 </script>
+
 
 @endsection

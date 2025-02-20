@@ -130,7 +130,7 @@
                     <div class="sidebar_fixed">
                         <div class="list-group">
                             <a href="/seller" class="list-group-item list-group-item-action active">Dashboard</a>
-                            <a href=" {{url('/seller/orders')}}  " class="list-group-item list-group-item-action">Orders</a>
+                            <a href=" {{url('/seller/orders')}} " class="list-group-item list-group-item-action">Orders</a>
 
                             <a href=" {{url('/admin/shops')}} " class="list-group-item list-group-item-action">Go to Shop</a>
 
@@ -139,6 +139,8 @@
                             <a href=" {{url('/seller/calendar')}}" class="list-group-item list-group-item-action">Shop Calendar</a>
 
                             <a href=" {{url('/seller/shop_desplay')}}" class="list-group-item list-group-item-action">Shop Desplay</a>
+
+                            <a href=" {{ url('/seller/shop_charts') }} " class="list-group-item list-group-item-action">Shop Charts</a>
                         </div>
                     </div>
                 </div>

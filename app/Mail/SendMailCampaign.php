@@ -10,6 +10,9 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 use App\Models\Mails;
+use App\Models\Campaign;
+use App\Models\Shop;
+use App\Models\User;
 
 class SendMailCampaign extends Mailable
 {
@@ -40,8 +43,19 @@ class SendMailCampaign extends Mailable
      */
     public function content(): Content
     {
+        
+        $formail_shops = Shop::where('user_id', $this->mails->shop_id)->first();
+        
+        // dd($formail_shops);
+
+        $formail_campaigns = Campaign::where('shop_id', $formail_shops->id)->first();
+        
+        // dd($formail_campaigns);
+        
         return new Content(
-            view: 'mail.order.shop-campaign',
+            markdown: 'mail.order.shop-campaign',
+            with: ['formail_campaigns' => $formail_campaigns, 'formail_shops' => $formail_shops, ],
+
         );
     }
 

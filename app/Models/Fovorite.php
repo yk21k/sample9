@@ -42,4 +42,9 @@ class Fovorite extends Model
         FavoritesDisplay::where('product_id', $product_id)->update(['norm_total'=>$norm_total]);
            
     }
+
+    public function forFavos()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

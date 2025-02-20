@@ -1,33 +1,20 @@
 @component('mail::message')
-# Invoice Paid
-
-Thanks for the purchase
-
-Here is your receipt
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Product name</th>
-            <th>quantity</th>
-            <th>price</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach($order->items as $item)
-        <tr>
-            <td scope="row">{{ $item->name }}</td>
-            <td>{{ $item->pivot->quantity }}</td>
-            <td>{{ $item->pivot->price }}</td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
-
-Total : {{$order->grand_total}}
+# Coupon Present
 
 
-@component('mail::button', )
+<strong>こんにちは!</strong><br>
+この度はご利用いただきありがとうございます。<br><br>
+ご愛顧の感謝の気持ちを込めて、次回のお買い物で使えるクーポンをプレゼントします！<br><br>
+クーポンコード: {{ $formail_coupons->name }} 
+
+<br>
+※ご利用期限は {{ $formail_coupons->expiry_date }} までです。<br><br>
+今後ともよろしくお願いいたします。<br>
+
+<em>（Shop 名）: {{ $formail_shops->name }}</em>
+
+
+@component('mail::button', ['url' => route('home')])
 Button Text
 @endcomponent
 

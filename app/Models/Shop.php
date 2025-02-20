@@ -31,5 +31,9 @@ class Shop extends Model
         return $this->hasMany(ShopCoupon::class, 'shop_id');
     }
 
+    public function shopCampaign()
+    {
+        return $this->hasMany(Campaign::class, 'shop_id');
+    }
 
 }

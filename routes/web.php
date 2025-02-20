@@ -180,6 +180,8 @@ Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', '
 
     Route::get('/orders/shop_mail/{suborder}', 'OrdersController@sendMail')->name('order.shop_mail');
 
+    Route::get('/shop_charts', 'OrdersController@chartPage')->name('order.shop_charts');
+
 
     Route::get('/calendar', 'CalendarController@show')->name('seller.calendar');
 

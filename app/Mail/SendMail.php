@@ -10,6 +10,10 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 use App\Models\Mails;
+use App\Models\Shop;
+
+use App\Models\ShopCoupon;
+
 
 class SendMail extends Mailable
 {
@@ -39,8 +43,13 @@ class SendMail extends Mailable
      */
     public function content(): Content
     {
+        $formail_coupons = ShopCoupon::where('id', $this->mails->coupon_id)->first();
+        $formail_shops = Shop::where('user_id', $this->mails->shop_id)->first();
+
         return new Content(
             markdown: 'mail.order.shop-coupon',
+            with: ['formail_coupons' => $formail_coupons, 'formail_shops' => $formail_shops, ],
+
         );
     }
 

@@ -12,6 +12,7 @@ use App\Models\OrderItem;
 use App\Models\SubOrder;
 use App\Models\Fovorite;
 use App\Models\DeliveryAddress;
+use App\Models\Product;
 use Auth;
 
 
@@ -22,16 +23,26 @@ class AccountController extends Controller
         $profiles = User::where('id', Auth::user()->id)->first();
 
         $order_histories = SubOrder::where('user_id', Auth::user()->id)->get();
-
+        // dd($order_histories->subOrders);
         $shipping_names = Order::where('user_id', Auth::user()->id)->get();
         
-
         $firstDelis = Order::where('user_id', Auth::user()->id)->latest()->first();
 
         $savedDelis = DeliveryAddress::where('user_id', Auth::user()->id)->get();
         // dd($savedDelis);
+
+        $userId = Auth::user();
+
+        // $favaoriteItems = Product::with('user_favo')->find($userId);
+        $favaoriteItems = Product::with('user_favo')->get();
+
+        // dd($favaoriteItems);
         
-        return view('account.account', compact('profiles', 'order_histories', 'firstDelis', 'savedDelis', 'shipping_names'));
+        // $favaoriteItems = Fovorite::where('user_id', Auth::user()->id)->get();
+        // dd($favaoriteItems);
+
+
+        return view('account.account', compact('profiles', 'order_histories', 'firstDelis', 'savedDelis', 'shipping_names', 'favaoriteItems'));
     }
 
     public function updateProf(Request $request, $id)

@@ -10,6 +10,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 use App\Models\Mails;
+use App\Models\Shop;
 
 class SendMailGreeting extends Mailable
 {
@@ -41,8 +42,12 @@ class SendMailGreeting extends Mailable
      */
     public function content(): Content
     {
+        $formail_shops = Shop::where('user_id', $this->mails->shop_id)->first();
+
         return new Content(
             markdown: 'mail.order.shop-greeting',
+            with: ['formail_shops' => $formail_shops, ],
+
         );
     }
 

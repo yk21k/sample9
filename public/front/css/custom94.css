@@ -1,0 +1,46 @@
+.review-list111 h2 {
+    font-size: 24px;
+}
+
+.review-item111 {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.review-info111 {
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.review-info111 h3 {
+    margin: 0;
+}
+
+.review-actions111 {
+    text-align: right;
+}
+
+button {
+    padding: 5px 10px;
+    margin-left: 10px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+button.edit-btn111 {
+    background-color: #4CAF50;
+    color: white;
+}
+
+button.delete-btn111 {
+    background-color: #f44336;
+    color: white;
+}
+
+.review-content111 {
+    font-size: 16px;
+    margin-top: 10px;
+}

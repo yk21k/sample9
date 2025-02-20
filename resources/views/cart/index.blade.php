@@ -80,8 +80,11 @@
 	</div>
 
 
-	 <button class="btn btn-danger button modalOpen">Confirm payment details</button>
-	 
+	@if(isset($cartItems))
+	 	<button class="btn btn-danger button modalOpen" disabled>Confirm payment details</button>
+	@else
+	 	<button class="btn btn-danger button modalOpen" >Confirm payment details</button>
+	@endif	
 	  <div class="modal">
 	    <div class="modal-inner">
 	    <div class="modal-content">

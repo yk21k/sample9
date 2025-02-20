@@ -27,6 +27,9 @@ class OrdersController extends Controller
         $campaigns = Campaign::where('shop_id', auth()->user()->shop->id)->get()->toArray();
         // dd(isset($campaigns), isset($coupons), empty($campaigns), empty($coupons), is_null($campaigns), is_null($coupons));
         // dd($campaigns);
+
+        
+
         return view('sellers.orders.index', compact(['orders', 'coupons', 'campaigns']));
 
     }
@@ -102,28 +105,52 @@ class OrdersController extends Controller
         // dd(empty($data['coupon_id']));
 
         $user = User::where('id', $data['user_id'])->first();
-        dd($user->email);
+        // dd($user->email);
 
-        $mail = new Mails;
-        $mail->user_id = $data['user_id'];
-        $mail->shop_id = $data['shop_id'];
-        $mail->mail = $user->email;
-        $mail->template = $data['template'];
-        if(empty($data['coupon_id'])){
-            $mail->coupon_id = " "; 
-        }else{
-            $mail->coupon_id = $data['coupon_id'];    
-        }
-        if(empty($data['campaign_id'])){
-            $mail->campaign_id = " "; 
-        }else{
-            $mail->campaign_id = $data['campaign_id'];    
-        }
-        
-        
-        $mail->save();
+        $mailDisplay = Mails::where('shop_id', auth()->id())->where('user_id', $data['user_id'])->where('template', "template1")->orWhere('template', "template3")->first();
 
-        return redirect('/seller/orders')->withMessage('Mail sent!!');
+        // $mailDisplay = Mails::where('shop_id', auth()->id())->where('user_id', $data['user_id'])->first();
+
+        // dd($mailDisplay->template, $data['template']);
+
+        // dd(($mailDisplay->template == 'template3') && ($data['template'] === 'template1'));
+
+        if(($mailDisplay->template == 'template1') && ($data['template'] == 'template3')){
+
+            return redirect('/seller/orders')->withMessage('クーポンを送った方には、このサイトからレビューを依頼できません!!'); 
+
+        }else if(($mailDisplay->template == 'template3') && ($data['template'] == 'template1')){
+
+            return redirect('/seller/orders')->withMessage('レビューを依頼した方には、このサイトからクーポンを送ることはできません!!');
+
+        }else{
+        
+            $mail = new Mails;
+            $mail->user_id = $data['user_id'];
+            $mail->shop_id = $data['shop_id'];
+            $mail->mail = $user->email;
+            $mail->template = $data['template'];
+            if(empty($data['coupon_id'])){
+                $mail->coupon_id = " "; 
+            }else{
+                $mail->coupon_id = $data['coupon_id'];    
+            }
+            if(empty($data['campaign_id'])){
+                $mail->campaign_id = " "; 
+            }else{
+                $mail->campaign_id = $data['campaign_id'];    
+            }
+            
+            $mail->save(); 
+
+            return redirect('/seller/orders')->withMessage('Mail sent!!');  
+        }
+
+    }
+
+    public function chartPage()
+    {
+        return view('sellers.charts.index');
 
     }
 

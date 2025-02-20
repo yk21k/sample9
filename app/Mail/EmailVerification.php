@@ -23,13 +23,13 @@ class EmailVerification extends Mailable
         $this->user = $user;
     }
 
-    public function build()
-    {
-        return $this
-            ->subject('【site】仮登録が完了しました')
-            ->view('auth.mail.pre_register')
-            ->with(['token' => $this->user->email_verify_token,]);
-    }
+    // public function build()
+    // {
+    //     return $this
+    //         ->subject('【site】仮登録が完了しました')
+    //         ->view()
+    //         ->with(['token' => $this->user->email_verify_token,]);
+    // }
 
 
 
@@ -46,12 +46,13 @@ class EmailVerification extends Mailable
     /**
      * Get the message content definition.
      */
-    // public function content(): Content
-    // {
-    //     return new Content(
-    //         view: 'view.name',
-    //     );
-    // }
+    public function content(): Content
+    {
+        return new Content(
+            markdown: 'auth.mail.pre_register',
+            with: ['token' => $this->user->email_verify_token,],
+        );
+    }
 
     /**
      * Get the attachments for the message.
