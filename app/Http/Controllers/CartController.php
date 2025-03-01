@@ -178,7 +178,7 @@ class CartController extends Controller
 
     }
 
-    public function checkout(Request $request)
+    public function checkout(Request $request, Product $product)
     {
         $deliveryAddresses = DeliveryAddress::where('user_id', Auth::user()->id)->get();
         // dd($deliveryAddresses);
@@ -189,7 +189,17 @@ class CartController extends Controller
         if(!empty($setDeliPlaces)){
             $setDeliPlaces;
         }
-        return view('cart.checkout', compact('deliveryAddresses', 'setDeliPlaces'));
+
+
+        $setCart = \Cart::session(auth()->id())->isEmpty();
+        // dd($setCart);
+        if($setCart){
+            // dd('empty');
+            return back()->withMessage('You cannot proceed to checkout. Please continue shopping');
+        }else{
+            return view('cart.checkout', compact('deliveryAddresses', 'setDeliPlaces', 'setCart'));
+
+        }    
     }
 
     public function deliPlace(Request $request)

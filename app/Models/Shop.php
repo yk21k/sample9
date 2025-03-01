@@ -36,4 +36,9 @@ class Shop extends Model
         return $this->hasMany(Campaign::class, 'shop_id');
     }
 
+    public function shopInq()
+    {
+        return $this->hasMany(Inquiries::class, 'shop_id');
+    }
+
 }

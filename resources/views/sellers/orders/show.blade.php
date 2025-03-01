@@ -15,6 +15,7 @@
     <tbody>
         @foreach ($items as $item)
         <tr>
+            @if($item->shop_id == $shopMane)
             <td scope="row">
                 {{$item->name}}
             </td>
@@ -24,6 +25,7 @@
             <td>
                 {{$item->pivot->price}}
             </td>
+            @endif
         </tr>
         @endforeach
 

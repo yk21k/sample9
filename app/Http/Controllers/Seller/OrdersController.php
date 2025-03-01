@@ -11,6 +11,8 @@ use App\Models\Mails;
 use App\Models\ShopCoupon;
 use App\Models\Shop;
 use App\Models\Campaign;
+use App\Models\Inquiries;
+use App\Models\PriceHistory;
 use DB;
 
 use Illuminate\Http\Request;
@@ -20,14 +22,23 @@ class OrdersController extends Controller
 {
     public function index(SubOrder $suborder)
     {
-        
-        $orders = SubOrder::where('seller_id', auth()->id())->latest()->paginate(15);
+        // dd(auth()->user()->id);
+        if(auth()->user()->id == 1){
+            $orders = SubOrder::latest()->paginate(15);
 
-        $coupons = ShopCoupon::where('shop_id', auth()->user()->shop->id)->get()->toArray();
+            $coupons = ShopCoupon::get()->toArray();
 
-        $campaigns = Campaign::where('shop_id', auth()->user()->shop->id)->get()->toArray();
-        // dd(isset($campaigns), isset($coupons), empty($campaigns), empty($coupons), is_null($campaigns), is_null($coupons));
-        // dd($campaigns);
+            $campaigns = Campaign::get()->toArray();
+
+        }else{
+            $orders = SubOrder::where('seller_id', auth()->id())->latest()->paginate(15);
+
+            $coupons = ShopCoupon::where('shop_id', auth()->user()->shop->id)->get()->toArray();
+
+            $campaigns = Campaign::where('shop_id', auth()->user()->shop->id)->get()->toArray();
+            // dd(isset($campaigns), isset($coupons), empty($campaigns), empty($coupons), is_null($campaigns), is_null($coupons));
+            // dd($campaigns);
+        }
 
         
 
@@ -36,10 +47,22 @@ class OrdersController extends Controller
     }
 
     public function show(SubOrder $order)
-    {
-        $items = $order->items;
-        // dd($items);
-        return view('sellers.orders.show', compact('items'));
+    {   
+        if(auth()->user()->id == 1){
+            $items = $order->items;
+            return view('sellers.orders.show', compact('items'));
+
+        }else{
+            $items = $order->items;
+
+            $shopMane = auth()->user()->shop->id;
+            // dd($shopMane);
+
+            // dd($items);
+            return view('sellers.orders.show', compact('items', 'shopMane'));
+        }
+        
+        
     }
 
     public function markAccepted(SubOrder $suborder)
@@ -153,17 +176,170 @@ class OrdersController extends Controller
     {
         $sellerId = auth()->user()->id;
         // dd($sellerId);
+
         // ユーザー数の推移（例えば月ごとのユーザー数）
         $userCounts = User::select(DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'), DB::raw('count(*) as count'))->groupBy(DB::raw('DATE_FORMAT(created_at, "%Y-%m")'))->orderBy('month')->get();
-        // dd($userCounts);
 
-        // オーダー数の推移（例えば月ごとのオーダー数）
-        $subOrderCounts = SubOrder::where('seller_id', $sellerId )->select(DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'), DB::raw('count(*) as count'))->groupBy(DB::raw('DATE_FORMAT(created_at, "%Y-%m")'))->orderBy('month')
+        $userTotalCount = User::count();
+        // dd($userTotalCount);
+
+
+        // 月ごとのオーダー数
+        $monthlySubOrderCounts = SubOrder::where('seller_id', $sellerId)
+        ->select(DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'), DB::raw('count(*) as count'))
+        ->groupBy(DB::raw('DATE_FORMAT(created_at, "%Y-%m")'))
+        ->orderBy('month')
+        ->get();
+
+        // 曜日ごとのオーダー数
+        $dailySubOrderCounts = SubOrder::where('seller_id', $sellerId)
+        ->select(DB::raw('DAYOFWEEK(created_at) as day_of_week'), DB::raw('count(*) as count'))
+        ->groupBy(DB::raw('DAYOFWEEK(created_at)'))
+        ->orderBy('day_of_week')
+        ->get();
+
+        // 週ごとのオーダー数
+        $weeklySubOrderCounts = SubOrder::where('seller_id', $sellerId)
+        ->select(DB::raw('YEARWEEK(created_at) as week'), DB::raw('count(*) as count'))
+        ->groupBy(DB::raw('YEARWEEK(created_at)'))
+        ->orderBy('week')
+        ->get();
+
+        // 月ごとの売上金額
+        $monthlySubOrderSalles = SubOrder::where('seller_id', $sellerId)
+        ->select(DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'), DB::raw('SUM(grand_total) as total_sales'))
+        ->groupBy(DB::raw('DATE_FORMAT(created_at, "%Y-%m")'))
+        ->orderBy('month')
+        ->get();
+
+        // 曜日ごとの売上金額
+        $dailySubOrderSalles = SubOrder::where('seller_id', $sellerId)
+        ->select(DB::raw('DAYOFWEEK(created_at) as day_of_week'), DB::raw('SUM(grand_total) as total_sales'))
+        ->groupBy(DB::raw('DAYOFWEEK(created_at)'))
+        ->orderBy('day_of_week')
+        ->get();
+
+        // 週ごとの売上金額
+        $weeklySubOrderSalles = SubOrder::where('seller_id', $sellerId)
+        ->select(DB::raw('YEARWEEK(created_at) as week'), DB::raw('SUM(grand_total) as total_sales'))
+        ->groupBy(DB::raw('YEARWEEK(created_at)'))
+        ->orderBy('week')
+        ->get();
+
+        // dd($monthlySubOrderSalles, $dailySubOrderSalles, $weeklySubOrderSalles);
+
+
+        
+        // 月ごとのメール
+        $monthlyMailsCounts = Mails::where('shop_id', $sellerId)
+        ->select(DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'), DB::raw('count(*) as count'))
+        ->groupBy(DB::raw('DATE_FORMAT(created_at, "%Y-%m")'))
+        ->orderBy('month')
+        ->get();
+
+        // 週ごとのメール
+        $weeklyMailsCounts = Mails::where('shop_id', $sellerId)
+        ->select(DB::raw('YEARWEEK(created_at) as week'), DB::raw('count(*) as count'))
+        ->groupBy(DB::raw('YEARWEEK(created_at)'))
+        ->orderBy('week')
+        ->get();
+
+        // 曜日ごとのメール
+        $dailyMailsCounts = Mails::where('shop_id', $sellerId)
+        ->select(DB::raw('DAYOFWEEK(created_at) as day_of_week'), DB::raw('count(*) as count'))
+        ->groupBy(DB::raw('DAYOFWEEK(created_at)'))
+        ->orderBy('day_of_week')
+        ->get();
+
+        // dd(auth()->user()->forChart->id);
+
+        $sellerId2 = auth()->user()->forChart->id;
+
+        // 月ごとのお問合せ
+        $monthlyInquiriesCounts = Inquiries::where('shop_id', $sellerId2)
+        ->select(DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'), DB::raw('count(*) as count'))
+        ->groupBy(DB::raw('DATE_FORMAT(created_at, "%Y-%m")'))
+        ->orderBy('month')
+        ->get();
+
+        // dd($monthlyInquiriesCounts);
+
+        // 週ごとのお問合せ
+        $weeklyInquiriesCounts = Inquiries::where('shop_id', $sellerId2)
+        ->select(DB::raw('YEARWEEK(created_at) as week'), DB::raw('count(*) as count'))
+        ->groupBy(DB::raw('YEARWEEK(created_at)'))
+        ->orderBy('week')
+        ->get();
+
+        // 曜日ごとのお問合せ
+        $dailyInquiriesCounts = Inquiries::where('shop_id', $sellerId2)
+        ->select(DB::raw('DAYOFWEEK(created_at) as day_of_week'), DB::raw('count(*) as count'))
+        ->groupBy(DB::raw('DAYOFWEEK(created_at)'))
+        ->orderBy('day_of_week')
+        ->get();
+
+        // 月ごとのクーポン
+        $monthlyShopCouponCounts = ShopCoupon::where('shop_id', $sellerId2)
+        ->select(DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'), DB::raw('count(*) as count'))
+        ->groupBy(DB::raw('DATE_FORMAT(created_at, "%Y-%m")'))
+        ->orderBy('month')
+        ->get();
+
+        // dd($monthlyShopCouponCounts);
+
+        // 週ごとのクーポン
+        $weeklyShopCouponCounts = ShopCoupon::where('shop_id', $sellerId2)
+        ->select(DB::raw('YEARWEEK(created_at) as week'), DB::raw('count(*) as count'))
+        ->groupBy(DB::raw('YEARWEEK(created_at)'))
+        ->orderBy('week')
+        ->get();
+
+        // 曜日ごとのクーポン
+        $dailyShopCouponCounts = ShopCoupon::where('shop_id', $sellerId2)
+        ->select(DB::raw('DAYOFWEEK(created_at) as day_of_week'), DB::raw('count(*) as count'))
+        ->groupBy(DB::raw('DAYOFWEEK(created_at)'))
+        ->orderBy('day_of_week')
+        ->get();
+
+        // キャンペーン
+        $campaigns = Campaign::where('shop_id', $sellerId2)->get();
+
+        // 開始日と終了日の形式を`Y-m-d`にする
+        $campaigns = $campaigns->map(function($campaign) {
+            return [
+                'name' => $campaign->name,
+                'start_date' => $campaign->start_date->format('Y-m-d'),
+                'end_date' => $campaign->end_date->format('Y-m-d'),
+                'discount_rate' => $campaign->dicount_rate1,
+            ];
+        });
+
+        // $sellerId2 はショップの ID
+        $priceHistory = PriceHistory::where('shop_id', $sellerId2)
+            ->orderBy('updated_at', 'asc') // 価格変更日でソート
             ->get();
-        // dd($orderCounts);
 
+        // 商品ごとに価格履歴をグループ化（product_idごとに）
+        $groupedPriceHistory = $priceHistory->groupBy('product_id');
 
-        return view('sellers.charts.index', compact('userCounts', 'subOrderCounts'));
+        // 商品ごとのデータをまとめる
+        $productData = [];
+
+        foreach ($groupedPriceHistory as $productId => $histories) {
+            // 商品の価格履歴データを準備
+            $dates = $histories->pluck('updated_at')->toArray();
+            $prices = $histories->pluck('price')->toArray();
+
+            // 商品IDを使って商品名などの追加情報を取得（例：Productモデルを使う）
+            $product = Product::find($productId); // 商品名を取得
+            $productData[] = [
+                'name' => $product->name,
+                'dates' => $dates,
+                'prices' => $prices,
+            ];
+        }
+        // dd($productData);
+        return view('sellers.charts.index', compact('userCounts', 'monthlySubOrderCounts', 'weeklySubOrderCounts', 'dailySubOrderCounts', 'monthlySubOrderSalles', 'dailySubOrderSalles', 'weeklySubOrderSalles', 'userTotalCount', 'monthlyMailsCounts', 'weeklyMailsCounts', 'dailyMailsCounts', 'monthlyInquiriesCounts', 'weeklyInquiriesCounts', 'dailyInquiriesCounts', 'monthlyShopCouponCounts', 'weeklyShopCouponCounts', 'dailyShopCouponCounts', 'campaigns', 'productData'));
 
     }
 

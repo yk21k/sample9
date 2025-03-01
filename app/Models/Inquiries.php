@@ -12,8 +12,6 @@ class Inquiries extends Model
         'user_id', 'shop_id', 'inq_subject', 'inquiry_details', 'ans_subject', 'answers'
     ];
 
-
-
     public function inqUser()
     {
         return $this->belongsTo(User::class, 'user_id');

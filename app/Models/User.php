@@ -85,9 +85,9 @@ class User extends \TCG\Voyager\Models\User
         return $this->hasOne(DeleteShop::class, 'user_id');
     }
 
-    public function forMail()
+    public function forChart()
     {
-        return $this->hasMany(Mails::class, 'shop_id');
+        return $this->hasOne(Shop::class, 'user_id');
     }
 
 }

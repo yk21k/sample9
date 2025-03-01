@@ -80,11 +80,9 @@
 	</div>
 
 
-	@if(isset($cartItems))
-	 	<button class="btn btn-danger button modalOpen" disabled>Confirm payment details</button>
-	@else
-	 	<button class="btn btn-danger button modalOpen" >Confirm payment details</button>
-	@endif	
+	
+	<button class="btn btn-danger button modalOpen" >Confirm payment details</button>
+	
 	  <div class="modal">
 	    <div class="modal-inner">
 	    <div class="modal-content">
@@ -125,7 +123,10 @@
 	<h3>
 		Total Price : $ {{ \Cart::session(auth()->id())->getTotal() }}
 	</h3>
+	
 	<button class="btn btn-primary" id="submitButton" onclick="location.href='{{ route('cart.checkout') }}' " role="button">Proceed to Checkout</button>
+	
+	
 
 
 

@@ -52,6 +52,19 @@ class Product extends Model
         return $this->hasMany(Fovorite::class);    
     }
 
+    public function generatePriceHistories()
+    {   
+        
+
+        $priceHistories = PriceHistory::find($this->id);
+        // dd($this->id);
+        $priceHistories = PriceHistory::updateOrCreate([
+            'product_id' => $this->id,
+            'price' => $this->getOriginal('price'),  // 変更前の価格
+            'shop_id' => $this->shop_id,
+        ]);
+    }
+
 
  
 
