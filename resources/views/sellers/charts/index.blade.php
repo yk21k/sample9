@@ -167,7 +167,91 @@ Campaign
             });
         </script>
     @endforeach
-    
+
+<h2>Favorite</h2>	
+    <!-- 商品ごとの価格履歴チャートを表示 -->
+    @foreach($productFavoriteschartData as $data)
+        <div style="margin-bottom: 40px;">
+            <h2>{{ $data['product_name'] }}のScore</h2>
+            <canvas id="favoriteChart_{{ $loop->index }}" width="400" height="200"></canvas>
+        </div>
+
+        <script>
+            // PHPからデータを渡す
+            var dates = @json($data['dates']);  // Score変更日
+            var prices = @json($data['scores']);  // Score
+
+            // 商品ごとのチャートを設定
+            var ctx = document.getElementById('favoriteChart_{{ $loop->index }}').getContext('2d');
+            var priceChart = new Chart(ctx, {
+                type: 'line',  // ラインチャートを作成
+                data: {
+                    labels: dates.map(function(date) {
+                        return new Date(date).toLocaleDateString(); // 日付を日本語の年月日形式に変換
+                    }),
+                    datasets: [{
+                        label: '{{ $data['product_name'] }} Score', // 商品名をラベルとして使用
+                        data: prices,
+                        borderColor: 'rgba(75, 192, 192, 1)', // 線の色
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)', // 塗りつぶしの色
+                        borderWidth: 1,
+                        fill: true  // 線の下を塗りつぶす
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '日付',
+                                color: 'white'
+                            },
+                            ticks: {
+		                    	color: 'white' // x軸の目盛り線の色を白に設定
+			                },
+			                grid: {
+			                    color: 'white' // x軸のグリッド線の色を白に設定
+			                }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Score (円)',
+                                color: 'white'
+                            },
+                            ticks: {
+		                    	color: 'white' // x軸の目盛り線の色を白に設定
+			                },
+			                grid: {
+			                    color: 'white' // x軸のグリッド線の色を白に設定
+			                }
+                        }
+                    },
+                    plugins: {
+                        // tooltip: {
+                        //     callbacks: {
+                        //         label: function(tooltipItem) {
+                        //             // ツールチップに表示される値のフォーマットを調整
+                        //             return 'Score: ' + tooltipItem.raw.toLocaleString() + ' 円';
+                        //         }
+                        //     }
+                        // },
+                        legend: {
+			                labels: {
+			                    color: 'white' // 凡例（label）の文字色を白に設定
+			                }
+			            }
+                    }
+                }
+            });
+        </script>
+    @endforeach 
+
+<h2>Stock</h2>
+<div style="width: 80%; margin: auto;">
+    <canvas id="inventoryChart"></canvas>
+</div>    
 
 
 
@@ -849,7 +933,100 @@ Campaign
                 }
             }
         });
-    
+
+        // Stock
+        // Laravelから渡された商品ごとの在庫データをJavaScriptに渡す
+        const inventoryDatas = @json($inventoryData);
+
+        const labels = []; // 日付
+        const datasets = []; // 商品ごとの在庫数データ
+
+        console.log('labels');
+        console.log('datasets');
+
+        // 商品ごとのデータを準備
+        inventoryDatas.forEach(product => {
+            const productData = {
+                label: product.name, // 商品名
+                data: [], // 在庫数
+                fill: false,
+                borderColor: getRandomColor(), // ランダムな色
+                tension: 0.1,
+                borderWidth: 2,
+                pointRadius: 4
+            };
+
+            // 日付ごとの在庫数をセット
+            product.inventory_logs.forEach(log => {
+                if (!labels.includes(log.date)) {
+                    labels.push(log.date);
+                }
+                productData.data.push(log.stock);
+            });
+
+            datasets.push(productData);
+        });
+
+        // ランダムな色を生成する関数
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // Chart.jsで折れ線グラフを描画
+        const ctx10 = document.getElementById('inventoryChart').getContext('2d');
+        const inventoryChart = new Chart(ctx10, {
+            type: 'line', // 折れ線グラフ
+            data: {
+                labels: labels, // X軸：日付
+                datasets: datasets // Y軸：商品ごとの在庫数
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date',
+                            color: 'white',
+                        },
+                        ticks: {
+                            color: 'white', // X軸の目盛りを白に設定
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.2)', // X軸の目盛り線を薄い白に設定
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Stock (units)',
+                            color: 'white',
+                        },
+                        ticks: {
+                            color: 'white', // X軸の目盛りを白に設定
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.2)', // X軸の目盛り線を薄い白に設定
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'white' // 凡例（label）の文字色を白に設定
+                        }
+                    }
+                }
+            }
+        });
+
+
+
 
 </script>
 @endsection

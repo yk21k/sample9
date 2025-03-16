@@ -90,4 +90,9 @@ class User extends \TCG\Voyager\Models\User
         return $this->hasOne(Shop::class, 'user_id');
     }
 
+    public function subOrders()
+    {
+        return $this->hasMany(SubOrder::class, 'seller_id');
+    }
+
 }

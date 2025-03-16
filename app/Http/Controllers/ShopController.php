@@ -60,9 +60,10 @@ class ShopController extends Controller
 
         if($request->hasFile('photo_1')){
             $images = $request->file('photo_1');
+                $str_r = md5(uniqid(rand(), true));
 
                 $file_name = rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('photo_1')->getClientOriginalName();
-                $request->file('photo_1')->storeAs('public', $file_name);
+                $request->file('photo_1')->storeAs('public/'.$str_r.'/'.$request->created_at.'/'.$request->name.'/', $file_name);
             
             
         }else{
@@ -71,7 +72,7 @@ class ShopController extends Controller
         if($request->hasFile('photo_2')){
 
                 $file_name = rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('photo_2')->getClientOriginalName();
-                $request->file('photo_2')->storeAs('public', $file_name);
+                $request->file('photo_2')->storeAs('public/'.$str_r.'/'.$request->created_at.'/'.$request->name, $file_name);
                 
 
         }else{
@@ -80,7 +81,7 @@ class ShopController extends Controller
         if($request->hasFile('photo_3')){
 
                 $file_name = rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('photo_3')->getClientOriginalName();
-                $request->file('photo_3')->storeAs('public', $file_name);
+                $request->file('photo_3')->storeAs('public/'.$str_r.'/'.$request->created_at.'/'.$request->name, $file_name);
                
 
         }else{
@@ -89,7 +90,7 @@ class ShopController extends Controller
         if($request->hasFile('file_1')){
 
                 $file_name = rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_1')->getClientOriginalName();
-                $request->file('file_1')->storeAs('public', $file_name);
+                $request->file('file_1')->storeAs('public/'.$str_r.'/'.$request->created_at.'/'.$request->name, $file_name);
             
 
         }else{
@@ -99,7 +100,7 @@ class ShopController extends Controller
             $images = $request->file('file_2');
 
                 $file_name = rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_2')->getClientOriginalName();
-                $request->file('file_2')->storeAs('public', $file_name);
+                $request->file('file_2')->storeAs('public/'.$str_r.'/'.$request->created_at.'/'.$request->name, $file_name);
             
 
         }else{
@@ -108,7 +109,7 @@ class ShopController extends Controller
         if($request->hasFile('file_3')){
 
                 $file_name = rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_3')->getClientOriginalName();
-                $request->file('file_3')->storeAs('public', $file_name);
+                $request->file('file_3')->storeAs('public/'.$str_r.'/'.$request->created_at.'/'.$request->name, $file_name);
             
              
 
@@ -118,10 +119,10 @@ class ShopController extends Controller
         if($request->hasFile('file_4')){
 
                 $file_name = rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_4')->getClientOriginalName();
-                $request->file('file_4')->storeAs('public', $file_name);
+                $request->file('file_4')->storeAs('public/'.$str_r.'/'.$request->created_at.'/'.$request->name, $file_name);
 
         }else{
-            $request->file_4 = "Not uploaded";
+            $request->file_3  = "nothing";
         }
 
          // dd($request->photo_2);

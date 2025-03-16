@@ -13,7 +13,9 @@ use App\Models\Shop;
 use App\Models\Campaign;
 use App\Models\Inquiries;
 use App\Models\PriceHistory;
+use App\Models\InventoryLog;
 use DB;
+use Carbon\Carbon;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -228,8 +230,6 @@ class OrdersController extends Controller
 
         // dd($monthlySubOrderSalles, $dailySubOrderSalles, $weeklySubOrderSalles);
 
-
-        
         // 月ごとのメール
         $monthlyMailsCounts = Mails::where('shop_id', $sellerId)
         ->select(DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'), DB::raw('count(*) as count'))
@@ -314,6 +314,7 @@ class OrdersController extends Controller
             ];
         });
 
+        // 価格遷移
         // $sellerId2 はショップの ID
         $priceHistory = PriceHistory::where('shop_id', $sellerId2)
             ->orderBy('updated_at', 'asc') // 価格変更日でソート
@@ -339,7 +340,47 @@ class OrdersController extends Controller
             ];
         }
         // dd($productData);
-        return view('sellers.charts.index', compact('userCounts', 'monthlySubOrderCounts', 'weeklySubOrderCounts', 'dailySubOrderCounts', 'monthlySubOrderSalles', 'dailySubOrderSalles', 'weeklySubOrderSalles', 'userTotalCount', 'monthlyMailsCounts', 'weeklyMailsCounts', 'dailyMailsCounts', 'monthlyInquiriesCounts', 'weeklyInquiriesCounts', 'dailyInquiriesCounts', 'monthlyShopCouponCounts', 'weeklyShopCouponCounts', 'dailyShopCouponCounts', 'campaigns', 'productData'));
+
+        // Favorite
+
+        // Fetch the products and their favorite scores over time
+        $productFavorites = Product::where('shop_id', $sellerId2)->with(['user_favo' => function($query) {
+            $query->orderBy('created_at', 'asc'); // Order by date
+        }])->get();
+
+        // $productFavorites = Product::where('shop_id', $sellerId2)->with('user_favo')->get();
+
+        // dd($productFavorites);
+
+        // グラフ用のデータを準備
+        $productFavoriteschartData = [];
+        foreach ($productFavorites as $product) {
+            $dates = [];
+            $scores = [];
+
+            // 商品のお気に入りスコアを取得
+            foreach ($product->user_favo as $favorite) {
+                $dates[] = Carbon::parse($favorite->created_at)->format('Y-m-d H:i:s'); // 日付のフォーマット
+                $scores[] = $favorite->wants; // スコア
+            }
+
+            $productFavoriteschartData[] = [
+                'product_name' => $product->name,
+                'dates' => $dates,
+                'scores' => $scores
+            ];
+        }
+        // dd($productFavoriteschartData);
+
+        // Stock
+        // 在庫データを日付順で取得
+        $inventoryData = Product::where('shop_id', $sellerId2 )->with('inventoryLogs')->get();
+
+        // dd($inventoryData);
+
+        
+
+        return view('sellers.charts.index', compact('userCounts', 'monthlySubOrderCounts', 'weeklySubOrderCounts', 'dailySubOrderCounts', 'monthlySubOrderSalles', 'dailySubOrderSalles', 'weeklySubOrderSalles', 'userTotalCount', 'monthlyMailsCounts', 'weeklyMailsCounts', 'dailyMailsCounts', 'monthlyInquiriesCounts', 'weeklyInquiriesCounts', 'dailyInquiriesCounts', 'monthlyShopCouponCounts', 'weeklyShopCouponCounts', 'dailyShopCouponCounts', 'campaigns', 'productData', 'productFavoriteschartData', 'inventoryData'));
 
     }
 

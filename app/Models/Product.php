@@ -54,8 +54,6 @@ class Product extends Model
 
     public function generatePriceHistories()
     {   
-        
-
         $priceHistories = PriceHistory::find($this->id);
         // dd($this->id);
         $priceHistories = PriceHistory::updateOrCreate([
@@ -63,6 +61,23 @@ class Product extends Model
             'price' => $this->getOriginal('price'),  // 変更前の価格
             'shop_id' => $this->shop_id,
         ]);
+    }
+
+    public function generateStockHistories()
+    {   
+        $stockHistories = InventoryLog::find($this->id);
+        // dd($this->id);
+        $stockHistories = InventoryLog::updateOrCreate([
+            'product_id' => $this->id,
+            'date' => $this->updated_at,
+            'stock' => $this->getOriginal('stock'),  // 変更前の価格
+            'shop_id' => $this->shop_id,
+        ]);
+    }
+
+    public function inventoryLogs()
+    {
+        return $this->hasMany(InventoryLog::class); // 商品に関連する在庫ログ
     }
 
 

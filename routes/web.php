@@ -57,6 +57,10 @@ Route::match(['get', 'post'], '/botman', [App\Http\Controllers\BotManController:
 
 Route::get('/testpage', [App\Http\Controllers\HomeController::class, 'testpage'])->name('testpage');
 
+// テスト
+Route::post('/submit', [App\Http\Controllers\HomeController::class, 'submit']);
+
+
 Route::get('/privacy-policy', [App\Http\Controllers\HomeController::class, 'privacy_policypage'])->name('privacy_policypage');
 
 Route::get('/personal-information', [App\Http\Controllers\HomeController::class, 'personal_information'])->name('personal_information');

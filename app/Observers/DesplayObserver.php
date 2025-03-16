@@ -3,6 +3,8 @@
 namespace App\Observers;
 
 use App\Models\Desplay;
+use App\Mail\ShopTemplateActivated;
+use Illuminate\Support\Facades\Mail;
 
 class DesplayObserver
 {
@@ -11,8 +13,9 @@ class DesplayObserver
      */
     public function created(Desplay $desplay): void
     {
-        //
-        $desplay->generate_static();
+            
+        $desplay->generate_static2();
+
     }
 
     /**
@@ -20,8 +23,17 @@ class DesplayObserver
      */
     public function updated(Desplay $desplay): void
     {
-        //
-        
+        if($desplay->getOriginal('is_active') == false && $desplay->is_active == true){
+            //dd('shop made active');
+            // send mail to customer 
+            // dd($desplay->shop->email);
+
+            Mail::to($desplay->shop->email)->send(new ShopTemplateActivated($desplay));
+            $desplay->generate_static();
+
+        }else{
+        //     dd('shop changed to inactive');
+        }        
        
     }
 

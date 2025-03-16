@@ -7,14 +7,11 @@
 
 @section('content')
 
-TEST
-
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shop Create Coupon</title>
-    <style>
+    <!-- <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -23,31 +20,33 @@ TEST
             align-items: center;
             background-color: #f4f4f9;
         }
-        .form-container {
-            background-color: #fff;
+        .form-container-coupon {
+            background-color: #4682b4;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 600px;
+            width: ;
         }
-        .form-container h2 {
+        .form-container-coupon h2 {
+            color:#f0f8ff;
             text-align: center;
             margin-bottom: 20px;
         }
-        .form-container label {
+        .form-container-coupon label {
+            color:#f0f8ff;
             font-size: 14px;
             margin-bottom: 5px;
             display: block;
         }
-        .form-container input[type="text"],
-        .form-container input[type="date"],
-        .form-container input[type="number"] {
+        .form-container-coupon input[type="text"],
+        .form-container-coupon input[type="date"],
+        .form-container-coupon input[type="number"] {
             width: 100%;
             padding: 8px;
             margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
-        .form-container button {
+        .form-container-coupon button {
             width: 30%;
             padding: 10px;
             background-color: #4CAF50;
@@ -57,10 +56,10 @@ TEST
             cursor: pointer;
             font-size: 16px;
         }
-        .form-container button:hover {
+        .form-container-coupon button:hover {
             background-color: #45a049;
         }
-    </style>
+    </style> -->
 </head>
 <body>
 	@if (session('success'))
@@ -68,7 +67,7 @@ TEST
 	        {{ session('success') }}
 	    </div>
 	@endif
-    <div class="form-container">
+    <div class="form-container-coupon">
         <h2>Shop Coupon Create</h2>
         <form action="{{ route('order.make_coupon') }}" method="POST"> @csrf
 

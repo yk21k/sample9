@@ -39,54 +39,135 @@ class CalendarView {
 	 * カレンダーを出力する
 	 */
 	function render(){
-		//HolidaySetting
-		$setting = HolidaySetting::where('shop_id', auth()->user()->shop->id)->firstOrNew();
-		$setting->loadHoliday($this->carbon->format("Y"));
-		// dd($setting);
-		//臨時営業日の読み込み
-		$this->holidays = ExtraHoliday::getExtraHolidayWithMonth($this->carbon->format("Ym"));
 
-		$timeHoliday = HolidaySetting::where('shop_id', auth()->user()->shop->id)->first();
-        $timeExtraHoliday = ExtraHoliday::where('shop_id', auth()->user()->shop->id)->latest()->first();
+			//HolidaySetting
+			$setting = HolidaySetting::where('shop_id', auth()->user()->shop->id)->firstOrNew();
+			$setting->loadHoliday($this->carbon->format("Y"));
+			// dd($setting);
+			//臨時営業日の読み込み
+			$this->holidays = ExtraHoliday::getExtraHolidayWithMonth($this->carbon->format("Ym"));
 
-		$html = [];
-		$html[] = '<div class="calendar">';
-		$html[] = '<table class="table">';
-		$html[] = '<thead>';
-		$html[] = '<tr>';
-		$html[] = '<th>月</th>';
-		$html[] = '<th>火</th>';
-		$html[] = '<th>水</th>';
-		$html[] = '<th>木</th>';
-		$html[] = '<th>金</th>';
-		$html[] = '<th>土</th>';
-		$html[] = '<th>日</th>';
-        
-		$html[] = '</tr>';
-		$html[] = '<a>休日の更新日:'.$timeHoliday->updated_at->format(config('const.format.datetime')).'</a>&nbsp;&nbsp;';
-		$html[] = '<a>臨時休日の更新日:'.$timeExtraHoliday->updated_at->format(config('const.format.datetime')).'</a>';
+			$timeHoliday = HolidaySetting::where('shop_id', auth()->user()->shop->id)->first();
+			// dd($timeHoliday->updated_at);
+	        $timeExtraHoliday = ExtraHoliday::where('shop_id', auth()->user()->shop->id)->latest()->first();
 
-		$html[] = '</thead>';
+		    if(is_null($timeHoliday)){    
+				$html = [];
+				$html[] = '<div class="calendar">';
+				$html[] = '<table class="table">';
+				$html[] = '<thead>';
+				$html[] = '<tr>';
+				$html[] = '<th>月</th>';
+				$html[] = '<th>火</th>';
+				$html[] = '<th>水</th>';
+				$html[] = '<th>木</th>';
+				$html[] = '<th>金</th>';
+				$html[] = '<th>土</th>';
+				$html[] = '<th>日</th>';
+		        
+				$html[] = '</tr>';
+				
+				$html[] = '</thead>';
 
-		$html[] = '<tbody>';
-	
-		$weeks = $this->getWeeks();
-		foreach($weeks as $week){
-			$html[] = '<tr class="'.$week->getClassName().'">';
-			$days = $week->getDays($setting);
-			foreach($days as $day){
+				$html[] = '<tbody>';
+			
+				$weeks = $this->getWeeks();
+				foreach($weeks as $week){
+					$html[] = '<tr class="'.$week->getClassName().'">';
+					$days = $week->getDays($setting);
+					foreach($days as $day){
 
-				$html[] = $this->renderDay($day);
+						$html[] = $this->renderDay($day);
 
+					}
+					$html[] = '</tr>';
+				}
+				
+				$html[] = '</tbody>';
+				$html[] = '</table>';
+				$html[] = '</div>';
+				return implode("", $html);
 			}
-			$html[] = '</tr>';
+			elseif(is_null($timeExtraHoliday)){
+				$html = [];
+				$html[] = '<div class="calendar">';
+				$html[] = '<table class="table">';
+				$html[] = '<thead>';
+				$html[] = '<tr>';
+				$html[] = '<th>月</th>';
+				$html[] = '<th>火</th>';
+				$html[] = '<th>水</th>';
+				$html[] = '<th>木</th>';
+				$html[] = '<th>金</th>';
+				$html[] = '<th>土</th>';
+				$html[] = '<th>日</th>';
+		        
+				$html[] = '</tr>';
+				$html[] = '<a>休日の更新日:'.$timeHoliday->updated_at->format(config('const.format.datetime')).'</a>&nbsp;&nbsp;';
+
+				$html[] = '</thead>';
+
+				$html[] = '<tbody>';
+			
+				$weeks = $this->getWeeks();
+				foreach($weeks as $week){
+					$html[] = '<tr class="'.$week->getClassName().'">';
+					$days = $week->getDays($setting);
+					foreach($days as $day){
+
+						$html[] = $this->renderDay($day);
+
+					}
+					$html[] = '</tr>';
+				}
+				
+				$html[] = '</tbody>';
+				$html[] = '</table>';
+				$html[] = '</div>';
+				return implode("", $html);
+			}
+			else{
+				$html = [];
+				$html[] = '<div class="calendar">';
+				$html[] = '<table class="table">';
+				$html[] = '<thead>';
+				$html[] = '<tr>';
+				$html[] = '<th>月</th>';
+				$html[] = '<th>火</th>';
+				$html[] = '<th>水</th>';
+				$html[] = '<th>木</th>';
+				$html[] = '<th>金</th>';
+				$html[] = '<th>土</th>';
+				$html[] = '<th>日</th>';
+		        
+				$html[] = '</tr>';
+				$html[] = '<a>休日の更新日:'.$timeHoliday->updated_at->format(config('const.format.datetime')).'</a>&nbsp;&nbsp;';
+
+				$html[] = '<a>臨時休日の更新日:'.$timeExtraHoliday->updated_at->format(config('const.format.datetime')).'</a>';
+
+				$html[] = '</thead>';
+
+				$html[] = '<tbody>';
+			
+				$weeks = $this->getWeeks();
+				foreach($weeks as $week){
+					$html[] = '<tr class="'.$week->getClassName().'">';
+					$days = $week->getDays($setting);
+					foreach($days as $day){
+
+						$html[] = $this->renderDay($day);
+
+					}
+					$html[] = '</tr>';
+				}
+				
+				$html[] = '</tbody>';
+				$html[] = '</table>';
+				$html[] = '</div>';
+				return implode("", $html);	
+			}
 		}
-		
-		$html[] = '</tbody>';
-		$html[] = '</table>';
-		$html[] = '</div>';
-		return implode("", $html);
-	}
+
 
 	/**
 	 * 日を描画する

@@ -24,7 +24,12 @@ class ProductObserver
         // 価格が変更された場合に履歴を保存
         if ($product->isDirty('price')) {
             $product->generatePriceHistories();
+        }elseif($product->isDirty('stock')){
+            // dd('Hello');
+            $product->generateStockHistories();
         }
+
+
     }
 
     /**

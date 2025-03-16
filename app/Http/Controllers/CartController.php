@@ -119,25 +119,6 @@ class CartController extends Controller
           ),
         ]);
 
-        // \Cart::session(auth()->id())->update($rowId,[
-        //     'quantity' => request('quantity')
-        // ]);
-
-        // \Cart::session(auth()->id())->update($rowId,[
-        //     'quantity' => array(
-        //       'relative' => true,
-        //       'value' => request('quantity')
-        //   ),
-        // ]);
-
-        // \Cart::session(auth()->id())->update($itemId,[
-        //     'quantity' => array(
-        //       'relative' => true,
-        //       'value' => request('quantity')
-        //   ),
-        // ]);
-
-
         DB::beginTransaction();
 
         $first_stocks = \Cart::session(auth()->id())->getContent($product->id);
@@ -180,16 +161,38 @@ class CartController extends Controller
 
     public function checkout(Request $request, Product $product)
     {
+        // dd(\Cart::session(auth()->id())->getContent());
+
+        $cartProducts = \Cart::session(auth()->id())->getContent();
+        
+        // dd($cartProducts);
+
+        $searchStock = [];
+        foreach ($cartProducts as $cartProduct) {
+
+            $searchStocks = $cartProduct->pluck('id')->toArray();
+            // dd($searchStocks);
+            foreach($searchStocks as $searchStock){
+                $stockProducts = Product::where('id', $searchStock)->get();
+                foreach($stockProducts as $stockProduct){
+                    // dd($stockProduct->stock);
+                    if($stockProduct->stock <= 0){
+                        return back()->withMessage(" I'm sorry. You cannot purchase the item because the item in your cart was paid for first or there has been a change in inventory. Please empty your cart again and continue shopping. ");   
+                    }    
+                }
+                
+            }
+            
+        }
+
         $deliveryAddresses = DeliveryAddress::where('user_id', Auth::user()->id)->get();
         // dd($deliveryAddresses);
         
-
         $setDeliPlaces = DeliveryAddress::setDeliPlaces();
         // dd($setDeliPlaces);
         if(!empty($setDeliPlaces)){
             $setDeliPlaces;
         }
-
 
         $setCart = \Cart::session(auth()->id())->isEmpty();
         // dd($setCart);

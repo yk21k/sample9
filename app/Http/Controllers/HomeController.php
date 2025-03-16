@@ -130,6 +130,13 @@ class HomeController extends Controller
         return view('listingterms.listing_terms');
     }
 
+    public function submit(Request $request)
+    {
+        
+        dd('Hello');
+        // POSTリクエストの処理
+        return response()->json(['message' => 'データが正常に受け取られました！', 'data' => $request->all()]);
+    }
 
 
 

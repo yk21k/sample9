@@ -41,4 +41,9 @@ class Shop extends Model
         return $this->hasMany(Inquiries::class, 'shop_id');
     }
 
+    public function desplay()
+    {
+        return $this->hasMany(Desplay::class, 'shop_id');
+    }
+
 }

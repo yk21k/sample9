@@ -42,9 +42,7 @@
     @include('voyager::alerts')
     <div class="row">
         <div class="col-md-12">
-            <div>
-    <a href="{{url('/seller/orders')}}" class="">Order Management</a>
-</div>
+            
             <div class="panel panel-bordered">
                 <div class="panel-body">
                     @if ($isServerSide)
