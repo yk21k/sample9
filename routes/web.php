@@ -10,11 +10,15 @@ use App\Http\Controllers\CustomerInquiryController;
 use App\Http\Controllers\InquiriesController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\AuctionController;
+use App\Http\Controllers\PaymentController;
+
 use App\Http\Controllers\Seller\OrdersController;
 use App\Http\Controllers\Seller\CalendarController;
 use App\Http\Controllers\Seller\HolidaySettingController;
 use App\Http\Controllers\Seller\ExtraHolidaySettingController;
 use App\Http\Controllers\Seller\DesplayController;
+
 use App\Http\Controllers\Auth\RegisterController;
 
 use App\Http\Controllers\ShopProfController;
@@ -50,6 +54,9 @@ Route::post('register/main_register', [App\Http\Controllers\Auth\RegisterControl
 
 
 
+// 支払い成功後のリダイレクト先URL
+Route::get('/payment/success', [App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');
+
 
 Route::match(['get', 'post'], '/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
@@ -74,6 +81,19 @@ Route::get('/delete_shop', [App\Http\Controllers\UsersController::class, 'index'
 
 Route::post('/delete_shop', [App\Http\Controllers\UsersController::class, 'termination'])->name('users.delete_shops');
 
+// Auction
+Route::get('/home/auction', [App\Http\Controllers\AuctionController::class, 'auction_index'])->name('home.auction');
+
+Route::get('/home/auction/show/{auction}', [App\Http\Controllers\AuctionController::class, 'auction_show'])->name('home.auction.show');
+
+Route::post('/auction/{auction}/bid', [AuctionController::class, 'storeBid'])->name('auction.bid.store');
+
+// 入札処理の後、即決金額が設定されていれば決済画面に遷移
+Route::post('/auction/{id}/bid', [AuctionController::class, 'storeBid'])->name('auction.bid.store');
+Route::get('/auction/{id}/payment', [AuctionController::class, 'payment'])->name('auction.payment');
+
+// 入札キャンセル用のルート
+Route::delete('/auction/bid/{bidId}/cancel', [AuctionController::class, 'cancelBid'])->name('auction.bid.cancel');
 
 
 Route::get('products/search', [App\Http\Controllers\ProductController::class, 'search'])->name('products.search');
@@ -88,6 +108,8 @@ Route::resource('products', ProductController::class);
 
 
 Route::get('/add-to-cart/{product}', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add')->middleware('auth');
+
+Route::get('/add-to-auction-cart/{auction}', [App\Http\Controllers\CartController::class, 'addAuction'])->name('cart.add.auction')->middleware('auth');
 
 Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index')->middleware('auth');
 
@@ -111,17 +133,15 @@ Route::post('/account/{id}', [App\Http\Controllers\AccountController::class, 'up
 Route::post('/account_addresses/{id}', [App\Http\Controllers\AccountController::class, 'saveDeliveryAddress'])->name('account.addresses')->middleware('auth');
 
 
-
-
 Route::get('/shop-prof', [App\Http\Controllers\ShopProfController::class, 'index'])->name('shop_prof')->middleware('auth');
 
 
 
-Route::get('/cutomer-inquiry', [App\Http\Controllers\CustomerInquiryController::class, 'inquiryForm'])->name('account.inquiry')->middleware('auth');
+Route::get('/cutomer-inquiry/{shopId}', [App\Http\Controllers\CustomerInquiryController::class, 'inquiryForm'])->name('customer.inquiry')->middleware('auth');
 
-Route::post('/cutomer-inquiry', [App\Http\Controllers\CustomerInquiryController::class, 'inquiryAnswer'])->name('account.inquiries')->middleware('auth');
+Route::post('/cutomer-inquiry', [App\Http\Controllers\CustomerInquiryController::class, 'inquiryAnswer'])->name('customer.inquiries')->middleware('auth');
 
-Route::get('/cutomer-answers', [App\Http\Controllers\CustomerInquiryController::class, 'answers'])->name('account.answers')->middleware('auth');
+Route::get('/cutomer-answers/{shopId}', [App\Http\Controllers\CustomerInquiryController::class, 'answers'])->name('customer.answers')->middleware('auth');
 
 
 
@@ -129,7 +149,7 @@ Route::get('inquiries/{id}', [App\Http\Controllers\InquiriesController::class, '
 
 Route::post('inquiries/{id}', [App\Http\Controllers\InquiriesController::class, 'store'])->name('inquiries.store')->middleware('auth');
 
-Route::get('/inquiries-answers/{id}', [App\Http\Controllers\InquiriesController::class, 'answers'])->name('inquiries.answers')->middleware('auth');
+Route::get('/inquiries-answers/', [App\Http\Controllers\InquiriesController::class, 'answers'])->name('inquiries.answers')->middleware('auth');
 
 
 Route::resource('orders', OrderController::class)->only('store')->middleware('auth');
@@ -137,7 +157,7 @@ Route::resource('orders', OrderController::class)->only('store')->middleware('au
 
 Route::resource('shops', ShopController::class)->middleware('auth');
 
-Route::get('shops/{id}', [App\Http\Controllers\UsersController::class, 'show'])->name('shops.overview');
+Route::get('shops/{id}', [App\Http\Controllers\ShopController::class, 'show'])->name('shops.overview');
 
 
 Route::resource('users',UsersController::class)->middleware('auth');
@@ -185,6 +205,8 @@ Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', '
     Route::get('/orders/shop_mail/{suborder}', 'OrdersController@sendMail')->name('order.shop_mail');
 
     Route::get('/shop_charts', 'OrdersController@chartPage')->name('order.shop_charts');
+
+    Route::get('/shop_mail', 'OrdersController@shopMailHistory')->name('order.shop_mails_history');
 
 
     Route::get('/calendar', 'CalendarController@show')->name('seller.calendar');

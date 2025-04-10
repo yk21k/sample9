@@ -10,6 +10,16 @@
         }
     }
 
+    .original-price {
+    text-decoration: line-through; /* 元の価格に取り消し線を引く */
+    color: grey; /* 元の価格の色を変更 */
+    }
+
+    .discounted-price {
+        font-weight: bold; /* 太文字 */
+        color: red; /* 赤色 */
+    }
+
 </style>
 <div class="sidenav shadow-sm">
 
@@ -145,19 +155,25 @@
                         <div class="card-body change-border01__inner">
 
                             <h4 class="card-title">{{ $product->name }}</h4>
+
                             {{ $product->description }}
 
-                                @foreach($capaign_objs as $obj) 
-
-                                    @if($product->shop->id == $obj['shop_id'])
-                                        <h4 class="card-title">${{ $product->price*(1-$obj['dicount_rate1']) }}</h4>
-                                        <div class="ribbon1"> Campaign !! </div>
-                                        <div class="ribbon2"> Up to: {{  Carbon\Carbon::parse($obj['end_date'])->format('Y/m/d')}}</div>
-                                    @endif
-
-                                @endforeach
+                            <h4 class="card-title">
                                 
-                            <h4 class="card-title">${{ $product->price }}</h4>
+                            @foreach($uniqueCampaigns as $uniqueCampaign) 
+
+                                @if($product->shop->id == $uniqueCampaign['shop_id'])
+                                    <span class="original-price">${{ $product->price }}</span>
+                                    <span class="discounted-price">${{ $product->price*(1-$uniqueCampaign['dicount_rate1']) }}</span>
+                                    <div class="ribbon1"> Campaign !! </div>
+                                    <div class="ribbon2"> Up to: {{  Carbon\Carbon::parse($uniqueCampaign['end_date'])->format('Y/m/d')}}</div>
+                                @else
+                                    <h4 class="card-title">${{ $product->price }}</h4>    
+                                @endif
+
+                            @endforeach
+                            </h4>                        
+                            
                             <h4 class="card-title" id="stockQty">
                              @if($product->stock<=0) 
                                 <div class="ribbon">Sold out!!</div>
@@ -175,7 +191,7 @@
                             @endforeach
                             <h4 class="card-title">{{ $product->shop->name }}</h4>
 
-                            <a class="" href="{{ route('inquiries.create', ['id'=>$product->shop->id]) }}"><h4>Contact Shop Manager</h4></a>
+                            <a class="" href="{{ route('customer.inquiry', ['shopId'=>$product->shop->id]) }}"><h4>Contact Shop Manager</h4></a>
                             <div class="card-body change-border01__inner" id="addCart1">
                                 <a href="{{ route('cart.add', $product->id) }}" class="card-link">Add to Cart</a>
                             </div>

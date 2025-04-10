@@ -4,17 +4,16 @@
 <html data-bs-theme="auto">
 	<head>
 		<meta charset="utf-8">
-		<title>Personal Information</title>
-	    
+		<title>個人情報の取り扱いに関する同意</title>
 	</head>
 	<body>
-	    <!-- Script to create style tag --> 
+	    <!-- スタイルタグを作成するためのスクリプト -->
 	    <script type="text/javascript">
 	  
-		    /* Function to add style */
+		    /* スタイルを追加する関数 */
 		    function addStyle(styles) {
 		      
-		      /* Create style element */
+		      /* スタイル要素を作成 */
 		      var css = document.createElement('style');
 		      css.type = 'text/css';
 		  
@@ -23,17 +22,17 @@
 		      else 
 		        css.appendChild(document.createTextNode(styles));
 		      
-		      /* Append style to the head element */
+		      /* ヘッド要素にスタイルを追加 */
 		      document.getElementsByTagName("head")[0].appendChild(css);
 		    }
 		    
-		    /* Declare the style element */
+		    /* スタイル要素の宣言 */
 		    var styles = 'h1 {padding: 1rem 2rem; color: #fff; background: #327a33; -webkit-box-shadow: 5px 5px 0 #007032; box-shadow: 5px 5px 0 #007032;} ';
 		    styles += ' body { text-align: center } ';
 		    styles += ' #header { height: 50px; background: green } ';
 		    styles += ' .wrapper {width: 94%; max-width: 1200px; margin: 0 auto; display: flex; justify-content:space-between;} ';
 		    styles += ' .main {width: calc(100% - 150px);} ';
-		    styles += ' p.m-p {text-align: left; color: #fff; background: #7da3a1;} ';
+		    styles += ' p.m-p {text-align: left; color: #fff; background: #2c6594;} ';
 		    styles += ' p.m-p2 {text-align: center;} ';
 
 		    styles += ' .sidebar {width: 280px;} ';
@@ -41,143 +40,140 @@
 		    
 		    styles += ' .widget--sticky {position: sticky; top: 20px;} ';   
 
-		    /* Function call */
+		    /* 関数呼び出し */
 		    window.onload = function() { addStyle(styles) };
 	    </script>
 
-
 	    <div class="wrapper">
 	  		<main class="main">
-	  			<h1>**Consent to the handling of personal information**</h1>
+	  			<h1>**個人情報の取り扱いに関する同意**</h1>
 	  			<p class="m-p">
 	  				<a name="title">
-	  					The customer (hereinafter referred to as the "user") agrees that the Company may collect, use, and store the personal information of the user in accordance with the following contents when using the e-commerce site (hereinafter referred to as the "site") operated by [company name] Co., Ltd. (hereinafter referred to as "the Company”).
+	  					お客様（以下「ユーザー」といいます）は、[会社名]株式会社（以下「会社」といいます）が運営するECサイト（以下「サイト」といいます）を利用する際に、以下の内容に従ってユーザーの個人情報を収集、利用、保存することに同意するものとします。
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a name="title1">
-	  					### 1. What personal information do we collect?
+	  					### 1. 収集する個人情報
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a>	
-						We collect the following personal information for the operation of this site and the provision of services.<br><br>
+						このサイトの運営およびサービス提供のために、以下の個人情報を収集します。<br><br>
 
-						-identity
-						-address
-						-telephone number
-						- E-mail address
-						- Payment information such as credit card information
-						- Product delivery address information
-						- Account information, such as user ID and password
-						Site usage information such as purchase history, browsing history, access logs, etc.
+						- 身分証明
+						- 住所
+						- 電話番号
+						- Eメールアドレス
+						- クレジットカード情報などの支払い情報
+						- 商品の配送先情報
+						- ユーザーIDやパスワードなどのアカウント情報
+						- 購入履歴、閲覧履歴、アクセスログなどのサイト使用情報
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a name="title2">
-	  					### 2. Purpose of use of personal information
+	  					### 2. 個人情報の利用目的
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a>	
-						We will use the collected personal information for the following purposes.<br><br>
+						収集した個人情報は、以下の目的で利用します。<br><br>
 
-						- Acceptance of orders from users and shipment of products
-						- Payment processing and purchase history management
-						- Responding to inquiries from users
-						- Provision of e-mail newsletters and campaign information (with the consent of the user)
-						- Improvement of services and operation and management of this site
-						Responding to laws and regulations and making necessary communications
+						- ユーザーからの注文受付および商品の発送
+						- 支払い処理および購入履歴の管理
+						- ユーザーからの問い合わせ対応
+						- ユーザーの同意を得た上でのメールニュースレターおよびキャンペーン情報の提供
+						- サービスの改善およびサイトの運営管理
+						- 法律および規制への対応および必要な通知
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a name="title3">
-	  					### 3. Provision of Personal Information to Third Parties
+	  					### 3. 第三者への個人情報提供
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a>	
-						The Company will not provide the personal information of users to third parties except in the following cases.<br><br>
+						会社は、以下の場合を除き、ユーザーの個人情報を第三者に提供しません。<br><br>
 
-						- With the consent of the user
-						- When required by law
-						When providing information to a subcontractor to the extent necessary for the operation of this site (e.g., payment agents, etc.)
+						- ユーザーの同意を得た場合
+						- 法律で要求される場合
+						- サイトの運営に必要な業務委託先（支払い代行業者等）に提供する場合
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a name="title4">
-	  					### 4. Storage and management of personal information
+	  					### 4. 個人情報の保管および管理
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a>	
-						We will appropriately manage the collected personal information and take reasonable safety measures to prevent unauthorized access, information leakage, falsification, loss, etc. If the user withdraws consent or the purpose has been achieved, the personal information will be deleted in an appropriate manner.
+						収集した個人情報は適切に管理し、不正アクセス、情報漏洩、改ざん、紛失等を防止するために合理的な安全措置を講じます。ユーザーが同意を撤回するか、目的が達成された場合には、適切な方法で個人情報を削除します。
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a name="title5">
-	  					### 5. Withdrawal of Consent and Disclosure, Correction and Deletion of Personal Information
+	  					### 5. 同意の撤回および個人情報の開示、訂正、削除
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a>	
-						If you wish to withdraw your consent to the use of your personal information, or if you wish to disclose, correct, or delete your personal information, you may make a request to us. The Company will respond to these requests to the extent reasonable and necessary in accordance with laws and regulations. However, if you withdraw your consent or delete your personal information, you may not be able to use all or part of our services. For inquiries regarding these matters, please contact the following.
+						個人情報の利用に対する同意を撤回したい場合、または個人情報の開示、訂正、削除を希望する場合は、当社にリクエストをすることができます。会社は、法令に従い合理的かつ必要な範囲でこれらのリクエストに対応します。ただし、同意を撤回したり、個人情報を削除したりすると、当社のサービスの全部または一部を利用できなくなる場合があります。これらに関するお問い合わせは以下の連絡先までご連絡ください。
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a name="title6">
-	  					### 6. Use of Cookies, etc.
+	  					### 6. クッキー等の利用
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a>	
-						We may use cookies and similar technologies to analyze how users use the site and to improve convenience. For more information about our use of cookies, please refer to our Cookie Policy.
+						当社は、ユーザーがサイトをどのように利用しているかを分析し、利便性向上のためにクッキーや類似の技術を使用する場合があります。クッキーの利用に関する詳細は、クッキーポリシーをご参照ください。
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a name="title7">
-	  					### 7. Inquiries
+	  					### 7. お問い合わせ
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a>	
-						For inquiries regarding the handling of personal information, please contact the following.<br><br>
+						個人情報の取り扱いに関するお問い合わせは、以下の連絡先までご連絡ください。<br><br>
 
-						【Inquiries】  
-						Co., Ltd. [Company Name]  
-						Address: [Business Address]  
-						Phone Number: [Phone Number]  
-						E-mail Address: [e-mail address]
+						【お問い合わせ】  
+						株式会社[会社名]  
+						住所: [事業所住所]  
+						電話番号: [電話番号]  
+						メールアドレス: [メールアドレス]
 
 						---<br><br>
 
-						**Consent**
+						**同意**
 
-						By using this site, you are deemed to have agreed to the "Consent to the Handling of Personal Information" above.
+						本サイトをご利用いただくことで、上記の「個人情報の取り扱いに関する同意」に同意したものと見なされます。
 
 						---
-
-
 	  				</a>	
 	  		</main>
-			<!-- Sidebar -->
+			<!-- サイドバー -->
 			<aside class="sidebar">
 			    <div class="widget widget--sticky">
 
-			    	<h3 class="w3-bar-item">Menu</h3>
+			    	<h3 class="w3-bar-item">メニュー</h3>
 			    	
-					<p class="m-p2"><a href="#title" class="w3-bar-item w3-button">Title</a></p>
-					<p class="m-p2"><a href="#title1" class="w3-bar-item w3-button">### 1. Definition of Personal Information</a></p>
-					<p><a href="#title2" class="w3-bar-item w3-button">### 2. How do we collect personal information?</a></p>
-					<p><a href="#title3" class="w3-bar-item w3-button">### 3. Provision of Personal Information to Third Parties</a></p>
-					<p><a href="#title4" class="w3-bar-item w3-button">### 4. Storage and 	management of personal information</a></p>
-					<p><a href="#title5" class="w3-bar-item w3-button">### 5. Management of personal information</a></p>
-					<p><a href="#title6" class="w3-bar-item w3-button">### 6. Use of Cookies, etc.</a></p>
-					<p><a href="#title7" class="w3-bar-item w3-button">### 7. Disclosure, Correction and Deletion of Personal Information</a></p>
-					<p><a href="#title8" class="w3-bar-item w3-button">### 8. Personal Information of Minors</a></p>
-					<p><a href="#title9" class="w3-bar-item w3-button">### 5. Withdrawal of Consent and Disclosure, Correction and Deletion of Personal Information</a></p>
-					<p><a href="#title10" class="w3-bar-item w3-button">### 6. Use of Cookies, etc.</a></p>
-					<p><a href="#title11" class="w3-bar-item w3-button">### 7. Inquiries</a></p>
+					<p class="m-p2"><a href="#title" class="w3-bar-item w3-button">タイトル</a></p>
+					<p class="m-p2"><a href="#title1" class="w3-bar-item w3-button">### 1. 個人情報の定義</a></p>
+					<p><a href="#title2" class="w3-bar-item w3-button">### 2. どのように個人情報を収集するか</a></p>
+					<p><a href="#title3" class="w3-bar-item w3-button">### 3. 第三者への個人情報の提供</a></p>
+					<p><a href="#title4" class="w3-bar-item w3-button">### 4. 個人情報の保管および管理</a></p>
+					<p><a href="#title5" class="w3-bar-item w3-button">### 5. 個人情報の管理</a></p>
+					<p><a href="#title6" class="w3-bar-item w3-button">### 6. クッキー等の利用</a></p>
+					<p><a href="#title7" class="w3-bar-item w3-button">### 7. 個人情報の開示、訂正、削除</a></p>
+					<p><a href="#title8" class="w3-bar-item w3-button">### 8. 未成年者の個人情報</a></p>
+					<p><a href="#title9" class="w3-bar-item w3-button">### 5. 同意の撤回および個人情報の開示、訂正、削除</a></p>
+					<p><a href="#title10" class="w3-bar-item w3-button">### 6. クッキー等の利用</a></p>
+					<p><a href="#title11" class="w3-bar-item w3-button">### 7. お問い合わせ</a></p>
 			    </div>
 			</aside>				
 		</div>

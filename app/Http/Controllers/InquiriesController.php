@@ -13,7 +13,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\Shop;
 
-use App\Mail\InquiryShopActivationRequest;
+use App\Mail\InquiryActivationRequest;
 use Illuminate\Support\Facades\Mail;
 
 
@@ -57,7 +57,6 @@ class InquiriesController extends Controller
 
             $inquiryAnswer = new Inquiries;
             $inquiryAnswer->user_id = Auth::user()->id;
-            $inquiryAnswer->shop_id = $id;
             $inquiryAnswer->inq_subject = $data['inq_subject'];
             $inquiryAnswer->inquiry_details = $data['inquiry_details'];
             $inquiryAnswer->status = 0;
@@ -73,17 +72,17 @@ class InquiriesController extends Controller
 
             
 
-            $adminId = Shop::where(['id'=>$inquiryAnswers->shop_id])->first();
+            // $adminId = Shop::where(['id'=>$inquiryAnswers->shop_id])->first();
 
             // dd($adminId->user_id);
 
 
-            $admins = User::where(['id'=>$adminId->user_id])->first();
+            $admins = User::where('id', '1')->first();
 
             // dd($admins->email);
 
-
-            Mail::to($admins->email)->send(new InquiryShopActivationRequest($inquiryAnswers));
+            // dd($inquiryAnswers);
+            Mail::to($admins->email)->send(new InquiryActivationRequest($inquiryAnswers));
 
         }
         return back()->withMessage('We have received your inquiry.');
@@ -92,7 +91,8 @@ class InquiriesController extends Controller
 
     public function answers()
     {
-        $inquiries = Inquiries::where('user_id', Auth::user()->id)->get();
+        // カスタマーとアドミン dd($id);InquiriesController
+        $inquiries = Inquiries::where('user_id', Auth::user()->id)->latest()->get();
         // dd($inquiries);
         return view('inquiries.answers', compact('inquiries'));
 

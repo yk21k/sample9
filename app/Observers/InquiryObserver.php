@@ -3,7 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Inquiries;
-use App\Mail\AnswerInqShopActivated;
+use App\Mail\AnswerInqActivated;
 use Illuminate\Support\Facades\Mail;
 
 class InquiryObserver
@@ -21,16 +21,16 @@ class InquiryObserver
      */
     public function updated(Inquiries $inquiries): void
     {
-        // dd($inquiries->status, $inquiries->getOriginal('status'));
+        // dd($inquiries->, $inquiries->getOriginal('status'));
             // dd($inquiries->shop_id);
 
         // Check if active column is changed from inactive to active
 
-        if($inquiries->getOriginal('status') == false && $inquiries->status == true){
+        if($inquiries->getOriginal('answers')){
             // dd('A Store representative has Responded');
             // send to mail customer
             // dd($inquiries);
-            Mail::to($inquiries->inqUser)->send(new AnswerInqShopActivated($inquiries));
+            Mail::to($inquiries->inqUser)->send(new AnswerInqActivated($inquiries));
 
         }else{
             // dd('The Store representative has Not Responded Yet.');

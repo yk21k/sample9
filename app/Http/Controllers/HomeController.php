@@ -56,6 +56,20 @@ class HomeController extends Controller
 
         ])->get()->toArray();
 
+        // 配列をコレクションに変換
+        $capaign_objs = collect($capaign_objs);
+
+        // 日付が重複した場合に、dicount_rate1 が高いものだけを抽出
+        $uniqueCampaigns = $capaign_objs->sortByDesc('dicount_rate1')
+            ->groupBy(function($item) {
+                return $item['start_date']; // 配列なので、キーを配列のキーに合わせてアクセス
+            })
+            ->map(function ($group) {
+                return $group[0]; // グループ内で最初の要素（dicount_rate1 が高いもの）を取得
+            });
+
+        $uniqueCampaigns = $uniqueCampaigns->values(); // インデックスをリセット
+
         $product_attributes = [];
         $product_attributes = Attribute::with('values')->get();
         // dd($product_attributes);
@@ -101,7 +115,7 @@ class HomeController extends Controller
 
         $extra_holidays_count = ExtraHoliday::where('date_key', $para_d)->get('shop_name')->count();
 
-        return response()->view('home', ['allProducts' => $products, 'product_attributes' => $product_attributes, 'categories' => $categories, 'capaign_objs' => $capaign_objs, 'holidays' => $holidays, 'extra_holidays' => $extra_holidays, 'norm_products_pres' => $norm_products_pres]);
+        return response()->view('home', ['allProducts' => $products, 'product_attributes' => $product_attributes, 'categories' => $categories, 'capaign_objs' => $capaign_objs, 'holidays' => $holidays, 'extra_holidays' => $extra_holidays, 'norm_products_pres' => $norm_products_pres, 'uniqueCampaigns' => $uniqueCampaigns]);
         
     }
 

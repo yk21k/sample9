@@ -1,14 +1,12 @@
 @component('mail::message')
-# Inquiry request
+# アカウントページからお問い合わせがありました
 
-We have received an inquiry. Here are inquiry details.
-
-Name : {{$inquiryAnswers->inqUser->name}}
+User ID : {{$inquiryAnswers->user_id}}
 Subject : {{$inquiryAnswers->inq_subject}}
 Subject : {{$inquiryAnswers->inquiry_details}}
 
-@component('mail::button', ['url' => url('/admin/customer-inquiries')])
-Manage Inquiries
+@component('mail::button', ['url' => url('/admin')])
+Please visit the site and answer
 @endcomponent
 
 Thanks,<br>

@@ -9,7 +9,8 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-use App\Models\CustomerInquiry;
+use App\Models\Inquiries;
+
 
 
 class InquiryActivationRequest extends Mailable
@@ -18,7 +19,7 @@ class InquiryActivationRequest extends Mailable
 
     public $inquiryAnswers;
     
-    public function __construct(CustomerInquiry $inquiryAnswers)
+    public function __construct(Inquiries $inquiryAnswers)
     {
         $this->inquiryAnswers = $inquiryAnswers;
     }

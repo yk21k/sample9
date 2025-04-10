@@ -9,7 +9,9 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-use App\Models\Inquiries;
+use App\Models\CustomerInquiry;
+
+
 // use App\Models\User;
 
 class AnswerInqShopActivated extends Mailable
@@ -30,7 +32,7 @@ class AnswerInqShopActivated extends Mailable
     //     // $this = $inquiries;
     // }
     public function __construct(
-        public Inquiries $inquiries,
+        public CustomerInquiry $customerInquiry,
     ) {}
 
     /**

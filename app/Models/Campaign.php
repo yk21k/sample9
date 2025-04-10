@@ -12,4 +12,9 @@ class Campaign extends Model
         'start_date' => 'datetime',
         'end_date' => 'datetime',
     ];
+
+    public function forMails()
+    {
+        return $this->hasMany(Mails::class, 'campaign_id');
+    }
 }

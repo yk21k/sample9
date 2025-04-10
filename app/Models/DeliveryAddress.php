@@ -12,7 +12,8 @@ class DeliveryAddress extends Model
     protected $fillable = ['status'];
 
     public static function setDeliPlaces(){
-        $setDeliPlaces = DeliveryAddress::where('user_id', Auth::user()->id)->where('status', 1)->get();
+        // $setDeliPlaces = DeliveryAddress::where('user_id', Auth::user()->id)->where('status', 1)->get();
+        $setDeliPlaces = DeliveryAddress::where('user_id', Auth::user()->id)->get();
         return  $setDeliPlaces;
     }
 }

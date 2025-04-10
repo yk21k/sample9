@@ -384,4 +384,13 @@ class OrdersController extends Controller
 
     }
 
+    public function shopMailHistory()
+    {
+
+        $mails_histories = Mails::where('shop_id', auth()->id())->latest()->paginate(20);
+
+        return view('sellers.mails.shop_mails_history', compact(['mails_histories']));
+
+    }
+
 }

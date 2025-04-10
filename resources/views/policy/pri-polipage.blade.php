@@ -1,18 +1,20 @@
+@extends('layouts.app')
+@section('content')
 <!DOCTYPE html>
 <html data-bs-theme="auto">
 	<head>
 		<meta charset="utf-8">
-		<title>Privacy Policy</title>
+		<title>プライバシーポリシー</title>
 	    
 	</head>
 	<body>
-	    <!-- Script to create style tag --> 
+	    <!-- スタイルタグを作成するスクリプト -->
 	    <script type="text/javascript">
 	  
-		    /* Function to add style */
+		    /* スタイルを追加する関数 */
 		    function addStyle(styles) {
 		      
-		      /* Create style element */
+		      /* スタイル要素を作成 */
 		      var css = document.createElement('style');
 		      css.type = 'text/css';
 		  
@@ -21,17 +23,17 @@
 		      else 
 		        css.appendChild(document.createTextNode(styles));
 		      
-		      /* Append style to the head element */
+		      /* head要素にスタイルを追加 */
 		      document.getElementsByTagName("head")[0].appendChild(css);
 		    }
 		    
-		    /* Declare the style element */
+		    /* スタイル要素を宣言 */
 		    var styles = 'h1 {padding: 1rem 2rem; color: #fff; background: #327a33; -webkit-box-shadow: 5px 5px 0 #007032; box-shadow: 5px 5px 0 #007032;} ';
 		    styles += ' body { text-align: center } ';
 		    styles += ' #header { height: 50px; background: green } ';
 		    styles += ' .wrapper {width: 94%; max-width: 1200px; margin: 0 auto; display: flex; justify-content:space-between;} ';
 		    styles += ' .main {width: calc(100% - 150px);} ';
-		    styles += ' p.m-p {text-align: left; color: #fff; background: #7da3a1;} ';
+		    styles += ' p.m-p {text-align: left; color: #fff; background: #2c6594;} ';
 		    styles += ' p.m-p2 {text-align: center;} ';
 
 		    styles += ' .sidebar {width: 280px;} ';
@@ -39,7 +41,7 @@
 		    
 		    styles += ' .widget--sticky {position: sticky; top: 20px;} ';   
 
-		    /* Function call */
+		    /* 関数を呼び出し */
 		    window.onload = function() { addStyle(styles) };
 	    </script>
         
@@ -47,162 +49,163 @@
 
 	    <div class="wrapper">
 	  		<main class="main">
-	  			<h1>Privacy Policy</h1>
+	  			<h1>プライバシーポリシー</h1>
 	  			<p class="m-p">
 	  				<a name="title">
-	  					[Company Name] Co., Ltd. (hereinafter referred to as "the Company") has established the following privacy policy (hereinafter referred to as the "Policy") in order to appropriately protect and use the personal information of customers on the EC site (hereinafter referred to as the "Site") operated by the Company.
+	  					[会社名]株式会社（以下「当社」といいます）は、当社が運営するECサイト（以下「本サイト」といいます）におけるお客様の個人情報を適切に保護し、利用するために、以下のプライバシーポリシー（以下「本ポリシー」といいます）を定めます。
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a name="title1">
-	  					### 1. Definition of Personal Information
+	  					### 1. 個人情報の定義
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a>	
-						For the purposes of this Policy, "personal information" refers to information about an individual that can identify a specific individual, such as name, address, telephone number, email address, and credit card information.	
+						本ポリシーにおける「個人情報」とは、氏名、住所、電話番号、メールアドレス、クレジットカード情報など、特定の個人を識別できる情報を指します。	
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a name="title2">
-	  					### 2. How do we collect personal information?
+	  					### 2. 個人情報の収集方法
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a>	
-						When you use this site, we may collect personal information in the following ways.<br><br>
+						本サイトを利用する際、以下の方法で個人情報を収集することがあります。<br><br>
 
-						- Input of information at the time of user registration
-						- Shipping address and payment information at the time of purchase
-						- Inquiries from the inquiry form
-						Questionnaire and campaign application information
+						- ユーザー登録時の情報入力
+						- 購入時の配送先住所や支払い情報
+						- お問い合わせフォームからの問い合わせ
+						- アンケートやキャンペーン申し込み情報
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a name="title3">
-	  					### 3. Purpose of use of personal information
+	  					### 3. 個人情報の利用目的
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a>	
-						We will use the collected personal information for the following purposes.<br><br>
+						収集した個人情報は、以下の目的で利用いたします。<br><br>
 
-						- Acceptance and delivery of orders for products
-						- Customer support and inquiries
-						- Improvement of services by analyzing site usage
-						- Sending e-mail newsletters and campaign information (if the customer agrees)
-						Necessary actions based on laws and regulations
+						- 商品の注文受付および発送
+						- 顧客サポートおよび問い合わせ対応
+						- サイト利用状況を分析し、サービスの改善を図る
+						- メールマガジンやキャンペーン情報の送付（お客様の同意がある場合）
+						- 法令に基づく必要な対応
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a name="title4">
-	  					### 4. Provision of Personal Information to Third Parties
+	  					### 4. 個人情報の第三者への提供
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a>	
-						We will not provide your personal information to third parties except in the following cases.<br><br>
+						以下の場合を除き、お客様の個人情報を第三者に提供することはありません。<br><br>
 
-						- With the consent of the customer
-						- When required by law
-						- When it is necessary to protect the life, body, or property of an individual and it is difficult to obtain the consent of the person
-						When providing personal information to a subcontractor to the extent necessary for business execution (e.g., a payment service company)
+						- お客様の同意がある場合
+						- 法令に基づく場合
+						- 人命、身体、財産の保護のために必要であり、本人の同意を得ることが困難な場合
+						- 業務遂行のために必要な範囲で、委託先に個人情報を提供する場合（例：決済サービス会社）
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a name="title5">
-	  					### 5. Management of personal information
+	  					### 5. 個人情報の管理
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a>	
-						We will take reasonable safety measures to properly manage your personal information and prevent unauthorized access, loss, falsification, leakage, etc.
+						当社は、個人情報の適切な管理を行い、不正アクセス、紛失、改ざん、漏洩等を防ぐために、合理的な安全管理措置を講じます。
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a name="title6">
-	  					### 6. Use of Cookies, etc.
+	  					### 6. クッキー等の利用
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a>	
-						We may use cookies and similar technologies to improve user convenience and analyze site usage. This may automatically collect information that does not identify you personally.
+						当社は、ユーザーの利便性を向上させ、サイト利用状況を分析するために、クッキー等の技術を利用することがあります。これにより、個人を特定できない情報が自動的に収集される場合があります。
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a name="title7">
-	  					### 7. Disclosure, Correction and Deletion of Personal Information
+	  					### 7. 個人情報の開示、訂正、削除
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a>	
-						You may request that we disclose, correct, or delete your personal information. The Company will respond to such requests within a reasonable range in accordance with laws and regulations. However, depending on the content of the request, we may not be able to respond to some or all of the requests due to our business operations or legal obligations. For inquiries regarding these, please contact the following.
+						お客様は、当社に対して、個人情報の開示、訂正、削除を求めることができます。当社は、法令に基づき、合理的な範囲内で対応いたします。ただし、リクエストの内容に応じて、業務運営や法的義務により、すべてまたは一部のリクエストに応じられない場合があります。これに関するお問い合わせは、以下の連絡先までご連絡ください。
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a name="title8">
-	  					### 8. Personal Information of Minors
+	  					### 8. 未成年者の個人情報
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a>	
-						If you are under the age of 18 and wish to use this site, please provide personal information with the consent of a parent or guardian.
+						18歳未満の方が本サイトを利用する場合は、親権者または保護者の同意を得た上で、個人情報を提供してください。
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a name="title9">
-	  					### 9. Changes to the Privacy Policy
+	  					### 9. プライバシーポリシーの変更
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a>	
-						The Company may change this policy as necessary. Any changes will be announced on this site. The revised policy shall take effect when it is posted on this site.
+						当社は、必要に応じて本ポリシーを変更することがあります。変更がある場合は、本サイトでお知らせいたします。改訂後のポリシーは、本サイトに掲示された時点で効力を生じます。
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a name="title10">
-	  					### 10. Inquiries
+	  					### 10. お問い合わせ
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a>	
-						For inquiries regarding the handling of personal information, please contact the following.
+						個人情報の取り扱いに関するお問い合わせは、以下までご連絡ください。
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a name="title11">
-	  					【Inquiries】
+	  					【お問い合わせ】
 	  				</a>
 	  			</p>
 	  			<p class="m-p">
 	  				<a>	
-						FCo., Ltd. [Company Name]  
-						Address: [Business Address]  
-						Phone Number: [Phone Number]  
-						E-mail Address: [e-mail address]
+						株式会社[会社名]  
+						住所：[所在地]  
+						電話番号：[電話番号]  
+						メールアドレス：[メールアドレス]
 	  				</a>
 	  			</p>	
 	  		</main>
-			<!-- Sidebar -->
+			<!-- サイドバー -->
 			<aside class="sidebar">
 			    <div class="widget widget--sticky">
 			    	
-			    	<h3 class="w3-bar-item">Menu</h3>
+			    	<h3 class="w3-bar-item">メニュー</h3>
 			    	
-					<p class="m-p2"><a href="#title" class="w3-bar-item w3-button">Title</a></p>
-					<p class="m-p2"><a href="#title1" class="w3-bar-item w3-button">### 1. Definition of Personal Information</a></p>
-					<p><a href="#title2" class="w3-bar-item w3-button">### 2. How do we collect personal information?</a></p>
-					<p><a href="#title3" class="w3-bar-item w3-button">### 3. Purpose of use of personal information</a></p>
-					<p><a href="#title4" class="w3-bar-item w3-button">### 4. Provision of Personal Information to Third Parties</a></p>
-					<p><a href="#title5" class="w3-bar-item w3-button">### 5. Management of personal information</a></p>
-					<p><a href="#title6" class="w3-bar-item w3-button">### 6. Use of Cookies, etc.</a></p>
-					<p><a href="#title7" class="w3-bar-item w3-button">### 7. Disclosure, Correction and Deletion of Personal Information</a></p>
-					<p><a href="#title8" class="w3-bar-item w3-button">### 8. Personal Information of Minors</a></p>
-					<p><a href="#title9" class="w3-bar-item w3-button">### 9. Changes to the Privacy Policy</a></p>
-					<p><a href="#title10" class="w3-bar-item w3-button">### 10. Inquiries</a></p>
-					<p><a href="#title11" class="w3-bar-item w3-button">【Inquiries】</a></p>
+					<p class="m-p2"><a href="#title" class="w3-bar-item w3-button">タイトル</a></p>
+					<p class="m-p2"><a href="#title1" class="w3-bar-item w3-button">### 1. 個人情報の定義</a></p>
+					<p><a href="#title2" class="w3-bar-item w3-button">### 2. 個人情報の収集方法</a></p>
+					<p><a href="#title3" class="w3-bar-item w3-button">### 3. 個人情報の利用目的</a></p>
+					<p><a href="#title4" class="w3-bar-item w3-button">### 4. 個人情報の第三者への提供</a></p>
+					<p><a href="#title5" class="w3-bar-item w3-button">### 5. 個人情報の管理</a></p>
+					<p><a href="#title6" class="w3-bar-item w3-button">### 6. クッキー等の利用</a></p>
+					<p><a href="#title7" class="w3-bar-item w3-button">### 7. 個人情報の開示、訂正、削除</a></p>
+					<p><a href="#title8" class="w3-bar-item w3-button">### 8. 未成年者の個人情報</a></p>
+					<p><a href="#title9" class="w3-bar-item w3-button">### 9. プライバシーポリシーの変更</a></p>
+					<p><a href="#title10" class="w3-bar-item w3-button">### 10. お問い合わせ</a></p>
+					<p><a href="#title11" class="w3-bar-item w3-button">【お問い合わせ】</a></p>
 			    </div>
 			</aside>				
 		</div>
 	</body>
 </html>	
+@endsection

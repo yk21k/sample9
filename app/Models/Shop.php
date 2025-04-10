@@ -46,4 +46,9 @@ class Shop extends Model
         return $this->hasMany(Desplay::class, 'shop_id');
     }
 
+    public function auction()
+    {
+        return $this->hasMany(Auction::class, 'shop_id');
+    }
+
 }

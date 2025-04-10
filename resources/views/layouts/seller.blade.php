@@ -145,6 +145,8 @@
                             <a href=" {{url('/seller/shop_desplay')}}" class="list-group-item list-group-item-action">Shop Desplay</a>
 
                             <a href=" {{ url('/seller/shop_charts') }} " class="list-group-item list-group-item-action">Shop Charts</a>
+
+                            <a href=" {{ url('/seller/shop_mail') }} " class="list-group-item list-group-item-action">Shop Mail</a>
                         </div>
                     </div>
                 </div>

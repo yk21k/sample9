@@ -95,4 +95,9 @@ class User extends \TCG\Voyager\Models\User
         return $this->hasMany(SubOrder::class, 'seller_id');
     }
 
+    public function forMails()
+    {
+        return $this->hasMany(Mails::class, 'user_id');
+    }
+
 }

@@ -11,7 +11,7 @@
         </ul>
     </div>
 @endif
-<form action="{{ route('account.inquiry') }}" method="post">
+<form action="{{ route('inquiries.store', ['id'=>auth()->user()->id]) }}" method="post">
     @csrf
 
     <input class="" type="hidden" id="user_id" name="user_id" value="{{ Auth::user()->id }}" readonly="">
@@ -32,6 +32,5 @@
 
 </form>
 
-<a href="{{ route('account.answers') }}">Answers</a>    
-
+<a href="{{ route('inquiries.answers') }}">Answers</a>    
 @endsection

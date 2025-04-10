@@ -39,7 +39,7 @@ class ShopController extends Controller
     {   
         //add validation
         $request->validate([
-            'name' => 'required|between:1, 30|unique:shops,name',
+            'name' => 'required|string||between:1, 30|unique:shops,name',
             // 'email' => 'required|string|email:strict,dns,spoof|max:255',When user register
             'email' => 'required|string|email|max:255',
             'telephone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
@@ -122,7 +122,7 @@ class ShopController extends Controller
                 $request->file('file_4')->storeAs('public/'.$str_r.'/'.$request->created_at.'/'.$request->name, $file_name);
 
         }else{
-            $request->file_3  = "nothing";
+            $request->file_4  = "no_file.txt";
         }
 
          // dd($request->photo_2);
@@ -130,6 +130,7 @@ class ShopController extends Controller
          // dd($file_name2);
 
         //save db
+        // dd($request->file('file_4')->getClientOriginalName());
         $shop = auth()->user()->shop()->create([
             'name'        => $request->input('name'),
             'description' => $request->input('description'),
@@ -150,7 +151,9 @@ class ShopController extends Controller
             'file_1' => rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_1')->getClientOriginalName(),
             'file_2' => rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_2')->getClientOriginalName(),
             'file_3' => rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_3')->getClientOriginalName(),
-            'file_4' => rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_4')->getClientOriginalName(),
+            
+
+            'file_4' => rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_4'),
 
             'representative' => $request->input('representative'),
             'manager' => $request->input('manager'),

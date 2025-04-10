@@ -25,6 +25,8 @@
     <link rel="stylesheet" href="{{ asset('front/css/custom91.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom93.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom94.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/css/custom95.css') }}">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     @stack('css')

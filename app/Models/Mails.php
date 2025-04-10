@@ -11,6 +11,16 @@ class Mails extends Model
 
     public function forMailUser()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function forMailCoupon()
+    {
+        return $this->belongsTo(Coupon::class, 'coupon_id');
+    }
+
+    public function forMailCampaign()
+    {
+        return $this->belongsTo(Campaign::class, 'campaign_id');
     }
 }

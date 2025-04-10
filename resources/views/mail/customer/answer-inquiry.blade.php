@@ -1,9 +1,9 @@
 @component('mail::message')
-# Answered
+# 回答済み
 
-You received an answer from the site administrator.
+サイト管理者から回答を受け取りました。
 
-This email will let you know that we have received your answer. We do not reply to this email, so please access the website from the link below and check for replies.
+このメールは、回答を受け取ったことをお知らせするものです。このメールには返信しませんので、下のリンクからウェブサイトにアクセスして返信を確認してください。
 
 @component('mail::button', ['url' => route('account.answers')])
 Visit the site to check

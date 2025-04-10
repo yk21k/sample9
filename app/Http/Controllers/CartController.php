@@ -10,6 +10,7 @@ use App\Models\Coupon;
 use App\Models\ShopCoupon;
 use App\Models\Order;
 use App\Models\DeliveryAddress;
+use App\Models\Auction;
 use Illuminate\Support\Facades\View;
 
 use Illuminate\Support\Facades\DB;
@@ -72,6 +73,22 @@ class CartController extends Controller
 
         return redirect()->route('cart.index');
     }
+
+    public function addAuction(Auction $auction)
+    {
+        // add the auction to cart
+        \Cart::session(auth()->id())->add(array(
+            'id' => $auction->id,
+            'name' => $auction->name,
+            'price' => $auction->spot_price,
+            'quantity' => 1,
+            'attributes' => array(),
+            'associatedModel' => $auction
+
+        ));
+        return redirect()->route('cart.index');
+    }
+
 
     public function index()
     {   
@@ -164,33 +181,46 @@ class CartController extends Controller
         // dd(\Cart::session(auth()->id())->getContent());
 
         $cartProducts = \Cart::session(auth()->id())->getContent();
+        $cartPrices = \Cart::getTotal();
+
         
+
+        session(['cart_total' => $cartPrices]); 
         // dd($cartProducts);
+        // dd($cartPrices);
+        
+        
+            $searchStock = [];
+            foreach ($cartProducts as $cartProduct) {
+                // dd($cartProduct);
+                // dd($cartProduct->associatedModel->shipping_fee);
+                $searchStocks = $cartProduct->pluck('id')->toArray();
+                // dd($searchStocks);
+                foreach($searchStocks as $searchStock){
+                    if($cartProduct->associatedModel->shipping_fee){
 
-        $searchStock = [];
-        foreach ($cartProducts as $cartProduct) {
+                    }else{
+                        $stockProducts = Product::where('id', $searchStock)->get();
+                        foreach($stockProducts as $stockProduct){
+                            // dd($stockProduct->stock);
 
-            $searchStocks = $cartProduct->pluck('id')->toArray();
-            // dd($searchStocks);
-            foreach($searchStocks as $searchStock){
-                $stockProducts = Product::where('id', $searchStock)->get();
-                foreach($stockProducts as $stockProduct){
-                    // dd($stockProduct->stock);
-                    if($stockProduct->stock <= 0){
-                        return back()->withMessage(" I'm sorry. You cannot purchase the item because the item in your cart was paid for first or there has been a change in inventory. Please empty your cart again and continue shopping. ");   
-                    }    
-                }
-                
-            }
-            
-        }
+                            if($stockProduct->stock <= 0){
+                                return back()->withMessage(" I'm sorry. You cannot purchase the item because the item in your cart was paid for first or there has been a change in inventory. Please empty your cart again and continue shopping. ");   
+                            }    
+                        }    
+                    }   
+                }        
+            }    
+        
+        
 
         $deliveryAddresses = DeliveryAddress::where('user_id', Auth::user()->id)->get();
         // dd($deliveryAddresses);
         
         $setDeliPlaces = DeliveryAddress::setDeliPlaces();
         // dd($setDeliPlaces);
-        if(!empty($setDeliPlaces)){
+        // dd(!isset($setDeliPlaces));
+        if(!isset($setDeliPlaces)){
             $setDeliPlaces;
         }
 
@@ -235,7 +265,6 @@ class CartController extends Controller
         if(!$couponData) {
             return back()->withMessage('Sorry! Coupon does not exist');
         }
-
         //coupon logic
         $condition = new \Darryldecode\Cart\CartCondition(array(
             'name' => $couponData->name,
@@ -258,66 +287,61 @@ class CartController extends Controller
         // dd($shopCouponCode);
 
         $shopCouponData = ShopCoupon::where('code', $shopCouponCode)->first();
-        // dd($shopCouponData);
+        // dd($shopCouponData->product_id);
 
         if(!$shopCouponData) {
             return back()->withMessage('Sorry! Coupon does not exist');
         }
 
         $shopCouponOrder = Order::where('coupon_code', $shopCouponCode)->first();
-        
+        // dd($shopCouponOrder);
+
         if($shopCouponOrder) {
             return back()->withMessage('Sorry! This coupon cannot be used as it has already been paid.');
         }    
 
-        //coupon logic
-        // $saleCondition = new \Darryldecode\Cart\CartCondition(array(
-        //     'name' => $shopCouponData->name,
-        //     'type' => $shopCouponData->type,
-        //     'value' => $shopCouponData->value,
-        // ));
-        // dd($condition);
-
         $cartItems = \Cart::session(auth()->id())->getContent();
         $items = \Cart::getContent();
         // dd($cartItems);
-        // dd($items);
         // dd($shopCouponData->product_shop_coupon->name);
+        // dd($shopCouponData->product_id);
+        $pre_productID = $shopCouponData->product_id;
 
-        $productID = $shopCouponData->product_id;
-        \Cart::clearItemConditions($productID);
-        $coupon101 = new \Darryldecode\Cart\CartCondition(array(
-            'name' => $shopCouponData->name,
-            'code' => $shopCouponData->code,  
-            'type' => $shopCouponData->type,
-            'value' => $shopCouponData->value,
-        ));
+        $cartItems_toArray = $cartItems->toArray();
 
-        \Cart::addItemCondition($productID, $coupon101);
+        // if (is_array($cartItems_toArray)) { 
+        //     dd('array'); 
+        // }
+        // dd($cartItems_toArray);
 
-        Session::put('coupon101', print_r($shopCouponCode, true));
-        
-           
+        $filtered_items = array_filter($cartItems_toArray, function($item, $pre_productID) {
+            return $item['id'] == $pre_productID;
+        }, ARRAY_FILTER_USE_BOTH);
 
-        // dd(\Cart::session(auth()->id())->getContent());
-        // dd(\Cart::session(auth()->id())->getConditions());
-        // $cartItems = array(
-        //     'id' => $shopCouponData->product_id,
-        //     'name' => $shopCouponData->product_shop_coupon->name,
-        //     'price' => $shopCouponData->product_shop_coupon->price,
-        //     'quantity' => 1,
-        //     'conditions' => $saleCondition
-        // );
+        // dd(!empty($filtered_items));
+        // 条件を満たす要素が存在するか判定
+        if (!empty($filtered_items)) {
 
-        // \Cart::add($cartItems);
-        // \Cart::add($saleCondition);
-        // \Cart::session(auth()->id())->condition($saleCondition);
-        // \Cart::condition($saleCondition);
-        // \Cart::addItemCondition($items, $saleCondition);
+                $productID = $shopCouponData->product_id;
+                \Cart::clearItemConditions($productID);
+                $coupon101 = new \Darryldecode\Cart\CartCondition(array(
+                    'name' => $shopCouponData->name,
+                    'code' => $shopCouponData->code,  
+                    'type' => $shopCouponData->type,
+                    'value' => $shopCouponData->value,
+                ));
 
-        // \Cart::session(auth()->id())->condition($saleCondition); // for a speicifc user's cart
+                \Cart::addItemCondition($productID, $coupon101);
 
-        return back()->withMessage('coupon applied');
+                Session::put('coupon101', print_r($shopCouponCode, true));
+
+                return back()->withMessage('If the amount does not change, the product is not eligible for the coupon.');
+
+        } else {
+                return back()->withMessage('Attention !!! There are no products that match the coupon');
+
+                
+        }
 
     }
 }

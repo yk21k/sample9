@@ -3,7 +3,7 @@
 namespace App\Observers;
 
 use App\Models\CustomerInquiry;
-use App\Mail\AnswerInqActivated;
+use App\Mail\AnswerInqShopActivated;
 use Illuminate\Support\Facades\Mail;
 
 class CustomerInquiryObserver
@@ -30,7 +30,7 @@ class CustomerInquiryObserver
             //dd('shop made active');
             // send mail to customer 
             // dd($customerInquiry->inqUser->email);
-            Mail::to($customerInquiry->inqUser->email)->send(new AnswerInqActivated($customerInquiry));
+            Mail::to($customerInquiry->inqUser->email)->send(new AnswerInqShopActivated($customerInquiry));
 
             
         }else{

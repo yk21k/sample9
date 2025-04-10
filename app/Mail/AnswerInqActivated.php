@@ -9,21 +9,20 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-use App\Models\CustomerInquiry;
-
+use App\Models\Inquiries;
 
 class AnswerInqActivated extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $customerInquiry;
+    public $inquiry;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(CustomerInquiry $customerInquiry)
+    public function __construct(Inquiries $inquiry)
     {
-        $this->forInq = $customerInquiry;
+        $this->forInq = $inquiry;
     }
 
     /**
@@ -56,3 +55,4 @@ class AnswerInqActivated extends Mailable
         return [];
     }
 }
+
