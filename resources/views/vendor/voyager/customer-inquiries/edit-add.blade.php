@@ -90,7 +90,7 @@
                                         <!-- 2025 add -->
                                         @if($row->display_name == 'shops' && auth()->user()->hasRole('seller'))
                                             {{auth()->user()->shop->name ?? 'n/a'}}
-                                            
+                                            <input type="hidden" name="shop_id" value="{{ auth()->user()->shop->id }}">
                                         @else
                                             @include('voyager::formfields.relationship', ['options' => $row->details])
                                         @endif
@@ -157,8 +157,6 @@
                 _token: '{{ csrf_token() }}'
             }
 
-            $('.confirm_delete_name').text(params.filename);
-            $('#confirm_delete_modal').modal('show');
           };
         }
 
@@ -187,6 +185,20 @@
             // 2025 delete
         });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const removeBtn = document.querySelector('.voyager-x.remove-single-image');
+
+            if (removeBtn) {
+                removeBtn.addEventListener('click', function (e) {
+                    e.preventDefault();  // hrefの挙動を止める
+                    e.stopPropagation(); // 他のイベントも止める
+                    return false;        // 念のため false を返す
+                });
+            }
+        });
+    </script>
+
     <script>
         // Hide both file inputs with name="inq_file"
         document.querySelectorAll('input[name="inq_file"]').forEach(function(input) {
