@@ -24,7 +24,8 @@
     <div lass="form-group">{{ $inquiry['created_at'] }}</div><br>
     <div class="form-group">
         <label for="inq_subject">Subject</label>
-        <input type="text" class="form-control" name="inq_subject" value="{{ $inquiry['inq_subject'] }}" id="" aria-describedby="helpId" readonly="">
+        <input type="text" class="form-control" name="inq_subject" value="{{ \App\Models\Inquiries::getInqSubjectLabels()[$inquiry['inq_subject']] ?? '不明な種別' }}
+" id="" aria-describedby="helpId" readonly="">
     </div><br>
 
     <div class="form-group">

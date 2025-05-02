@@ -17,6 +17,7 @@
 	<h3><a href="{{ url('/personal-information') }}">Personal information </a></h3>
 	<h3><a href="{{ url('/terms-of-service') }}">Terms of Service</a></h3>
 	<h3><a href="{{ url('/listing_terms') }}">Listing terms</a></h3>
+	<h3><a href="https://www.recall.caa.go.jp/" target="_blank">消費者庁リコール情報サイト</a></h3>
 
 	<h3> Management policy, mechanism, listing terms</h3>
 	<h3> Management policy, mechanism, listing terms</h3>

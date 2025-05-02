@@ -9,7 +9,7 @@ class Shop extends Model
 {
     use HasFactory;
 
-    protected $fillable=['name', 'description', 'representative', 'location_1', 'location_2', 'telephone', 'email', 'identification_1', 'identification_2', 'identification_3','photo_1', 'photo_2', 'photo_3', 'file_1', 'file_2', 'file_3',  'file_4', 'manager', 'product_type', 'volume', 'note'];
+    protected $fillable=['name', 'description', 'representative', 'location_1', 'location_2', 'telephone', 'email', 'identification_1', 'identification_2', 'identification_3','photo_1', 'photo_2', 'photo_3', 'file_1', 'file_2', 'file_3',  'file_4', 'manager', 'product_type', 'volume', 'note', 'license_expiry', 'person_1', 'person_2', 'person_3'];
 
     public function owner()
     {

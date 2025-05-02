@@ -14,10 +14,12 @@ class ShopFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    public function definition(): array
+    public function definition()
     {
         return [
-            //
+            'name' => $this->faker->company,  // ここでランダムな名前を生成
+            'email' => $this->faker->unique()->safeEmail,
+            // その他の必要なフィールドをここに追加
         ];
     }
 }

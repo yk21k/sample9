@@ -64,6 +64,7 @@
 
                             @foreach($dataTypeRows as $row)
                                 <!-- GET THE DISPLAY OPTIONS -->
+
                                 @php
                                     $display_options = $row->details->display ?? NULL;
                                     if ($dataTypeContent->{$row->field.'_'.($edit ? 'edit' : 'add')}) {
@@ -73,10 +74,10 @@
                                 @if (isset($row->details->legend) && isset($row->details->legend->text))
                                     <legend class="text-{{ $row->details->legend->align ?? 'center' }}" style="background-color: {{ $row->details->legend->bgcolor ?? '#f0f0f0' }};padding: 5px;">{{ $row->details->legend->text }}</legend>
                                 @endif
-
                                 <div class="form-group @if($row->type == 'hidden') hidden @endif col-md-{{ $display_options->width ?? 12 }} {{ $errors->has($row->field) ? 'has-error' : '' }}" @if(isset($display_options->id)){{ "id=$display_options->id" }}@endif>
                                     {{ $row->slugify }}
                                     <label class="control-label" for="name">{{ $row->getTranslatedAttribute('display_name') }}</label>
+
                                     @include('voyager::multilingual.input-hidden-bread-edit-add')
                                     @if ($add && isset($row->details->view_add))
                                         @include($row->details->view_add, ['row' => $row, 'dataType' => $dataType, 'dataTypeContent' => $dataTypeContent, 'content' => $dataTypeContent->{$row->field}, 'view' => 'add', 'options' => $row->details])
@@ -84,12 +85,23 @@
                                         @include($row->details->view_edit, ['row' => $row, 'dataType' => $dataType, 'dataTypeContent' => $dataTypeContent, 'content' => $dataTypeContent->{$row->field}, 'view' => 'edit', 'options' => $row->details])
                                     @elseif (isset($row->details->view))
                                         @include($row->details->view, ['row' => $row, 'dataType' => $dataType, 'dataTypeContent' => $dataTypeContent, 'content' => $dataTypeContent->{$row->field}, 'action' => ($edit ? 'edit' : 'add'), 'view' => ($edit ? 'edit' : 'add'), 'options' => $row->details])
+                                
+
                                     @elseif ($row->type == 'relationship')
 
                                         <!-- 20240728 add -->
-                                        @if($row->display_name == 'shops' && auth()->user()->hasRole('seller'))
-                                            {{ auth()->user()->shop->name ?? 'n/a' }}
-                                            <input type="hidden" name="shop_id" value="{{ auth()->user()->shop->id }}">
+                                        @if($row->display_name == 'Shop' )
+                                            @php
+                                                $seller_id_shop = App\Models\Shop::where('user_id', $dataTypeContent->seller_id)->first();
+                                            @endphp    
+                                                {{ $seller_id_shop->name }}
+                                            <input type="hidden" name="shop_id" value="{{ $seller_id_shop->id }}">
+                                        @elseif($row->display_name == 'users' )
+                                            @php
+                                                $seller_id_user = App\Models\User::where('id', $dataTypeContent->seller_id)->first();
+                                            @endphp    
+                                                {{ $seller_id_user->name }}
+                                            <input type="hidden" name="shop_id" value="{{ $seller_id_user->id }}">    
                                         @else
                                             @include('voyager::formfields.relationship', ['options' => $row->details])
                                         @endif

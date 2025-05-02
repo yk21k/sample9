@@ -1,14 +1,14 @@
 @component('mail::message')
-# Termination of Membership activation request
+# ショップ無効化のご依頼
 
-Please make your shop In-Active. Shop details are here.
+以下のショップについて、会員終了に伴う無効化の対応をお願いいたします。詳細は以下のとおりです。
 
-User Name : {{$deleteShop->deleteShopp->name}}
+**ユーザー名：** {{ $deleteShop->deleteShopp->name }}
 
 @component('mail::button', ['url' => url('/admin/shops')])
-Manage In-Active or Active Shops
+ショップの有効／無効を管理する
 @endcomponent
 
-Thanks,<br>
+何卒よろしくお願いいたします。  
 {{ config('app.name') }}
 @endcomponent

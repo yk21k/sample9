@@ -1,12 +1,16 @@
 @component('mail::message')
-# Congratulations
+# おめでとうございます
 
-Your shop is now active
+ショップがオープンしました
 
 @component('mail::button', ['url' => route('shops.show', $shop->id)])
-Visit Your Shop
+当サイトにアクセス
 @endcomponent
 
-Thanks,<br>
+@component('mail::button', ['url' => url('/admin/shops')])
+当サイトのあなたのShopの管理画面ににアクセス
+@endcomponent
+
+Shop開設の申込ありがとうございました。<br>
 {{ config('app.name') }}
 @endcomponent

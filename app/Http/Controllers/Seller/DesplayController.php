@@ -24,9 +24,7 @@ class DesplayController extends Controller
             $check_desplay_count = Desplay::where('shop_id', auth()->user()->shop->id)->get()->count();
             // dd($check_desplay->is_active);
             
-            $activeDate = $check_desplay->updated_at;  
-            // Carbonを使って2週間後の日付を取得
-            $twoWeeksLater = Carbon::parse($activeDate)->addWeeks(2);
+
             
             if(is_null($check_desplay)){
                 // dd('Hello');
@@ -38,6 +36,10 @@ class DesplayController extends Controller
                 return view('sellers.desplay.select_display', ["check_desplay_count" => 0, 'check_desplay' => $check_desplay]);
             }
             else{
+                $activeDate = $check_desplay->updated_at; 
+                // Carbonを使って2週間後の日付を取得
+                $twoWeeksLater = Carbon::parse($activeDate)->addWeeks(2);
+
                 return view('sellers.desplay.select_display', ["check_desplay_count" => $check_desplay_count, 'check_desplay' => $check_desplay, 'twoWeeksLater' => $twoWeeksLater]);
             }
         }
@@ -56,17 +58,19 @@ class DesplayController extends Controller
         $rules = [
 
             'desplay_id' => 'required',
-            'shop_name' => 'required|between:1, 30',
-            // 'url' => 'active_url',
-            'desplay_phone' => 'required|string',
-            'desplay_mail' => 'required|string|email|max:255',
+            'shop_name' => 'required|alpha|between:1, 30',
+            'display_shop_name' => 'required|between:1, 30',
+        
             'desplay_area' => 'string|max:255',
 
             'desplay_real_store1' => 'required|string|max:100',
             'desplay_real_address1' => 'required|string|max:255',
 
-            // 'desplay_real_store2' => 'required|string|max:100',
+            'desplay_real_store2' => 'required|string|max:100',
             'desplay_real_address2' => 'required|string|max:255',
+
+            'desplay_real_store3' => 'required|string|max:100',
+            'desplay_real_address3' => 'required|string|max:255',
 
             'name1' => 'required|string|max:100',
             'photo1' => 'required|mimes:jpg,jpeg,png',
@@ -84,14 +88,16 @@ class DesplayController extends Controller
         $customMessages = [
             'desplay_id' => 'Please Select Template',
             'shop_name.required' => 'Shop Name is required',
-            'desplay_phone.required' => 'Phone is required',
-            'desplay_mail.required' => 'Email is required',
+            'display_shop_name.required' => 'Display Shop Name is required',
 
             'desplay_real_store1.required' => 'Store name of store 1　is required',
             'desplay_real_address1' => 'Store 1 location　is required',
 
             'desplay_real_store2.required' => 'Store name of store 2　is required',
             'desplay_real_address2' => 'Store 2 location　is required',
+
+            'desplay_real_store3.required' => 'Store name of store 3　is required',
+            'desplay_real_address3' => 'Store 3 location　is required',
 
         ];
 
@@ -110,16 +116,16 @@ class DesplayController extends Controller
         $selectDesplay->shop_id = auth()->user()->shop->id;
         $selectDesplay->desplay_id = $request->desplay_id;
         $selectDesplay->shop_name = $request->shop_name;
+        $selectDesplay->display_shop_name = $request->display_shop_name;
+        $selectDesplay->shop_address = $request->shop_address;
 
-        $selectDesplay->url = $request->url;
-        $selectDesplay->desplay_phone = $request->desplay_phone;
-        $selectDesplay->desplay_mail = $request->desplay_mail;
-        
         $selectDesplay->desplay_area = $request->desplay_area;
         $selectDesplay->desplay_real_store1 = $request->desplay_real_store1;
         $selectDesplay->desplay_real_address1 = $request->desplay_real_address1;
         $selectDesplay->desplay_real_store2 = $request->desplay_real_store2;
         $selectDesplay->desplay_real_address2 = $request->desplay_real_address2;
+        $selectDesplay->desplay_real_store3 = $request->desplay_real_store3;
+        $selectDesplay->desplay_real_address3 = $request->desplay_real_address3;
 
         $selectDesplay->name1 = $request->name1;
 
@@ -141,12 +147,12 @@ class DesplayController extends Controller
         $selectDesplay->photo3 = basename($image_path3);
         $selectDesplay->description3 = $request->description3;
 
-        $selectDesplay->desplay_pr = $request->name3;
+        $selectDesplay->desplay_pr = $request->desplay_pr;
         $selectDesplay->seller_mail = $request->seller_mail;
         // dd($selectDesplay);
         $selectDesplay->save();
 
-        return redirect()->route('shop_desplay')->withMessage('Thank you!!');
+        return back()->with('Thank you!!');
 
     }
 

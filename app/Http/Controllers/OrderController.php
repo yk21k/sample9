@@ -263,7 +263,7 @@ class OrderController extends Controller
 
             // PaymentIntentを作成して支払いを処理
             $paymentIntent = PaymentIntent::create([
-                'amount' => $cartTotal * 100,  // Stripeは最小通貨単位で金額を受け取るので、100倍します（例: 1000円なら1000）
+                'amount' => $cartTotal,  // Stripeは最小通貨単位で金額を受け取るので、100倍します（例: 1000円なら1000）
                 'currency' => 'jpy',           // 通貨（日本円）
                 'customer' => $customer->id,   // 顧客ID
                 'payment_method' => $paymentMethod,
@@ -314,19 +314,23 @@ class OrderController extends Controller
                 // クーポンコードがある場合、オーダーに設定
                 $order->coupon_code = Session::get('coupon101');
                 $order->grand_total = \Cart::session(auth()->id())->getTotal();
-                $order->item_count = \Cart::session(auth()->id())->getContent()->count();
+                $order->item_count = \Cart::session(auth()->id())->getTotalQuantity();
                 $order->user_id = auth()->id();
 
                 // 支払い方法を設定
                 $order->payment_method = $request->input('pay');
                 
-
+                // dd($order->item_count);
                 // オーダーを保存
                 $order->save();
 
                 // カートアイテムを保存
                 $cartItems = \Cart::session(auth()->id())->getContent();
                 foreach ($cartItems as $item) {
+                    $product = Product::find($item->id);
+                    if (is_null($product->shop_id)) {
+                        Log::warning("shop_id が null の商品があります: 商品ID={$product->id}");
+                    }
                     // 注文アイテムを関連付け
                     $order->items()->attach($item->id, ['price' => $item->price, 'quantity' => $item->quantity]);
 
@@ -337,6 +341,7 @@ class OrderController extends Controller
 
                 // その他のオーダー関連処理
                 $order->generateSubOrders();
+                Log::info('generateSubOrders 呼び出し確認');
                 $order->generateFavoritesSalesRate();
                 $order->generateFavoritesDisplay();
 

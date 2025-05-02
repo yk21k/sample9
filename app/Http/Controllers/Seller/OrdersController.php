@@ -119,6 +119,7 @@ class OrdersController extends Controller
         $suborder->save();
         
         $suborder->order()->update(['status'=>'completed']);
+        $suborder->order()->update(['payment_status'=>'mark as delivered']);
         
 
         return redirect('/seller/orders')->withMessage('Order marked Complete');

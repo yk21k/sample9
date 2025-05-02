@@ -23,7 +23,6 @@
     <div class="page-content edit-add container-fluid">
         <div class="row">
 
-            <!-- <h2>jfgia:@gaiog:a</h2> -->
 
             <div>
                 <a href="{{url('/seller/orders')}}" class="">Order Management</a>
@@ -96,7 +95,7 @@
                                             <input type="hidden" name="shop_id" value="{{ auth()->user()->shop->id }}">
                                             @include($row->details->view, ['row' => $row, 'dataType' => $dataType, 'dataTypeContent' => $dataTypeContent, 'content' => $dataTypeContent->{$row->field}, 'action' => ($edit ? 'edit' : 'add'), 'view' => ($edit ? 'edit' : 'add'), 'options' => "{{ auth()->user()->shop->name ?? 'n/a' }}" ])
                                         @else
-                                            <!-- @include($row->details->view, ['row' => $row, 'dataType' => $dataType, 'dataTypeContent' => $dataTypeContent, 'content' => $dataTypeContent->{$row->field}, 'action' => ($edit ? 'edit' : 'add'), 'view' => ($edit ? 'edit' : 'add'), 'options' => $row->details]) -->
+                                            @include($row->details->view, ['row' => $row, 'dataType' => $dataType, 'dataTypeContent' => $dataTypeContent, 'content' => $dataTypeContent->{$row->field}, 'action' => ($edit ? 'edit' : 'add'), 'view' => ($edit ? 'edit' : 'add'), 'options' => $row->details])
                                         @endif     
                                             
                                     @elseif ($row->type == 'relationship')

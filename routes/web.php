@@ -18,6 +18,7 @@ use App\Http\Controllers\Seller\CalendarController;
 use App\Http\Controllers\Seller\HolidaySettingController;
 use App\Http\Controllers\Seller\ExtraHolidaySettingController;
 use App\Http\Controllers\Seller\DesplayController;
+use App\Http\Controllers\Seller\ShopSettingController;
 
 use App\Http\Controllers\Auth\RegisterController;
 
@@ -132,6 +133,9 @@ Route::post('/account/{id}', [App\Http\Controllers\AccountController::class, 'up
 
 Route::post('/account_addresses/{id}', [App\Http\Controllers\AccountController::class, 'saveDeliveryAddress'])->name('account.addresses')->middleware('auth');
 
+Route::post('/account_arrival/{id}', [App\Http\Controllers\AccountController::class, 'arrival'])->name('account.arrival')->middleware('auth');
+
+
 
 Route::get('/shop-prof', [App\Http\Controllers\ShopProfController::class, 'index'])->name('shop_prof')->middleware('auth');
 
@@ -226,6 +230,11 @@ Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', '
     Route::post('/shop_desplay', 'DesplayController@saveSelect')->name('select_desplay');
 
     Route::post('/delete_shop_desplay', 'DesplayController@deleteSelect')->name('delete_desplay');
+
+    Route::get('/shop_setting', 'ShopSettingController@index')->name('shop.shop_setting');
+
+    Route::post('/shop_setting', 'ShopSettingController@shopUpdate')->name('shop.shop_setting.update');
+
 
 
 });

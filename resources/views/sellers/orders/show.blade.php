@@ -23,7 +23,7 @@
                 {{$item->pivot->quantity}}
             </td>
             <td>
-                {{$item->pivot->price}}
+                {{$item->pivot->price*$item->pivot->quantity}}
             </td>
             @endif
         </tr>

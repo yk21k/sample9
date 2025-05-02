@@ -179,11 +179,12 @@ class CartController extends Controller
     public function checkout(Request $request, Product $product)
     {
         // dd(\Cart::session(auth()->id())->getContent());
+        // dd(\Cart::session(auth()->id())->getTotalQuantity());
+
+        
 
         $cartProducts = \Cart::session(auth()->id())->getContent();
         $cartPrices = \Cart::getTotal();
-
-        
 
         session(['cart_total' => $cartPrices]); 
         // dd($cartProducts);

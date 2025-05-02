@@ -1,15 +1,15 @@
 @component('mail::message')
-# Shop activation request
+# ショップ有効化のご依頼
 
-Please activate shop. Here are shop details.
+以下のショップが新規に登録されました。内容をご確認のうえ、有効化の対応をお願いいたします。
 
-Shop Name : {{$shop->name}}
-Shop Owner : {{$shop->owner->name}}
+**ショップ名：** {{ $shop->name }}  
+**ショップオーナー：** {{ $shop->owner->name }}
 
 @component('mail::button', ['url' => url('/admin/shops')])
-Manage Shops
+ショップ管理画面を開く
 @endcomponent
 
-Thanks,<br>
+何卒よろしくお願いいたします。  
 {{ config('app.name') }}
 @endcomponent

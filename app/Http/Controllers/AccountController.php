@@ -13,6 +13,7 @@ use App\Models\SubOrder;
 use App\Models\Fovorite;
 use App\Models\DeliveryAddress;
 use App\Models\Product;
+use App\Models\SubOrdersArrivalReport;
 use Auth;
 
 
@@ -40,6 +41,8 @@ class AccountController extends Controller
         
         // $favaoriteItems = Fovorite::where('user_id', Auth::user()->id)->get();
         // dd($favaoriteItems);
+
+        // $arrival = SubOrdersArrivalReport::where('sub_order_id', )->first();
 
 
         return view('account.account', compact('profiles', 'order_histories', 'firstDelis', 'savedDelis', 'shipping_names', 'favaoriteItems'));
@@ -110,6 +113,30 @@ class AccountController extends Controller
 
         return redirect()->route('account.account', ['id', $id])->withMessage('registered a new address');
 
+    }
+    public function arrival(Request $request, $id)
+    {
+        if($request->isMethod('post'))
+        {
+            $data = $request->all();
+            // dd($data); 
+            $rules = [
+                'comments'  =>  'max:100' 
+            ]; 
+
+            $customMessages = [
+                'comments' => '100文字以内で入力ください。'    
+            ];
+
+            $this->validate($request, $rules, $customMessages);
+
+            $subOrdersArrivalReport = new SubOrdersArrivalReport;
+            $subOrdersArrivalReport->sub_order_id = $data['sub_order_id'];
+            $subOrdersArrivalReport->arrival_reported  = $data['arrival_reported'];
+            $subOrdersArrivalReport->comments = $data['comments'];
+            $subOrdersArrivalReport->save();
+        }
+        return redirect()->route('account.account', ['id', $id])->withMessage('到着したと確認しました。');
 
     }
 

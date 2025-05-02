@@ -35,144 +35,135 @@ class ShopController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
+    // store メソッド
     public function store(StoreShopRequest $request)
-    {   
-        //add validation
-        $request->validate([
-            'name' => 'required|string||between:1, 30|unique:shops,name',
-            // 'email' => 'required|string|email:strict,dns,spoof|max:255',When user register
-            'email' => 'required|string|email|max:255',
-            'telephone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
-            'description' => 'required|string|max:2000',
-            'manager' => 'required|between:1, 100|unique:shops,manager',
-            'representative' => 'required|between:1, 100',
-            'product_type' => 'required',
-            'volume' => 'required|numeric|min:1',
-            'note' => 'max:2000',
-
-        ]);
-
-        // $shop = new Shop; 
-         // dd($shop);
-
-        $imgName = auth()->user()->email;
+    {
+        // dd($request->input('person_3'));
 
 
-        if($request->hasFile('photo_1')){
-            $images = $request->file('photo_1');
-                $str_r = md5(uniqid(rand(), true));
+        // 本日の日付フォルダ（例：20250420）
+        $dateFolder = now()->format('Ymd');
+        $userEmail = auth()->user()->email;
 
-                $file_name = rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('photo_1')->getClientOriginalName();
-                $request->file('photo_1')->storeAs('public/'.$str_r.'/'.$request->created_at.'/'.$request->name.'/', $file_name);
-            
-            
-        }else{
-            $request->photo_1 = "Not uploaded";
-        }
-        if($request->hasFile('photo_2')){
+        // 保存先パス：storage/app/public/20250420/user@example.com/
+        $basePath = "public/{$dateFolder}/{$userEmail}";
 
-                $file_name = rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('photo_2')->getClientOriginalName();
-                $request->file('photo_2')->storeAs('public/'.$str_r.'/'.$request->created_at.'/'.$request->name, $file_name);
-                
+        // ファイル名生成関数（rand + email + rand + original name）
+        $generateFileName = fn($file) =>
+            rand(1111, 9999999) . $userEmail . rand(1111, 9999999) . $file->getClientOriginalName();
 
-        }else{
-            $request->photo_2 = "Not uploaded";
-        }
-        if($request->hasFile('photo_3')){
+        // ファイル保存（共通化するときはループでも可）
 
-                $file_name = rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('photo_3')->getClientOriginalName();
-                $request->file('photo_3')->storeAs('public/'.$str_r.'/'.$request->created_at.'/'.$request->name, $file_name);
-               
+        $photo_1_name = 'no_file.txt';
+        $photo_2_name = 'no_file.txt';
+        $photo_3_name = 'no_file.txt';
+        $file_1_name  = 'no_file.txt';
+        $file_2_name  = 'no_file.txt';
+        $file_3_name  = 'no_file.txt';
+        $file_4_name  = 'no_file.txt';
 
-        }else{
-            $request->photo_3 = "Not uploaded";
-        }
-        if($request->hasFile('file_1')){
-
-                $file_name = rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_1')->getClientOriginalName();
-                $request->file('file_1')->storeAs('public/'.$str_r.'/'.$request->created_at.'/'.$request->name, $file_name);
-            
-
-        }else{
-            $request->file_1 = "Not uploaded";
-        }
-        if($request->hasFile('file_2')){
-            $images = $request->file('file_2');
-
-                $file_name = rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_2')->getClientOriginalName();
-                $request->file('file_2')->storeAs('public/'.$str_r.'/'.$request->created_at.'/'.$request->name, $file_name);
-            
-
-        }else{
-            $request->file_2 = "Not uploaded";
-        }
-        if($request->hasFile('file_3')){
-
-                $file_name = rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_3')->getClientOriginalName();
-                $request->file('file_3')->storeAs('public/'.$str_r.'/'.$request->created_at.'/'.$request->name, $file_name);
-            
-             
-
-        }else{
-            $request->file_3 = "Not uploaded";
-        }
-        if($request->hasFile('file_4')){
-
-                $file_name = rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_4')->getClientOriginalName();
-                $request->file('file_4')->storeAs('public/'.$str_r.'/'.$request->created_at.'/'.$request->name, $file_name);
-
-        }else{
-            $request->file_4  = "no_file.txt";
+        if ($request->hasFile('photo_1')) {
+            $photo = $request->file('photo_1');
+            $photo_1_name = $generateFileName($photo);
+            $photo->storeAs($basePath, $photo_1_name);
         }
 
-         // dd($request->photo_2);
-         // dd($shop);
-         // dd($file_name2);
+        if ($request->hasFile('photo_2')) {
+            $photo = $request->file('photo_2');
+            $photo_2_name = $generateFileName($photo);
+            $photo->storeAs($basePath, $photo_2_name);
+        }
 
-        //save db
-        // dd($request->file('file_4')->getClientOriginalName());
+        if ($request->hasFile('photo_3')) {
+            $photo = $request->file('photo_3');
+            $photo_3_name = $generateFileName($photo);
+            $photo->storeAs($basePath, $photo_3_name);
+        }
+
+        if ($request->hasFile('file_1')) {
+            $file = $request->file('file_1');
+            $file_1_name = $generateFileName($file);
+            $file->storeAs($basePath, $file_1_name);
+        }
+
+        if ($request->hasFile('file_2')) {
+            $file = $request->file('file_2');
+            $file_2_name = $generateFileName($file);
+            $file->storeAs($basePath, $file_2_name);
+        }
+
+        if ($request->hasFile('file_3')) {
+            $file = $request->file('file_3');
+            $file_3_name = $generateFileName($file);
+            $file->storeAs($basePath, $file_3_name);
+        }
+
+        if ($request->hasFile('file_4')) {
+            $file = $request->file('file_4');
+            $file_4_name = $generateFileName($file);
+            $file->storeAs($basePath, $file_4_name);
+        }
+
+
+        // identification の片方だけを選択
+        $registrationType = $request->registration_type;
+
+        // identification_1 関連のデフォルト値
+        $identification_1 = null;
+        $file_1_name = null;
+        $license_expiry = null;
+
+        // 条件: 個人 or 個人事業主 の場合のみ格納
+        if (in_array($registrationType, ['個人', '個人事業主'])) {
+            $identification_1 = $request->input('identification_1');
+            $license_expiry = $request->input('license_expiry');
+
+            if ($request->hasFile('file_1')) {
+                $file_1_name = $generateFileName($request->file('file_1'));
+                $request->file('file_1')->storeAs($basePath, $file_1_name);
+            }
+        }
+
+        $identification_2 = null;
+        if ($registrationType === '個人事業主') {
+            $identification_2 = $request->input('identification_2_1');
+        } elseif (in_array($registrationType, ['法人', '業務請負'])) {
+            $identification_2 = $request->input('identification_2_2');
+        }
+
+        // Shop 作成
         $shop = auth()->user()->shop()->create([
-            'name'        => $request->input('name'),
+            'name' => $request->input('name'),
             'description' => $request->input('description'),
-
             'location_1' => $request->input('location_1'),
             'location_2' => $request->input('location_2'),
-
             'telephone' => $request->input('telephone'),
             'email' => $request->input('email'),
-
-            'identification_1' => $request->input('identification_1'),
-            'identification_2' => $request->input('identification_2'),
-            'identification_3' => $request->input('identification_3'),
-
-            'photo_1' => rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('photo_1')->getClientOriginalName(),
-            'photo_2' => rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('photo_2')->getClientOriginalName(),
-            'photo_3' => rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('photo_3')->getClientOriginalName(),
-            'file_1' => rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_1')->getClientOriginalName(),
-            'file_2' => rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_2')->getClientOriginalName(),
-            'file_3' => rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_3')->getClientOriginalName(),
+            'person_1' => $request->input('person_1'),
+            'person_2' => $request->input('person_2'),
+            'person_3' => $request->input('person_3'),
+            'license_expiry' => $request->input('license_expiry'),
             
-
-            'file_4' => rand(1111,9999999).auth()->user()->email.rand(1111,9999999).$request->file('file_4'),
-
             'representative' => $request->input('representative'),
             'manager' => $request->input('manager'),
             'product_type' => $request->input('product_type'),
             'volume' => $request->input('volume'),
             'note' => $request->input('note'),
+
+            'identification_1' => $request->input('identification_1'),
+            'identification_2' => $identification_2, // ここで片方だけ保存
+
+            'photo_1' => $photo_1_name,
+            'photo_2' => $photo_2_name,
+            'photo_3' => $photo_3_name,
+            'file_1' => $file_1_name,
+            'file_2' => $file_2_name,
+            'file_3' => $file_3_name,
+            'file_4' => $file_4_name ?? 'no_file.txt',
         ]);
 
-        // dd($shop);
-
-        // dd($request->all());
-        // dd($shop);
-        // dd($shop->representative);
-        // dd(auth()->user()->email);
-
-        $shop->save();
-        // dd($shop);
-
-        //send mail to admin
+        // 管理者へメール通知
         $admins = User::whereHas('role', function ($q) {
             $q->where('name', 'admin');
         })->get();
@@ -180,7 +171,6 @@ class ShopController extends Controller
         Mail::to($admins)->send(new ShopActivationRequest($shop));
 
         return redirect()->route('home')->withMessage('Create shop request sent');
-            
     }
 
     /**

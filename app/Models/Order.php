@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 use Auth;
 
@@ -40,31 +41,110 @@ class Order extends Model
         return $this->hasMany(SubOrder::class);
     }
 
+    // public function generateSubOrders()
+    // {
+    //     $orderItems = $this->items;
+    //     // dd($this);
+    //     foreach ($orderItems->groupBy('shop_id') as $shopId => $products) {
+    //         $shop = Shop::find($shopId);
+
+    //         $suborder = $this->subOrders()->create([
+    //             'order_id'=> $this->id,
+    //             'seller_id'=> $shop->user_id ?? 1,
+    //             'user_id'=> Auth::user()->id,
+    //             'grand_total'=> $products->sum('pivot.price'),
+    //             'item_count'=> $products->count(),
+    //             'coupon_code'=> $this->coupon_code,
+
+    //         ]);
+
+    //         // dd($suborder->items());
+    //         // dd($suborder);
+    //         // dd($products);
+    //         // dd($products);
+    //         // dd($orderItems);
+
+    //         foreach($products as $product) {
+    //             $suborder->items()->attach($product->id, ['user_id' => $suborder->user_id, 'price' => $product->pivot->price, 'quantity' => $product->pivot->quantity]);
+    //         }
+
+    //     }
+    // }
+
     public function generateSubOrders()
     {
         $orderItems = $this->items;
-        // dd($this);
+        Log::debug('orderItems:', $orderItems->toArray());
         foreach ($orderItems->groupBy('shop_id') as $shopId => $products) {
+            if (is_null($shopId)) {
+                Log::warning("shop_id が null の商品をスキップしました。");
+                continue;
+            }
+            // dd($products);
             $shop = Shop::find($shopId);
+            if (!$shop) {
+                Log::warning("Shop ID {$shopId} が見つかりません。");
+                continue;
+            }
 
-            $suborder = $this->subOrders()->create([
-                'order_id'=> $this->id,
-                'seller_id'=> $shop->user_id ?? 1,
-                'user_id'=> Auth::user()->id,
-                'grand_total'=> $products->sum('pivot.price'),
-                'item_count'=> $products->count(),
-                'coupon_code'=> $this->coupon_code,
+            DB::beginTransaction();
 
-            ]);
+            try {
+                Log::debug('サブオーダー作成前のデータ', [
+                    'order_id'    => $this->id,
+                    'seller_id'   => $shop->user_id ?? 1,
+                    'user_id'     => auth()->id(),
+                    'grand_total' => $products->sum('pivot.price'),
+                    'item_count'  => $products->count(),
+                    'coupon_code' => $this->coupon_code,
+                ]);
+                // サブオーダーの作成
+                $suborder = $this->subOrders()->create([
+                    'order_id'     => $this->id,
+                    'seller_id'    => $shop->user_id ?? 1,
+                    'user_id'      => auth()->id(),
+                    'grand_total'  => $products->sum('pivot.price'),
+                    'item_count'   => $products->count(),
+                    'coupon_code'  => $this->coupon_code,
+                ]);
 
-            // dd($suborder->items());
-            // dd($suborder);
-            // dd($products);
-            // dd($products);
-            // dd($orderItems);
+                // サブオーダーIDの確認
+                if (!$suborder || !$suborder->id) {
+                    Log::error('サブオーダーの作成に失敗しました', ['suborder' => $suborder]);
+                    throw new \Exception('サブオーダーの作成に失敗しました。');
+                }
 
-            foreach($products as $product) {
-                $suborder->items()->attach($product->id, ['user_id' => $suborder->user_id, 'price' => $product->pivot->price, 'quantity' => $product->pivot->quantity]);
+                Log::debug("Created SubOrder ID: {$suborder->id}");
+
+                // サブオーダーIDが正しいかを再確認
+                Log::debug("Inserting to sub_order_items with sub_order_id: {$suborder->id}");
+                foreach ($products as $product) {
+                    Log::debug('Inserting to sub_order_items with sub_order_id: ' . $suborder->id);
+
+                    try {
+                        $suborder->items()->attach($product->id, [
+                            'user_id'   => $suborder->user_id,
+                            'price'     => $product->pivot->price,
+                            'quantity'  => $product->pivot->quantity,
+                        ]);
+                    } catch (\Exception $e) {
+                        Log::error('アイテムの添付に失敗', [
+                            'suborder_id' => $suborder->id,
+                            'product_id' => $product->id,
+                            'message' => $e->getMessage(),
+                        ]);
+                    }
+                }
+
+
+
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('サブオーダー作成失敗', [
+                    'message' => $e->getMessage(),
+                    'trace'   => $e->getTraceAsString(),
+                ]);
             }
 
         }

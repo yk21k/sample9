@@ -142,7 +142,7 @@
                                             style="width:100px">
                                         @elseif($row->type == 'relationship')
                                             
-                                            @if($row->display_name == 'Shop Manager')
+                                            @if($row->display_name == 'Shop')
                                                 @php
                                                     $seller_id_shop = App\Models\Shop::where('user_id', $data->seller_id)->first();
                                                 @endphp    
@@ -153,9 +153,6 @@
                                                 $row->details])
                                             @endif
 
-                                                
-
-                                            
                                             
                                         @elseif($row->type == 'select_multiple')
                                         @if(property_exists($row->details, 'relationship'))

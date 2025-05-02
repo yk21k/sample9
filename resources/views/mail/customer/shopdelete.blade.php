@@ -1,12 +1,12 @@
 @component('mail::message')
-# Thank you for using our service.
+# ご利用いただきありがとうございます。
 
-Your shop is now Not active
+当サイト上であなたのショップは現在、稼働していません。
 
 @component('mail::button', ['url' => route('home')])
-Visit to find out more
+詳細については、こちらをご覧ください
 @endcomponent
 
-Thanks,<br>
+<br>
 {{ config('app.name') }}
 @endcomponent

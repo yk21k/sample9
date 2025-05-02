@@ -22,10 +22,11 @@
 		    <h3><a class="nav-link link-secondary" href="#">Shipping Address</a></h3>
 		  </li>
 		  <li class="nav-item">
+		  	
 		    <h3><a class="nav-link link-secondary" href="{{ route('shops.create') }}">Open Your Shop</a></h3>
 		  </li>
 		  <li class="nav-item">
-		    <h3><a class="nav-link link-secondary" href="{{ route('account.inquiry') }}">Contact Us</a></h3>
+		    <h3><a class="nav-link link-secondary" href="{{ route('inquiries.create', ['id' => auth()->user()->id]) }}">Contact Us</a></h3>
 		  </li>
 		  <li class="nav-item">
 		    <h3><a class="nav-link link-secondary" href="#wishlist">Wish list</a></h3>
@@ -51,6 +52,7 @@
             	<table class="table table-bordered table-striped" id="table_order1">
 	            	<thead>	
 		        	    <tr>
+
 		        	    	<td>Delivery Status</td>
 		        	    	<td>Shipping Company</td>
 		        	    	<td>Invoice Number</td>
@@ -59,6 +61,7 @@
 					        <td>Name</td>
 					        <td>Zip-code</td>
 					        <td>Address</td>
+					        
 				        </tr>
 			        </thead>
 		        	@foreach($order_histories as $order_history)
@@ -81,12 +84,36 @@
 		        				<td>⭐⭐️　Delivery Arranged</td>
 
 		        			@elseif($order_history->status=="completed")	
-		        				<td>*Delivered*</td>
+		        				<td>*Delivered* 
+			        				<a class="btn btn-warning btn-sm" id="hide_arrival_button" style="margin: 2px;">到着確認</button></a><br> 
+	                                <div class="form_arrival">
+								    	@php
+								            $arrival = App\Models\SubOrdersArrivalReport::where('sub_order_id', $order_history->id)->first();
+								        @endphp								    
+									           
+	                                	@if(isset($arrival))
+									        <p>すでに確認済みです（{{ $arrival->created_at->format('Y年：m月：d日') }}）</p>
+									    @else
+									        <form method="POST" action="{{route('account.arrival', Auth::user()->id)}}" >
+									            @csrf
+									            <p>この商品の到着を確認したら、下のボタンを押してください。</p>
+									            <input type="hidden" name="sub_order_id" value="{{ $order_history->id }}">
+									            <input type="hidden" name="arrival_reported" value="1">
+									            <div>
+									                <label for="comments">コメント（任意）:</label><br>
+									                <textarea name="comments" id="comments" rows="4" cols="50">{{ old('comments') }}</textarea>
+									            </div>
+
+									            <button type="submit" class="btn btn-info">到着を報告する</button>
+									        </form>
+									    @endif    
+	                                </div>
+                                </td>
 		        			@else
 		        				<td>Details Unknown</td>
 		        			@endif
 		        			<td>{{ $order_history->shipping_company }}</td>
-		        			<td>^^^^^^^</td>
+		        			<td>{{ $order_history->invoice_number }}</td>
 		        			<td>{{ $order_history->order_id }}</td>
 		        			<td>{{ $order_history->created_at }}</td>
 		        			<td>{{ $order_history->order->shipping_fullname }}</td>
@@ -246,6 +273,12 @@ $(function() {
     });
 });
 </script>
-
+<script>
+    $(function() {
+        $("#hide_arrival_button").click(function() {
+            $(".form_arrival").slideToggle();
+        });
+    });
+</script>
 
 @endsection

@@ -177,7 +177,7 @@
 </head>
 <body>
   <div class="auction-container">
-    <h1>{{ $desplay->shop_name }}</h1>
+    <h1>{{ $desplay->display_shop_name }}</h1>
     <div class="row">
       <div class="col-4">
         <div class="list-group" id="list-tab" role="tablist">
@@ -199,11 +199,9 @@
                     
                     <!-- 商品詳細 -->
                     <p><strong>商品名:</strong> {{ $desplay->name1 }}</p>
-                    <p><strong>ショップ名:</strong> {{ $desplay->shop_name }}</p>
-                    <p><strong>URL:</strong> <a href="https://example.com" target="_blank">{{ $desplay->url }}</a></p>
-                    <p><strong>住所:</strong> 東京都新宿区1-2-3</p>
-                    <p><strong>メールアドレス:</strong> {{ $desplay->desplay_mail }}</p>
-                    <p><strong>電話番号:</strong> {{ $desplay->desplay_phone }}</p>
+                    <p><strong>ショップ名:</strong> {{ $desplay->desplay_real_store1}}</p>
+                    <p><strong>住所:</strong> {{ $desplay->desplay_real_address1 }}</p>
+
                     
                   </div>
                 </div>
@@ -218,13 +216,10 @@
                     <h2 class="item-title">{{ $desplay->name2 }}</h2>
                     <p class="item-description">{{ $desplay->description2 }}</p>
                     
-                    <!-- 商品詳細 -->
+                     <!-- 商品詳細 -->
                     <p><strong>商品名:</strong> {{ $desplay->name2 }}</p>
-                    <p><strong>ショップ名:</strong> {{ $desplay->shop_name }}</p>
-                    <p><strong>URL:</strong> <a href="https://example.com" target="_blank">{{ $desplay->url }}</a></p>
-                    <p><strong>住所:</strong> 東京都新宿区2-2-3</p>
-                    <p><strong>メールアドレス:</strong> {{ $desplay->desplay_mail }}</p>
-                    <p><strong>電話番号:</strong> {{ $desplay->desplay_phone }}</p>
+                    <p><strong>ショップ名:</strong> {{ $desplay->desplay_real_store2 }}</p>
+                    <p><strong>住所:</strong> {{ $desplay->desplay_real_address2 }}</p>
                     
                     
 
@@ -243,12 +238,9 @@
                     <p class="item-description">{{ $desplay->description3 }}</p>
                     
                     <!-- 商品詳細 -->
-                    <p><strong>商品名:</strong> {{ $desplay->name1 }}</p>
+                    <p><strong>商品名:</strong> {{ $desplay->name3 }}</p>
                     <p><strong>ショップ名:</strong> {{ $desplay->shop_name }}</p>
-                    <p><strong>URL:</strong> <a href="https://example.com" target="_blank">{{ $desplay->url }}</a></p>
-                    <p><strong>住所:</strong> 東京都新宿区1-2-3</p>
-                    <p><strong>メールアドレス:</strong> {{ $desplay->desplay_mail }}</p>
-                    <p><strong>電話番号:</strong> {{ $desplay->desplay_phone }}</p>
+                    <p><strong>住所:</strong> {{ $desplay->desplay_real_address3 }}</p>
                     
                   </div>
                 </div>
@@ -257,15 +249,35 @@
           </div>
           <div class="tab-pane fade" id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">その他のご案内　PR
               <p><strong>PR:</strong> {{ $desplay->desplay_pr }}</p>
+              <!-- 会社情報 -->
+              <p><strong>会社名（屋号）:</strong> {{ $desplay->display_shop_name }}</p>
+                <p><strong>会社住所:</strong>
+                 <a href="https://www.google.com/maps/search/?q={{ urlencode($desplay->shop_address) }}" target="_blank" rel="noopener noreferrer">
+                    {{ $desplay->shop_address }}
+                </a>
+              </p>
+              道順や電話番号、営業日は、Googleマップで検索ください
               <!-- 実店舗情報 -->
               <p><strong>実店舗名:</strong> {{ $desplay->desplay_real_store1 }}</p>
-              <p><strong>実店舗住所:</strong> {{ $desplay->desplay_real_address1 }}</p>
+              <p><strong>実店舗住所:</strong> </p>
+                  <a href="https://www.google.com/maps/search/?q={{ urlencode($desplay->desplay_real_address1) }}" target="_blank" rel="noopener noreferrer">
+                      {{ $desplay->desplay_real_address1 }}
+                  </a>
+              </p>
               <!-- 実店舗情報 -->
               <p><strong>実店舗名:</strong> {{ $desplay->desplay_real_store2 }}</p>
-              <p><strong>実店舗住所:</strong> {{ $desplay->desplay_real_address2 }}</p>
+              <p><strong>実店舗住所:</strong> 
+                  <a href="https://www.google.com/maps/search/?q={{ urlencode($desplay->desplay_real_address2) }}" target="_blank" rel="noopener noreferrer">
+                      {{ $desplay->desplay_real_address2 }}
+                  </a>
+              </p>
               <!-- 実店舗情報 -->
               <p><strong>実店舗名:</strong> {{ $desplay->desplay_real_store3 }}</p>
-              <p><strong>実店舗住所:</strong> {{ $desplay->desplay_real_address3 }}</p>
+              <p><strong>実店舗住所:</strong> 
+                  <a href="https://www.google.com/maps/search/?q={{ urlencode($desplay->desplay_real_address3) }}" target="_blank" rel="noopener noreferrer">
+                      {{ $desplay->desplay_real_address3 }}
+                  </a>
+              </p>
           </div>
 
         </div>

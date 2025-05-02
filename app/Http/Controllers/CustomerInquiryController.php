@@ -43,13 +43,17 @@ class CustomerInquiryController extends Controller
 
         if($validator->passes()){
             $data = $request->all();
-            // dd($data);
+            // dd($data);   
 
             $inquiryAnswer = new CustomerInquiry;
             $inquiryAnswer->user_id = Auth::user()->id;
             $inquiryAnswer->shop_id = $data['shop_id'];
             $inquiryAnswer->inq_subject = $data['inq_subject'];
-            $inquiryAnswer->inq_reason = $data['inq_reason'];
+
+            // キーが存在するときだけ代入
+            if (isset($data['inq_reason'])) {
+                $inquiryAnswer->inq_reason = $data['inq_reason'];
+            }
             $inquiryAnswer->inquiry_details = $data['inquiry_details'];
 
             $image = $request->file('inq_file');

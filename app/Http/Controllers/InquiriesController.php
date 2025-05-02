@@ -34,11 +34,11 @@ class InquiriesController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Product $product, $id)
+    public function create(User $user)
     {
         // dd($id);
 
-        return view('inquiries.inquiries_create', ['id'=>$id]);
+        return view('account.inquiry', ['id'=>$user->id]);
     }
 
     /**

@@ -3,6 +3,9 @@
 @section('content')
 
 <!-- Side navigation -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link href="https://vjs.zencdn.net/7.21.1/video-js.css" rel="stylesheet" />
+<script src="https://vjs.zencdn.net/7.21.1/video.min.js"></script>
 <style>
     @media screen and (max-width: 480px) {
         .sidenav {
@@ -20,7 +23,26 @@
         color: red; /* 赤色 */
     }
 
+      .video-overlay-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    display: none; /* 最初は非表示 */
+  }
+
+  .video-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
 </style>
+
 <div class="sidenav shadow-sm">
 
     <div style="color: black;"><a><h3>Category Menu</h3></a></div>
@@ -99,20 +121,103 @@
         @endforeach
         <br><br><br><br><br><br>   
             
-        @foreach($norm_products_pres as $attr)
-            @foreach($attr->fovo_dises as $n)
-                @foreach (json_decode($attr->movie, true) as $movie)
-                    @if(null !== $attr->fovo_dises)
-                    Name:{{ $attr->name }}
-                    Price:{{ $attr->price }}
-                    Score:{{ $n->norm_total }} 
-                    <video controls width="60%" src="{{ asset('storage/'.$movie['download_link']) }}#t=0,2" muted class="contents_width"></video>
-                    @else
-                        none
-                    @endif
+
+        @php
+        $products = collect();
+        foreach($norm_products_pres as $attr) {
+            foreach($attr->fovo_dises as $n) {
+                $products->push([
+                    'attr' => $attr,
+                    'score' => $n->norm_total,
+                    'movie' => json_decode($attr->movie, true)
+                ]);
+            }
+        }
+        $sorted = $products->sortByDesc('score')->values();
+        @endphp
+
+        @foreach($sorted as $index => $item)
+            @php
+                $attr = $item['attr'];
+                $score = $item['score'];
+                $movies = $item['movie'];
+            @endphp
+
+            @if($index === 0)
+            <!-- 🏆 1位（特別表示） -->
+            <div class="guaranteed-product" style="border: 2px solid gold; padding: 20px; margin-bottom: 30px; background: darkslategray;">
+                <h2>🏆 保証品（1位）</h2>
+                <p style="font-size: 1.2em;">Name: {{ $attr->name }}</p>
+                <p style="font-size: 1.2em;">Price: {{ $attr->price }}</p>
+                <p style="font-size: 1.2em;">Score: {{ $score }}</p>
+
+                @foreach ($movies as $movie)
+                    <div class="video-wrapper" data-product-id="{{ $attr->id }}" style="position: relative; display: inline-block; width: 100%; max-width: 800px; margin: 20px auto; /* 中央寄せ＋上下余白 */">
+
+                        <video class="my-video video-js" controls preload="auto" width="850" height="" data-setup="{}" muted style="max-height: 450px;">
+                            <source src="{{ asset('storage/'.$movie['download_link']) }}" type="video/mp4">
+                        </video>
+
+                        <div class="overlay-btn video-overlay-button" style="
+                            position: absolute;
+                            top: 20px;
+                            right: 20px;
+                            z-index: 10;
+                            background: rgba(255,255,255,0.85);
+                            padding: 10px 12px;
+                            border-radius: 6px;
+                            font-weight: bold;
+                            cursor: pointer;
+                            display: none;
+                            font-size: 1em;
+                            color:black;">
+                            🔥 商品を見る　
+                        </div>
+                    </div>
                 @endforeach
-            @endforeach    
-        @endforeach 
+            </div>
+
+            @else
+                @if($index % 2 === 1)
+                    <div class="product-row" style="display: flex; gap: 20px; margin-bottom: 30px;">
+                @endif
+
+                <div class="product" style="flex: 1; border: 1px solid #ccc; padding: 10px;">
+                    <p>Name: {{ $attr->name }}</p>
+                    <p>Price: {{ $attr->price }}</p>
+                    <p>Score: {{ $score }}</p>
+
+                    @foreach ($movies as $movie)
+                        <div class="video-wrapper" data-product-id="{{ $attr->id }}" style="position: relative; display: inline-block;">
+                            <video class="my-video video-js" controls preload="auto" width="640" height="360"data-setup="{}" muted>
+                                <source src="{{ asset('storage/'.$movie['download_link']) }}" type="video/mp4">
+                            </video>
+
+                            <div class="overlay-btn video-overlay-button" style="
+                                position: absolute;
+                                top: 20px;
+                                right: 20px;
+                                z-index: 10;
+                                background: rgba(255,255,255,0.85);
+                                padding: 8px 12px;
+                                border-radius: 6px;
+                                font-weight: bold;
+                                cursor: pointer;
+                                display: none;
+                                color: black;">
+                                🔥 商品を見る
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                @if($index % 2 === 0 || $loop->last)
+                    </div>
+                @endif
+            @endif
+        @endforeach
+
+
 
         <br><br><br>
         @foreach($allProducts as $product)
@@ -210,5 +315,38 @@
     
 
 </div><br>
+<script src="https://vjs.zencdn.net/7.21.1/video.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const videoElements = document.querySelectorAll('.my-video');
+
+    videoElements.forEach((videoEl) => {
+        const player = videojs(videoEl);
+        const wrapper = videoEl.closest('.video-wrapper');
+        const overlayBtn = wrapper.querySelector('.overlay-btn');
+        const productId = wrapper.dataset.productId;
+
+        player.ready(function () {
+            player.on('play', function () {
+                setTimeout(() => {
+                    overlayBtn.style.display = 'block';
+                }, 1000);
+            });
+        });
+
+        overlayBtn.addEventListener('click', function () {
+            if (productId) {
+                window.location.href = `/product/${productId}`;
+            } else {
+                alert("商品IDが見つかりませんでした。");
+            }
+        });
+    });
+});
+
+</script>
+
+
+
 
 @endsection

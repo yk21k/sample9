@@ -1,7 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-	
+    <head>
+	   <meta name="csrf-token" content="{{ csrf_token() }}">
+    </head>   
 	<div class="container mt-5">
 		<h2 class="text-center mb-4">Checkout</h2>
 		@if(!empty($deliveryAddresses))
@@ -74,86 +76,88 @@
 
 	<script src="https://js.stripe.com/v3/"></script>
     <script>
-    var stripe = Stripe('{{ env('STRIPE_KEY') }}');
-    var elements = stripe.elements();
-    var card = elements.create('card', {
-        hidePostalCode: true // 郵便番号を表示
-    });
-    card.mount('#card-element');
+        // var stripe = Stripe('{{ env('STRIPE_KEY') }}');
+        var stripe = Stripe(@json(config('services.stripe.key')));
+        var elements = stripe.elements();
+        var card = elements.create('card', {
+            hidePostalCode: true // 郵便番号を表示
+        });
+        card.mount('#card-element');
 
-    // フォーム送信処理
-    var form = document.getElementById('payment-form');
-    form.addEventListener('submit', function(event) {
-        event.preventDefault(); // デフォルトのフォーム送信を防ぐ
+        // フォーム送信処理
+        var form = document.getElementById('payment-form');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // デフォルトのフォーム送信を防ぐ
 
-        // 郵便番号バリデーション
-        var postalCode = document.querySelector('input[name="shipping_zipcode"]').value;
-        if (postalCode.length !== 7 || !/^\d{7}$/.test(postalCode)) {
-            document.getElementById('payment-message').textContent = "郵便番号は7桁の数字でなければなりません。";
-            document.getElementById('payment-message').classList.add('payment-error');
-            return;
-        }
+            // 郵便番号バリデーション
+            var postalCode = document.querySelector('input[name="shipping_zipcode"]').value;
+            if (postalCode.length !== 7 || !/^\d{7}$/.test(postalCode)) {
+                document.getElementById('payment-message').textContent = "郵便番号は7桁の数字でなければなりません。";
+                document.getElementById('payment-message').classList.add('payment-error');
+                return;
+            }
 
-        // 支払い方法作成
-        stripe.createPaymentMethod({
-            type: 'card',
-            card: card,
-            billing_details: {
-                address: {
-                    postal_code: postalCode // 入力された郵便番号を使用
+            // 支払い方法作成
+            stripe.createPaymentMethod({
+                type: 'card',
+                card: card,
+                billing_details: {
+                    address: {
+                        postal_code: postalCode // 入力された郵便番号を使用
+
+                    }
 
                 }
+            }).then(function(result) {
+                if (result.error) {
+                    // エラーメッセージの表示
+                    console.log(result.error.message);
+                    document.getElementById('payment-message').textContent = result.error.message;
+                    document.getElementById('payment-message').classList.add('payment-error');
+                } else {
+                    // 作成したPaymentMethod IDをサーバーに送信
+                    var paymentMethodId = result.paymentMethod.id;
+                    var formData = new FormData(form);
+                    formData.append('payment_method', paymentMethodId);
 
-            }
-        }).then(function(result) {
-            if (result.error) {
-                // エラーメッセージの表示
-                console.log(result.error.message);
-                document.getElementById('payment-message').textContent = result.error.message;
-                document.getElementById('payment-message').classList.add('payment-error');
-            } else {
-                // 作成したPaymentMethod IDをサーバーに送信
-                var paymentMethodId = result.paymentMethod.id;
-                var formData = new FormData(form);
-                formData.append('payment_method', paymentMethodId);
-
-                fetch(form.action, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: formData,
-                })
-                .then(response => response.text())  
-                .then(text => {
-                    console.log(text);
-                    try {
-                        const data = JSON.parse(text);
-                        if (data.status === 'success') {
-                            document.getElementById('payment-message').textContent = "決済が成功しました！";
-                            document.getElementById('payment-message').classList.add('payment-success');
-                            setTimeout(function() {
-                                window.location.href = "{{ route('payment.success') }}";
-                            }, 3000);
-                        } else {
-                            document.getElementById('payment-message').textContent = "決済に失敗しました: " + data.message;
+                    fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: formData,
+                    })
+                    .then(response => response.text())  
+                    .then(text => {
+                        console.log(text);
+                        try {
+                            const data = JSON.parse(text);
+                            if (data.status === 'success') {
+                                document.getElementById('payment-message').textContent = "決済が成功しました！";
+                                document.getElementById('payment-message').classList.add('payment-success');
+                                setTimeout(function() {
+                                    window.location.href = "{{ route('payment.success') }}";
+                                }, 3000);
+                            } else {
+                                document.getElementById('payment-message').textContent = "決済に失敗しました: " + data.message;
+                                document.getElementById('payment-message').classList.add('payment-error');
+                            }
+                        } catch (error) {
+                            console.error('JSONパースエラー:', error);
+                            document.getElementById('payment-message').textContent = "通信エラーが発生しました";
                             document.getElementById('payment-message').classList.add('payment-error');
                         }
-                    } catch (error) {
-                        console.error('JSONパースエラー:', error);
+                    })
+                    .catch(error => {
+                        console.error('ネットワークエラー:', error);
                         document.getElementById('payment-message').textContent = "通信エラーが発生しました";
                         document.getElementById('payment-message').classList.add('payment-error');
-                    }
-                })
-                .catch(error => {
-                    console.error('ネットワークエラー:', error);
-                    document.getElementById('payment-message').textContent = "通信エラーが発生しました";
-                    document.getElementById('payment-message').classList.add('payment-error');
-                });
-            }
+                    });
+                }
+            });
         });
-    });
-</script>
+    </script>
+    
 
     <style>
         .shadow-sm {

@@ -33,7 +33,7 @@
     </select>
   </div>
 
-  <div class="form-group">
+  <div class="form-group" id="cancel-reason-group" style="display: none;">
     <label for="inq_reason">「6.キャンセルしたい」を選択された方へ</label>
     <select class="form-control" id="inq_reason" name="inq_reason" required>
       <option value="" disabled selected>Select--</option>
@@ -70,17 +70,23 @@
    
 
 <script>
-  document.getElementById('exampleFormControlSelect1').addEventListener('change', function() {
-    var inqSubject = this.value;
-    var inqReason = document.getElementById('inq_reason');
-    
-    // 「6: キャンセルしたい」が選択された場合のみ、inq_reasonを有効化
-    if (inqSubject == '6') {
-      inqReason.disabled = false;
-    } else {
-      inqReason.disabled = true;
-    }
+  document.addEventListener('DOMContentLoaded', function () {
+    const subjectSelect = document.getElementById('exampleFormControlSelect1');
+    const cancelReasonGroup = document.getElementById('cancel-reason-group');
+    const cancelReasonSelect = document.getElementById('inq_reason');
+
+    subjectSelect.addEventListener('change', function () {
+      if (this.value === '6') {
+        cancelReasonGroup.style.display = 'block';
+        cancelReasonSelect.setAttribute('required', 'required');
+      } else {
+        cancelReasonGroup.style.display = 'none';
+        cancelReasonSelect.removeAttribute('required');
+        cancelReasonSelect.value = ''; // 初期化（オプション）
+      }
+    });
   });
 </script>
+
 
 @endsection
