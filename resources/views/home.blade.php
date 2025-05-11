@@ -7,15 +7,18 @@
 <link href="https://vjs.zencdn.net/7.21.1/video-js.css" rel="stylesheet" />
 <script src="https://vjs.zencdn.net/7.21.1/video.min.js"></script>
 <style>
-    @media screen and (max-width: 480px) {
+
+    @media screen and (max-width: 768px) {
         .sidenav {
-            display: none;
+            width: 100%;
+            padding: 10px;
+            background-color: #f8f9fa;
         }
     }
 
     .original-price {
-    text-decoration: line-through; /* 元の価格に取り消し線を引く */
-    color: grey; /* 元の価格の色を変更 */
+        text-decoration: line-through; /* 元の価格に取り消し線を引く */
+        color: grey; /* 元の価格の色を変更 */
     }
 
     .discounted-price {
@@ -23,28 +26,27 @@
         color: red; /* 赤色 */
     }
 
-      .video-overlay-button {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    z-index: 10;
-    background: rgba(255, 255, 255, 0.8);
-    padding: 8px 12px;
-    border-radius: 4px;
-    font-weight: bold;
-    cursor: pointer;
-    display: none; /* 最初は非表示 */
-  }
+    .video-overlay-button {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+        display: none; /* 最初は非表示 */
+    }
 
-  .video-wrapper {
-    position: relative;
-    display: inline-block;
-  }
+    .video-wrapper {
+        position: relative;
+        display: inline-block;
+    }
 
 </style>
 
 <div class="sidenav shadow-sm">
-
     <div style="color: black;"><a><h3>Category Menu</h3></a></div>
         <ul class="multilevel-dropdown-menu">
             @foreach($categories as $category)

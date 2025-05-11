@@ -199,19 +199,18 @@
     </div>    
 
         <!-- header part -->
-            <div class="wrapper">
+            <div class="wrapper" >
                 @include('layouts.header')      
             </div>
 
             <div class="wrapper" style="margin-left: 3%;">
-                <div class="wrapper" style="margin-left: 8%;">
+                <div class="wrapper" style=" margin-left: 250px;">
                     @yield('content')
                 </div>
             </div>    
         <!-- footer part -->
             <div class="wrapper" style="margin: 5%;">
                 @include('layouts.footer')
-
             </div>
 
     <!--====== Noscript ======-->

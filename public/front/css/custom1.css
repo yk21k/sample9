@@ -4,10 +4,8 @@ search-item {
 
 
 
-.sidenav {
-/*  max-width: 130px;*/
+/*.sidenav {
   width:fit-content;
-/*  display:inline-block*/
   position: fixed;
   z-index: 1;
   top: 80px;
@@ -15,6 +13,18 @@ search-item {
   background: #eee;
   padding: 8px 0;
   margin-right: 2%;
+}
+*/
+.sidenav {
+  width: 250px;
+  position: fixed;
+  top: 80px;
+  left: 10px;
+  z-index: 1000;
+  background-color: #f8f9fa;
+  padding: 1rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
 body,
