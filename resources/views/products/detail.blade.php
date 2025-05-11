@@ -87,7 +87,11 @@
     @if($search_order_ids)
         <!-- Button trigger modal -->
         @if(null !== $ableFavos)
-            @if($ableFavos->product_id == $id)
+            @php
+                $matched = $ableFavos->contains('product_id', $id);
+            @endphp
+
+            @if ($matched)
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                     Launch Favorite
                 </button>
@@ -96,6 +100,7 @@
                     Launch Favorite (Please help us by writing reviews about products purchased on This Site.)
                 </button>
             @endif
+    
             <!-- Modal -->
             <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <!-- Scrollable modal -->    

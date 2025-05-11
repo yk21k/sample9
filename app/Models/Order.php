@@ -41,35 +41,6 @@ class Order extends Model
         return $this->hasMany(SubOrder::class);
     }
 
-    // public function generateSubOrders()
-    // {
-    //     $orderItems = $this->items;
-    //     // dd($this);
-    //     foreach ($orderItems->groupBy('shop_id') as $shopId => $products) {
-    //         $shop = Shop::find($shopId);
-
-    //         $suborder = $this->subOrders()->create([
-    //             'order_id'=> $this->id,
-    //             'seller_id'=> $shop->user_id ?? 1,
-    //             'user_id'=> Auth::user()->id,
-    //             'grand_total'=> $products->sum('pivot.price'),
-    //             'item_count'=> $products->count(),
-    //             'coupon_code'=> $this->coupon_code,
-
-    //         ]);
-
-    //         // dd($suborder->items());
-    //         // dd($suborder);
-    //         // dd($products);
-    //         // dd($products);
-    //         // dd($orderItems);
-
-    //         foreach($products as $product) {
-    //             $suborder->items()->attach($product->id, ['user_id' => $suborder->user_id, 'price' => $product->pivot->price, 'quantity' => $product->pivot->quantity]);
-    //         }
-
-    //     }
-    // }
 
     public function generateSubOrders()
     {

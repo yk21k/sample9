@@ -34,6 +34,11 @@ class SubOrder extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function arrivalUser()//SubOrderObserverで利用
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     public function arrivalReport()
     {
         return $this->hasOne(SubOrdersArrivalReport::class);

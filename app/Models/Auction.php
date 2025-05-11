@@ -14,11 +14,14 @@ class Auction extends Model
         return $this->belongsTo(Shop::class, 'shop_id');
     }
 
-
-
     public function categories()
     {
         return $this->belongsToMany(Categories::class, 'category_auction', 'auction_id', 'category_id');
+    }
+
+    public function winner()
+    {
+        return $this->belongsTo(User::class, 'winner_user_id');
     }
 
 }

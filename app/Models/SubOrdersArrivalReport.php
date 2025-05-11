@@ -15,14 +15,14 @@ class SubOrdersArrivalReport extends Model
         'comments',
     ];
 
-    public static function boot()
-    {
-        parent::boot();
+    // public static function boot()
+    // {
+    //     parent::boot();
 
-        static::creating(function ($report) {
-            $report->confirmation_deadline = now()->addDays(7);
-        });
-    }
+    //     static::creating(function ($report) {
+    //         $report->confirmation_deadline = now()->addDays(7);
+    //     });
+    // }
 
     public function subOrder()
     {

@@ -88,25 +88,33 @@
 			        				<a class="btn btn-warning btn-sm" id="hide_arrival_button" style="margin: 2px;">到着確認</button></a><br> 
 	                                <div class="form_arrival">
 								    	@php
-								            $arrival = App\Models\SubOrdersArrivalReport::where('sub_order_id', $order_history->id)->first();
-								        @endphp								    
-									           
-	                                	@if(isset($arrival))
-									        <p>すでに確認済みです（{{ $arrival->created_at->format('Y年：m月：d日') }}）</p>
-									    @else
-									        <form method="POST" action="{{route('account.arrival', Auth::user()->id)}}" >
-									            @csrf
-									            <p>この商品の到着を確認したら、下のボタンを押してください。</p>
-									            <input type="hidden" name="sub_order_id" value="{{ $order_history->id }}">
-									            <input type="hidden" name="arrival_reported" value="1">
-									            <div>
-									                <label for="comments">コメント（任意）:</label><br>
-									                <textarea name="comments" id="comments" rows="4" cols="50">{{ old('comments') }}</textarea>
-									            </div>
 
-									            <button type="submit" class="btn btn-info">到着を報告する</button>
-									        </form>
-									    @endif    
+										    $arrival = App\Models\SubOrdersArrivalReport::where('sub_order_id', $order_history->id)->first();
+										    $today = Carbon\Carbon::today();
+										@endphp
+
+										@if($arrival && $arrival->arrival_reported == 1)
+										    <p>すでに確認済みです（{{ $arrival->created_at->format('Y年m月d日') }}）</p>
+
+										@elseif($arrival && Carbon\Carbon::parse($arrival->confirmation_deadline)->lt($today))
+										    <p>到着確認の期限は（{{ Carbon\Carbon::parse($arrival->confirmation_deadline)->format('Y年m月d日') }}）でした。期限超過ため到着確認済</p>
+
+										@else
+										    <form method="POST" action="{{ route('account.arrival', Auth::user()->id) }}">
+										        @csrf
+										        <p>この商品の到着を確認したら、下のボタンを押してください。</p>
+										        <input type="hidden" name="sub_order_id" value="{{ $order_history->id }}">
+										        <input type="hidden" name="arrival_reported" value="1">
+										        <div>
+										            <label for="comments">コメント（任意）:</label><br>
+										            <textarea name="comments" id="comments" rows="4" cols="50">{{ old('comments') }}</textarea>
+										        </div>
+
+										        <button type="submit" class="btn btn-info">到着を報告する</button>
+										    </form>
+										@endif
+
+    
 	                                </div>
                                 </td>
 		        			@else

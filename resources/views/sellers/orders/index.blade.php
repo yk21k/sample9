@@ -3,7 +3,8 @@
 
 @section('content')
     <div class="bg-secondary text-white">
-        <h4 class="bg-primary text-white">Orders</h4>
+        <h4 class="bg-primary text-white"> Orders</h4>
+
 
         <table class="table table-striped">
             <thead>
@@ -23,10 +24,11 @@
                 @forelse ($orders as $subOrder)
                     <tr class="table-secondary">
                         <td scope="row">
+
                             {{$subOrder->order->order_number}}
                         </td>
                         <td>
-                            {{$subOrder->order->id}}
+                            {{$subOrder->order->id}}  
                         </td>
                         <td>
                             {{$subOrder->status}}<br>

@@ -87,6 +87,8 @@ Route::get('/home/auction', [App\Http\Controllers\AuctionController::class, 'auc
 
 Route::get('/home/auction/show/{auction}', [App\Http\Controllers\AuctionController::class, 'auction_show'])->name('home.auction.show');
 
+Route::get('/home/auction/show/detail/{auction}', [App\Http\Controllers\AuctionController::class, 'auction_detail'])->name('home.auction.detail');
+
 Route::post('/auction/{auction}/bid', [AuctionController::class, 'storeBid'])->name('auction.bid.store');
 
 // 入札処理の後、即決金額が設定されていれば決済画面に遷移

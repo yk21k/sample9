@@ -11,6 +11,7 @@ use App\Observers\CampaignObserver;
 use App\Observers\DesplayObserver;
 use App\Observers\MailsObserver;
 use App\Observers\ProductObserver;
+use App\Observers\SubOrderObserver;
 
 use App\Models\Shop;
 use App\Models\CustomerInquiry;
@@ -21,6 +22,7 @@ use App\Models\Campaign;
 use App\Models\Desplay;
 use App\Models\Mails;
 use App\Models\Product;
+use App\Models\SubOrder;
 
 use TCG\Voyager\Facades\Voyager;
 use Illuminate\Pagination\Paginator;
@@ -51,6 +53,9 @@ class AppServiceProvider extends ServiceProvider
         DeleteShop::observe(DeleteShopObserver::class);
         Mails::observe(MailsObserver::class);
         Product::observe(ProductObserver::class); 
+        SubOrder::observe(SubOrderObserver::class); 
+
+        
         Voyager::useModel('Category', \App\Models\Categories::class);
         Voyager::useModel('Menu', \App\Models\Menu::class);
         Paginator::useBootstrap();

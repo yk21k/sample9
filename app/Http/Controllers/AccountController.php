@@ -114,6 +114,7 @@ class AccountController extends Controller
         return redirect()->route('account.account', ['id', $id])->withMessage('registered a new address');
 
     }
+    
     public function arrival(Request $request, $id)
     {
         if($request->isMethod('post'))
@@ -130,15 +131,19 @@ class AccountController extends Controller
 
             $this->validate($request, $rules, $customMessages);
 
-            $subOrdersArrivalReport = new SubOrdersArrivalReport;
-            $subOrdersArrivalReport->sub_order_id = $data['sub_order_id'];
-            $subOrdersArrivalReport->arrival_reported  = $data['arrival_reported'];
-            $subOrdersArrivalReport->comments = $data['comments'];
-            $subOrdersArrivalReport->save();
+            SubOrdersArrivalReport::updateOrCreate(
+                ['sub_order_id' => $data['sub_order_id']], // 検索条件
+                [
+                    'arrival_reported' => $data['arrival_reported'],
+                    'comments' => $data['comments'],
+                ] // 更新または新規作成する値
+            );
         }
         return redirect()->route('account.account', ['id', $id])->withMessage('到着したと確認しました。');
 
     }
+
+
 
 
 

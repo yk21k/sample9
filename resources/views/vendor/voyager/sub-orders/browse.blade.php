@@ -307,16 +307,41 @@
                                         @include('voyager::bread.partials.actions', ['action' => $action])
                                         @endif
                                         @endforeach
+                                        
+                                        @php
+                                            $payActives = App\Models\SubOrdersArrivalReport::where('sub_order_id', $data->id)->first();
+                                            $isCompletedWithPay = $data->status === 'completed' && isset($payActives);
+                                            $isPastConfirmationDeadline = false;
+                                            $arrivalReported = isset($payActives->arrival_reported) && $payActives->arrival_reported == 1;
 
-                                        @if($data->status == 'completed')
+                                            if ($isCompletedWithPay) {
+                                                $confirmationDate = \Carbon\Carbon::parse($payActives->confirmation_deadline);
+                                                $today = \Carbon\Carbon::today();
+                                                $isPastConfirmationDeadline = $today->greaterThan($confirmationDate);
+                                            }
+
+                                            $showPayButton = $isCompletedWithPay && ($isPastConfirmationDeadline || $arrivalReported);
+                                        @endphp
+
+                                        @if ($showPayButton)
                                             <a href="{{ route('order.pay', $data) }}"
                                                 class="btn btn-sm btn-success pull-right" style="margin-right: 5px;">
-                                                <i class="{{ $action->getIcon() }}"></i> <span class="hidden-xs hidden-sm">Pay</span>
+                                                <i class="{{ $action->getIcon() }}"></i>
+                                                <span class="hidden-xs hidden-sm">Pay</span>
+                                                @if ($isPastConfirmationDeadline)
+                                                    <span class="badge bg-danger">期限超過</span>
+                                                @endif
                                             </a>
-
                                         @endif
-                                    </td>
 
+                                        @if (isset($payActives->arrival_reported))
+                                            <td>{{ \Carbon\Carbon::parse($payActives->confirmation_deadline)->format('Y年m月d日') }}</td>
+                                        @else
+                                            <td>到着確認なし</td>
+                                        @endif
+
+
+ 
                                 </tr>
                                 @endforeach
                             </tbody>

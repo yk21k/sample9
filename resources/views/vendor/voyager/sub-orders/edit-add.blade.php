@@ -93,7 +93,8 @@
                                         @if($row->display_name == 'Shop' )
                                             @php
                                                 $seller_id_shop = App\Models\Shop::where('user_id', $dataTypeContent->seller_id)->first();
-                                            @endphp    
+                                            @endphp 
+                                            <input type="hidden" name="seller_id" value="{{ $dataTypeContent->seller_id }}">   
                                                 {{ $seller_id_shop->name }}
                                             <input type="hidden" name="shop_id" value="{{ $seller_id_shop->id }}">
                                         @elseif($row->display_name == 'users' )
