@@ -8,11 +8,12 @@
 <script src="https://vjs.zencdn.net/7.21.1/video.min.js"></script>
 <style>
 
-    @media screen and (max-width: 768px) {
+    @media screen and (max-width: 384px) {
         .sidenav {
-            width: 100%;
+            /*width: 50%;
             padding: 10px;
-            background-color: #f8f9fa;
+            background-color: #f8f9fa;*/
+            display: none;
         }
     }
 
@@ -43,6 +44,21 @@
         position: relative;
         display: inline-block;
     }
+
+    .original-price {
+      text-decoration: none;
+      color: #d3d3d3;
+      transition: all 0.3s ease;
+    }
+
+    .discount-price {
+      color: #e53935;
+      font-weight: bold;
+      margin-left: 8px;
+    }
+
+
+
 
 </style>
 
@@ -221,9 +237,9 @@
 
 
 
-        <br><br><br>
-        @foreach($allProducts as $product)
+        <br><br><br>        
 
+        @foreach ($discountedProducts as $product)
 
 
             <div class="col-4">
@@ -267,20 +283,21 @@
 
                             <h4 class="card-title">
                                 
-                            @foreach($uniqueCampaigns as $uniqueCampaign) 
-
-                                @if($product->shop->id == $uniqueCampaign['shop_id'])
-                                    <span class="original-price">${{ $product->price }}</span>
-                                    <span class="discounted-price">${{ $product->price*(1-$uniqueCampaign['dicount_rate1']) }}</span>
-                                    <div class="ribbon1"> Campaign !! </div>
-                                    <div class="ribbon2"> Up to: {{  Carbon\Carbon::parse($uniqueCampaign['end_date'])->format('Y/m/d')}}</div>
+                                @if ($product->campaign)
+                                    <div class="price-box">
+                                        <span class="original-price"> ${{ $product->price }} </span>
+                                        <span class="discount-price" style="display: none;">{{ ($product->campaign->dicount_rate1)*100 }}%&nbsp;割引後価格: ¥{{ number_format($product->discounted_price) }}</span>
+                                        <div class="ribbon1"> Campaign !! </div>
+                                        <div class="ribbon2">
+                                             <small>Up to: {{Carbon\Carbon::parse($product->campaign->end_date)->format('Y/m/d')}}</small>
+                                        </div>
+                                    </div>
                                 @else
-                                    <h4 class="card-title">${{ $product->price }}</h4>    
+                                    ${{ $product->price }}   
+
                                 @endif
 
-                            @endforeach
-                            </h4>                        
-                            
+                            </h4>    
                             <h4 class="card-title" id="stockQty">
                              @if($product->stock<=0) 
                                 <div class="ribbon">Sold out!!</div>
@@ -298,7 +315,7 @@
                             @endforeach
                             <h4 class="card-title">{{ $product->shop->name }}</h4>
 
-                            <a class="" href="{{ route('customer.inquiry', ['shopId'=>$product->shop->id]) }}"><h4>Contact Shop Manager</h4></a>
+                            <a class="" href="{{ route('customer.inquiry', ['shopId'=>$product->shop->id]) }}"><h5>Contact Shop Manager</h5></a>
                             <div class="card-body change-border01__inner" id="addCart1">
                                 <a href="{{ route('cart.add', $product->id) }}" class="card-link">Add to Cart</a>
                             </div>
@@ -347,6 +364,25 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+</script>
+<script>
+document.querySelectorAll('.price-box').forEach(function(box) {
+  box.addEventListener('mouseenter', function() {
+    const original = box.querySelector('.original-price');
+    const discount = box.querySelector('.discount-price');
+
+    original.style.textDecoration = 'line-through';
+    discount.style.display = 'inline';
+  });
+
+  box.addEventListener('mouseleave', function() {
+    const original = box.querySelector('.original-price');
+    const discount = box.querySelector('.discount-price');
+
+    original.style.textDecoration = 'none';
+    discount.style.display = 'none';
+  });
+});
 </script>
 
 

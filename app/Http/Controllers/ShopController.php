@@ -40,7 +40,8 @@ class ShopController extends Controller
     public function store(StoreShopRequest $request)
     {
         // dd($request->input('person_3'));
-
+        // $data = $request->all();
+        // dd($data);
 
         // 本日の日付フォルダ（例：20250420）
         $dateFolder = now()->format('Ymd');
@@ -58,6 +59,10 @@ class ShopController extends Controller
         $photo_1_name = 'no_file.txt';
         $photo_2_name = 'no_file.txt';
         $photo_3_name = 'no_file.txt';
+        $photo_4_name = 'no_file.txt';
+        $photo_5_name = 'no_file.txt';
+        $photo_6_name = 'no_file.txt';
+        $photo_7_name = 'no_file.txt';
         $file_1_name  = 'no_file.txt';
         $file_2_name  = 'no_file.txt';
         $file_3_name  = 'no_file.txt';
@@ -80,6 +85,30 @@ class ShopController extends Controller
             $photo_3_name = $generateFileName($photo);
             $photo->storeAs($basePath, $photo_3_name);
         }
+
+        if ($request->hasFile('photo_4')) {
+            $photo = $request->file('photo_4');
+            $photo_4_name = $generateFileName($photo);
+            $photo->storeAs($basePath, $photo_4_name);
+        }
+
+        if ($request->hasFile('photo_5')) {
+            $photo = $request->file('photo_5');
+            $photo_5_name = $generateFileName($photo);
+            $photo->storeAs($basePath, $photo_5_name);
+        }
+
+        if ($request->hasFile('photo_6')) {
+            $photo = $request->file('photo_6');
+            $photo_6_name = $generateFileName($photo);
+            $photo->storeAs($basePath, $photo_6_name);
+        }
+
+        if ($request->hasFile('photo_7')) {
+            $photo = $request->file('photo_7');
+            $photo_7_name = $generateFileName($photo);
+            $photo->storeAs($basePath, $photo_7_name);
+        }                 
 
         if ($request->hasFile('file_1')) {
             $file = $request->file('file_1');
@@ -157,6 +186,10 @@ class ShopController extends Controller
             'photo_1' => $photo_1_name,
             'photo_2' => $photo_2_name,
             'photo_3' => $photo_3_name,
+            'photo_4' => $photo_4_name,
+            'photo_5' => $photo_5_name,
+            'photo_6' => $photo_6_name,
+            'photo_7' => $photo_7_name,
             'file_1' => $file_1_name,
             'file_2' => $file_2_name,
             'file_3' => $file_3_name,

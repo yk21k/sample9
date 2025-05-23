@@ -114,8 +114,15 @@
             </div>
         </div>
         <br>
+        <div id="fileGroup5" class="form-group">
+            <div class="form-group">
+                <label for="photo_4">  <div id="" style="font-size:20pt">上記の内容をアップロード(運転免許証の場合の裏面）</div></label>
+                <input type="file" class="form-control" id="photo_4" name="photo_4" class="form-control" multiple>
+            </div>
+        </div>
+        <br>
 
-        <label for="license_expiry" class="form-label"><h3>上記の運転免許/パスポートの有効期限</h3></label>
+        <label for="license_expiry" class="form-label"><h3>上記の運転免許証/パスポートの有効期限</h3></label>
         <input class="form-control" type="date" name="license_expiry" id="license_expiry" >
     </div> 
     &nbsp;  
@@ -177,6 +184,9 @@
         <label for="photo_1">  <h3>(上記内容のアップロード) *</h3></label>
         <input type="file" class="form-control" id="photo_1" name="photo_1" class="form-control" multiple>
         <br>
+
+        <label for="photo_5">  <h3>上記の内容をアップロード(運転免許証の場合の裏面） *</h3></label>
+        <input type="file" class="form-control" id="photo_5" name="photo_5" class="form-control" multiple>
     </div>
     
 
@@ -196,6 +206,9 @@
         <label for="photo_2">  <h3>(上記内容のアップロード) *</h3></label>
         <input type="file" class="form-control" id="photo_2" name="photo_2" class="form-control" multiple>
         <br>
+        <label for="photo_6">  <h3>上記の内容をアップロード(運転免許証の場合の裏面） *</h3></label>
+        <input type="file" class="form-control" id="photo_6" name="photo_6" class="form-control" multiple>
+        <br>
     </div>
     &nbsp;
 
@@ -214,12 +227,15 @@
         <label for="photo_3">  <h3>(上記内容のアップロード)*</h3></label>
         <input type="file" class="form-control" id="photo_3" name="photo_3" class="form-control" multiple>
         <br>
+        <label for="photo_7">  <h3>上記の内容をアップロード(運転免許証の場合の裏面） *</h3></label>
+        <input type="file" class="form-control" id="photo_7" name="photo_7" class="form-control" multiple>
+        <br>
     </div>
 
     <div id="fileGroup3" style="display: none;">
         <div class="form-group">
             <label for="file_3"> <div id="output3" style="font-size:20pt">file_3 * (Compatible with jpg, jpeg, png, pdf)</div></label>
-            <input type="file" class="form-control" id="file_3" name="file_3" class="form-control" multiple>
+            <input type="file" class="form-control" id="" name="" class="form-control" multiple>
         </div>
     </div>
     <br>
@@ -227,10 +243,10 @@
     <div id="fileGroup4" style="display: none;">
         <div class="form-group">
             <label for="file_4">  <h3>file_4 (Compatible with PDF only)　例：代表以外の担当者がいる場合は、担当者全員の集合写真など</h3></label>
-            <input type="file" class="form-control" id="file_4" name="file_4" class="form-control" multiple>
+            <input type="file" class="form-control" id="" name="" class="form-control" multiple>
         </div>
-    </div>
-
+    </div> 
+ 
     <div id="extraFields" style="display: none;">
         <div class="form-group">
             <label for="manager">  <h3>manager *</h3></label>

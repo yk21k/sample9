@@ -84,15 +84,14 @@
                                     @elseif (isset($row->details->view))
                                         @include($row->details->view, ['row' => $row, 'dataType' => $dataType, 'dataTypeContent' => $dataTypeContent, 'content' => $dataTypeContent->{$row->field}, 'action' => ($edit ? 'edit' : 'add'), 'view' => ($edit ? 'edit' : 'add'), 'options' => $row->details])
                                     @elseif ($row->type == 'relationship')
-                                      
-
-                                        @if($row->display_name == 'Shops' && auth()->user()->hasRole('seller'))
+                                        
+                                        @if($row->display_name == 'shops' && auth()->user()->hasRole('seller'))
                                             {{auth()->user()->shop->name ?? 'n/a'}}
                                             <input type="hidden" name="shop_id" value="{{auth()->user()->shop->id}}">
                                         @else
                                             @include('voyager::formfields.relationship', ['options' => $row->details])
-                                        @endif
-                            
+                                        @endif                               
+                                        
                                     @else
                                         {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!}
                                     @endif

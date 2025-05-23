@@ -52,11 +52,13 @@
             @forelse($mails_histories as $history)
                 <tr>
                     <td>{{ $history->mail }}</td>
-                    @if(!is_null($history->forMailUser->name))
-                    	<td>{{ $history->mail->forMailUser->name }}</td>
-                    @else
-                    	<td>未設定</td>	
-                    @endif
+                    <td>
+                        @if(!is_null($history->forMailUser?->name))
+                            {{ $history->forMailUser->name }}
+                        @else
+                            未設定
+                        @endif
+                    </td>
 
                     @if($history->template == 'template1')
 

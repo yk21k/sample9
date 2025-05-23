@@ -49,5 +49,10 @@ class SubOrder extends Model
        return $this->hasMany(SubOrderItem::class,  'sub_order_items', 'sub_order_id', 'product_id', 'quantity');
     }
 
+    public function shopCoupons()
+    {
+        return $this->belongsToMany(ShopCoupon::class, 'shop_coupon_sub_order', 'sub_order_id', 'shop_coupon_id');
+    }
+
     
 }

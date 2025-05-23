@@ -42,84 +42,145 @@ class Order extends Model
     }
 
 
-    public function generateSubOrders()
-    {
-        $orderItems = $this->items;
-        Log::debug('orderItems:', $orderItems->toArray());
-        foreach ($orderItems->groupBy('shop_id') as $shopId => $products) {
-            if (is_null($shopId)) {
-                Log::warning("shop_id が null の商品をスキップしました。");
-                continue;
-            }
-            // dd($products);
-            $shop = Shop::find($shopId);
-            if (!$shop) {
-                Log::warning("Shop ID {$shopId} が見つかりません。");
-                continue;
-            }
+public function generateSubOrders()
+{
 
-            DB::beginTransaction();
+    Log::debug('generateSubOrders開始時点のクーポンコード:', [
+        'coupon_code' => $this->coupon_code
+    ]);
+    Log::debug('全OrderItems:', $this->items->toArray());
 
-            try {
-                Log::debug('サブオーダー作成前のデータ', [
-                    'order_id'    => $this->id,
-                    'seller_id'   => $shop->user_id ?? 1,
-                    'user_id'     => auth()->id(),
-                    'grand_total' => $products->sum('pivot.price'),
-                    'item_count'  => $products->count(),
-                    'coupon_code' => $this->coupon_code,
-                ]);
-                // サブオーダーの作成
-                $suborder = $this->subOrders()->create([
-                    'order_id'     => $this->id,
-                    'seller_id'    => $shop->user_id ?? 1,
-                    'user_id'      => auth()->id(),
-                    'grand_total'  => $products->sum('pivot.price'),
-                    'item_count'   => $products->count(),
-                    'coupon_code'  => $this->coupon_code,
-                ]);
+    $orderItems = $this->items;
 
-                // サブオーダーIDの確認
-                if (!$suborder || !$suborder->id) {
-                    Log::error('サブオーダーの作成に失敗しました', ['suborder' => $suborder]);
-                    throw new \Exception('サブオーダーの作成に失敗しました。');
+    // クーポンコードがカンマ区切りで保存されている場合の対応
+    // $couponCodeList = explode(',', $this->coupon_code ?? '');
+
+    // 修正案
+    $couponCodeList = Session::get('applied_coupon_codes', []);
+    if (!is_array($couponCodeList)) {
+        $couponCodeList = explode(',', $couponCodeList);
+    }
+
+    $couponCodeList = array_map('trim', array_filter($couponCodeList)); // 空白・空文字除去
+
+    foreach ($orderItems->groupBy('shop_id') as $shopId => $products) {
+        Log::debug("処理中のshop_id: {$shopId}", ['商品数' => $products->count()]);
+
+        if (is_null($shopId)) {
+            Log::warning("shop_id が null の商品をスキップしました。");
+            continue;
+        }
+
+        $shop = Shop::find($shopId);
+        if (!$shop) {
+            Log::warning("Shop ID {$shopId} が見つかりません。");
+            continue;
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $couponIds = [];
+
+            foreach ($products as $product) {
+                Log::debug("商品ID: {$product->id} に対してクーポン検索を実行");
+
+                // クーポンを複数コードで検索
+                $shopCoupon = ShopCoupon::whereIn('code', $couponCodeList)
+                                        ->where('product_id', $product->id)
+                                        ->first();
+
+                if ($shopCoupon) {
+                    Log::debug("クーポン適用対象: coupon_id={$shopCoupon->id}, product_id={$product->id}");
+                    $couponIds[] = $shopCoupon->id;
+                } else {
+                    Log::warning("該当するクーポンが見つかりませんでした: code=" . implode(', ', $couponCodeList) . ", product_id={$product->id}");
                 }
-
-                Log::debug("Created SubOrder ID: {$suborder->id}");
-
-                // サブオーダーIDが正しいかを再確認
-                Log::debug("Inserting to sub_order_items with sub_order_id: {$suborder->id}");
-                foreach ($products as $product) {
-                    Log::debug('Inserting to sub_order_items with sub_order_id: ' . $suborder->id);
-
-                    try {
-                        $suborder->items()->attach($product->id, [
-                            'user_id'   => $suborder->user_id,
-                            'price'     => $product->pivot->price,
-                            'quantity'  => $product->pivot->quantity,
-                        ]);
-                    } catch (\Exception $e) {
-                        Log::error('アイテムの添付に失敗', [
-                            'suborder_id' => $suborder->id,
-                            'product_id' => $product->id,
-                            'message' => $e->getMessage(),
-                        ]);
-                    }
-                }
-
-
-
-                DB::commit();
-            } catch (\Exception $e) {
-                DB::rollBack();
-                Log::error('サブオーダー作成失敗', [
-                    'message' => $e->getMessage(),
-                    'trace'   => $e->getTraceAsString(),
-                ]);
             }
 
+            $couponIds = array_unique($couponIds);
+
+            // 表示用に1件だけコード取得（なければ null）
+            // $couponCodeToApply = !empty($couponIds)
+            //     ? optional(ShopCoupon::find($couponIds[0]))->code
+            //     : null;
+
+            $couponCodesToApply = [];
+
+            foreach ($couponIds as $cid) {
+                $coupon = ShopCoupon::find($cid);
+                if ($coupon) {
+                    $couponCodesToApply[] = $coupon->code;
+                }
+            }
+
+            // カンマ区切りの文字列へ変換
+            $couponCodeString = implode(',', array_unique($couponCodesToApply));
+
+
+            Log::debug('サブオーダー作成前のデータ', [
+                'order_id'     => $this->id,
+                'seller_id'    => $shop->user_id ?? 1,
+                'user_id'      => auth()->id(),
+                'grand_total'  => $products->sum('pivot.price'),
+                'item_count'   => $products->count(),
+                // 'coupon_code'  => $couponCodeToApply,
+                'coupon_code'  => $couponCodeString,
+            ]);
+
+            $suborder = $this->subOrders()->create([
+                'order_id'     => $this->id,
+                'seller_id'    => $shop->user_id ?? 1,
+                'user_id'      => auth()->id(),
+                'grand_total'  => $products->sum('pivot.price'),
+                'item_count'   => $products->count(),
+                // 'coupon_code'  => $couponCodeToApply,
+                'coupon_code'  => $couponCodeString,
+            ]);
+
+            if (!$suborder || !$suborder->id) {
+                throw new \Exception('サブオーダーの作成に失敗しました。');
+            }
+
+            // クーポンを中間テーブルに紐付け
+            if (!empty($couponIds)) {
+                $suborder->shopCoupons()->syncWithoutDetaching($couponIds);
+            }
+
+            Log::debug("Created SubOrder ID: {$suborder->id}");
+
+            foreach ($products as $product) {
+                try {
+                    $suborder->items()->attach($product->id, [
+                        'user_id'   => $suborder->user_id,
+                        'price'     => $product->pivot->price,
+                        'quantity'  => $product->pivot->quantity,
+                    ]);
+                    Log::debug("商品ID: {$product->id} を sub_order_id: {$suborder->id} に追加");
+                } catch (\Exception $e) {
+                    Log::error('アイテムの添付に失敗', [
+                        'suborder_id' => $suborder->id,
+                        'product_id'  => $product->id,
+                        'message'     => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('サブオーダー作成失敗', [
+                'message' => $e->getMessage(),
+                'trace'   => $e->getTraceAsString(),
+            ]);
         }
     }
+
+    Log::info('generateSubOrders 呼び出し確認');
+}
+
+
+
 
     public function favoriteSales()
     {

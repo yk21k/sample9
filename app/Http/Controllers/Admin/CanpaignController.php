@@ -67,6 +67,8 @@ class CanpaignController extends VoyagerBaseController
             // dd($query);
             // query to display seller's shop only
 
+            
+
             if(auth()->user()->hasRole('seller')){
 
                 $query->where('shop_id', auth()->user()->shop->id);

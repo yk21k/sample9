@@ -11,55 +11,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shop Create Coupon</title>
-    <!-- <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            background-color: #f4f4f9;
-        }
+    <style>
         .form-container-coupon {
-            background-color: #4682b4;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: ;
+            max-width: 500px;
+            margin: 40px auto;
+            background: #f9f9f9;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            font-family: 'Arial', sans-serif;
         }
+
         .form-container-coupon h2 {
-            color:#f0f8ff;
-            text-align: center;
             margin-bottom: 20px;
+            color: #333;
+            text-align: center;
         }
+
         .form-container-coupon label {
-            color:#f0f8ff;
-            font-size: 14px;
-            margin-bottom: 5px;
             display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #555;
         }
-        .form-container-coupon input[type="text"],
-        .form-container-coupon input[type="date"],
-        .form-container-coupon input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
+
+        .form-container-coupon input,
+        .form-container-coupon select,
         .form-container-coupon button {
-            width: 30%;
+            width: 100%;
             padding: 10px;
-            background-color: #4CAF50;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-container-coupon button {
+            background-color: #007BFF;
             color: white;
-            border: none;
-            border-radius: 4px;
+            font-weight: bold;
             cursor: pointer;
-            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-top: 20px;
         }
+
         .form-container-coupon button:hover {
-            background-color: #45a049;
+            background-color: #0056b3;
         }
-    </style> -->
+    </style>
 </head>
 <body>
 	@if (session('success'))
@@ -71,36 +70,40 @@
         <h2>Shop Coupon Create</h2>
         <form action="{{ route('order.make_coupon') }}" method="POST"> @csrf
 
-            <label for="expiry_date">Expiry date:</label>
+            <label for="expiry_date">有効期限:</label>
             <input type="date" id="expiry_date" name="expiry_date" required>
 
-            <label for="sheets">Sheets:</label>
+            <label for="sheets">枚数:</label>
             <input type="number" id="sheets" name="sheets" min="1" required>
 
-            <label for="product">Product:</label>
+            <label for="product_id">商品:</label>
             @php
                 $product_shop_coupons = App\Models\Product::where('shop_id', auth()->user()->shop->id)->get()
             @endphp
-            <select name="product_id">
+            <select name="product_id" id="product_id">
                 @foreach($product_shop_coupons as $pscoupon)
-                    
-                    <option name="product_id" value="{{ $pscoupon->id }}" id="product_id"  > {{ $pscoupon->name }}</option>
-
-
+                    <option value="{{ $pscoupon->id }}">{{ $pscoupon->name }}</option>
                 @endforeach    
             </select> 
 
-            <label for="value">Value:</label>
-            <input type="text" id="value" name="value" min="-50%" required>
+            <label for="value">割引額（※半角ハイフン付き数字のみ）:</label>
+            <input type="text" id="value" name="value" placeholder="-100" required>
 
-            <label for="description">Description:</label>
+
+            <label for="description">説明:</label>
             <input type="text" id="description" name="description">
 
-            <button type="submit">Submit</button>
+            <button type="submit">作成する</button>
         </form>
     </div>
 
 </body>
+
+<script>
+document.getElementById('value').addEventListener('input', function (e) {
+    this.value = this.value.replace(/[^\d\-%]/g, ''); // 数字、-、%以外を除外
+});
+</script>
 
 @endsection
 

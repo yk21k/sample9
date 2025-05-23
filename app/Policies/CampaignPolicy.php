@@ -58,13 +58,29 @@ class CampaignPolicy
      * @param  \App\User  $user
      * @return mixed
      */
-    public function add(User $user)
-    {
+    // public function add(User $user)
+    // {
     
-        return $user->hasRole('seller');
+    //     return $user->hasRole('seller');
 
         
+    // }
+
+    public function add(User $user)
+    {
+        // sellerでなければNG
+        if (!$user->hasRole('seller')) {
+            return false;
+        }
+
+        // SubOrderにshop_idが1件もない場合はNG
+        $hasShopId = \App\Models\SubOrder::where('seller_id', $user->id)
+            ->whereNotNull('seller_id') // shop_idがnullでないことを確認
+            ->exists();
+
+        return $hasShopId;
     }
+
 
     /**
      * Determine whether the user can delete the Campaign.

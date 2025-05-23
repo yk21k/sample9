@@ -70,12 +70,48 @@ class HomeController extends Controller
 
         $uniqueCampaigns = $uniqueCampaigns->values(); // インデックスをリセット
 
-        $product_attributes = [];
-        $product_attributes = Attribute::with('values')->get();
-        // dd($product_attributes);
 
+        $today = Carbon::today();
+
+        // 対象キャンペーンを取得（有効なもの）
+        $campaigns = Campaign::where('status', 1)
+            ->where('start_date', '<=', $today)
+            ->where('end_date', '>=', $today)
+            ->get();
+
+        // 商品属性も取得（ここはそのままでOK）
+        $product_attributes = Attribute::with('values')->get();
+
+        // 商品を20件だけ取得（ここが大事）
         $products = Product::take(20)->get();
-        // dd($products);
+
+        // 各商品に対応するキャンペーンを見つけて、割引価格を追加
+        $discountedProducts = $products->map(function ($product) use ($campaigns) {
+            $matchingCampaign = $campaigns->where('shop_id', $product->shop_id)
+                                          ->sortByDesc('dicount_rate1')
+                                          ->first();
+
+            if ($matchingCampaign) {
+                $discountRate = $matchingCampaign->dicount_rate1;
+                $product->discounted_price = $product->price - ($product->price*$discountRate);
+                $product->campaign = $matchingCampaign;
+            } else {
+                $product->discounted_price = $product->price;
+                $product->campaign = null;
+            }
+
+            return $product;
+        });
+       
+
+
+
+        // $product_attributes = [];
+        // $product_attributes = Attribute::with('values')->get();
+        // // dd($product_attributes);
+
+        // $products = Product::take(20)->get();
+        // // dd($products);
 
         // $norm_products = Product::with('fovo_dises')->get();
         // dd($norm_products);
@@ -115,7 +151,7 @@ class HomeController extends Controller
 
         $extra_holidays_count = ExtraHoliday::where('date_key', $para_d)->get('shop_name')->count();
 
-        return response()->view('home', ['allProducts' => $products, 'product_attributes' => $product_attributes, 'categories' => $categories, 'capaign_objs' => $capaign_objs, 'holidays' => $holidays, 'extra_holidays' => $extra_holidays, 'norm_products_pres' => $norm_products_pres, 'uniqueCampaigns' => $uniqueCampaigns]);
+        return response()->view('home', ['allProducts' => $products, 'product_attributes' => $product_attributes, 'categories' => $categories, 'capaign_objs' => $capaign_objs, 'holidays' => $holidays, 'extra_holidays' => $extra_holidays, 'norm_products_pres' => $norm_products_pres, 'uniqueCampaigns' => $uniqueCampaigns, 'discountedProducts' => $discountedProducts]);
         
     }
 

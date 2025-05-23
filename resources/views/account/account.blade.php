@@ -21,10 +21,18 @@
 		  <li class="nav-item">
 		    <h3><a class="nav-link link-secondary" href="#">Shipping Address</a></h3>
 		  </li>
-		  <li class="nav-item">
-		  	
-		    <h3><a class="nav-link link-secondary" href="{{ route('shops.create') }}">Open Your Shop</a></h3>
-		  </li>
+		  @php
+		  	$open_shops = App\Models\Shop::where('user_id', auth()->user()->id)->first();
+		  @endphp
+		  @if(empty($open_shops))
+			  <li class="nav-item">
+			    <h3><a class="nav-link link-secondary" href="{{ route('shops.create') }}">Open Your Shop</a></h3>
+			  </li>
+		  @else
+		  	  <li class="nav-item">
+			    <h3><a class="nav-link link-secondary">あなたの店舗は開設済みです。</a></h3>
+			  </li>
+		  @endif
 		  <li class="nav-item">
 		    <h3><a class="nav-link link-secondary" href="{{ route('inquiries.create', ['id' => auth()->user()->id]) }}">Contact Us</a></h3>
 		  </li>

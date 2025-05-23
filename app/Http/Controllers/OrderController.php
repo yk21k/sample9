@@ -9,8 +9,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\OrderItem;
 use App\Models\SubOrder;
-use Session;
-
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
@@ -238,7 +237,8 @@ class OrderController extends Controller
     // }
 
     public function store(StoreOrderRequest $request, Product $product)
-    {
+    {   
+        // dd(Session::get('coupon101'));
         // Stripe APIのシークレットキーを設定
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
@@ -312,7 +312,25 @@ class OrderController extends Controller
                 }
 
                 // クーポンコードがある場合、オーダーに設定
-                $order->coupon_code = Session::get('coupon101');
+                // $order->coupon_code = Session::get('coupon101');
+                
+                $appliedCoupons = Session::get('applied_coupon_codes', []);
+
+                if (!is_array($appliedCoupons)) {
+                    Log::warning('applied_coupon_codes の値が配列ではありません', [
+                        'value' => $appliedCoupons,
+                        'type' => gettype($appliedCoupons)
+                    ]);
+                    $appliedCoupons = [];
+                }
+                
+                Log::debug('適用されたクーポンコード一覧:', [
+                    'applied_coupon_codes' => $appliedCoupons
+                ]);
+                $order->coupon_code = implode(',', $appliedCoupons);
+
+
+
                 $order->grand_total = \Cart::session(auth()->id())->getTotal();
                 $order->item_count = \Cart::session(auth()->id())->getTotalQuantity();
                 $order->user_id = auth()->id();
@@ -331,8 +349,15 @@ class OrderController extends Controller
                     if (is_null($product->shop_id)) {
                         Log::warning("shop_id が null の商品があります: 商品ID={$product->id}");
                     }
+                    
+                    // 割引価格が設定されていればそれを使う
+                    $priceToUse = $item->discounted_price ?? $item->price;
+
                     // 注文アイテムを関連付け
-                    $order->items()->attach($item->id, ['price' => $item->price, 'quantity' => $item->quantity]);
+                    $order->items()->attach($item->id, [
+                        'price' => $priceToUse,
+                        'quantity' => $item->quantity
+                    ]);
 
                     // 在庫を更新
                     $product = Product::find($item->id);

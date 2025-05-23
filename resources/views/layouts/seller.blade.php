@@ -33,6 +33,14 @@
     <link rel="stylesheet" href="{{ asset('front/css/custom9.css') }}">
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <style>
+        .disabled-coupon-link {
+            pointer-events: none;
+            opacity: 0.6;
+            cursor: not-allowed;
+            position: relative;
+        }
+    </style>
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 
@@ -141,7 +149,14 @@
 
                             <a href=" {{url('/admin/shops')}} " class="list-group-item list-group-item-action">Go to Shop</a>
 
-                            <a href=" {{ route('order.make_coupon') }} " class="list-group-item list-group-item-action">Create Shop Coupon</a>
+                            @php
+                                $orders = App\Models\SubOrder::where('seller_id', auth()->id())->first();
+                            @endphp
+                            @if($orders)
+                                <a href=" {{ route('order.make_coupon') }} " class="list-group-item list-group-item-action">Create Shop Coupon</a>
+                            @else
+                                <a href="" class="list-group-item list-group-item-action">Create Shop Coupon<br>（初決済後にご利用いただけます。）</a>    
+                            @endif
 
                             <a href=" {{url('/seller/calendar')}}" class="list-group-item list-group-item-action">Shop Calendar</a>
 

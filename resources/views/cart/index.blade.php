@@ -1,11 +1,48 @@
 @extends('layouts.app')
 
 @section('content')
+	<style>
+	    .price-line {
+	    	color: #b0c4de;
+	        display: flex;
+	        margin: 0.5em 0;
+	    }
+
+	    .original-price {
+	        text-decoration: line-through;
+	        color: #999;
+	    }
+
+	    .discounted-price {
+	        color: #d32f2f;
+	        font-weight: bold;
+	    }
+
+	    .discount-badge {
+	        background: #ffdce0;
+	        color: #c62828;
+	        font-size: 0.8em;
+	        font-weight: bold;
+	        padding: 0.2em 0.6em;
+	        border-radius: 12px;
+	        display: inline-block;
+	        margin-left: 0.5em;
+	    }
+
+	    .save-note {
+	        color: #b0c4de;
+	        font-size: 0.9em;
+	        margin-top: 0.5em;
+	    }
+
+	    .campaign-end {
+	        font-size: 0.8em;
+	        color: #b0c4de;
+	        margin-top: 0.4em;
+	    }
+	</style>
 
 	<h2> Your Cart </h2>
-
-
-
 	<table class="table">
 		<thead>
 			<tr>
@@ -13,6 +50,7 @@
 				<th>Name</th>
 				<th>Price</th>
 				<th>Quantity</th>
+				<th>Total</th>
 				<th>Action</th>
 				<th>Shop Name</th>
 			</tr>
@@ -32,11 +70,33 @@
 					</td>
 
 					<td>{{ $item->name }}</td>
+					
 					<td>
-						$ {{ \Cart::session(auth()->id())->get($item->id)->getPriceSum() }}
-						aa{{ \Cart::session(auth()->id())->getTotal() }}
-						auction aa{{ $item->getPriceWithConditions() }}
+						@php
+							if((int)$item->discounted_price > $item->finalPrice){
+								$lowestPrice = $item->finalPrice;	
+							}else{
+								$lowestPrice = $item->discounted_price;
+							}	
+
+						@endphp
+						@if($lowestPrice = $item->finalPrice)
+
+							¥{{ number_format($lowestPrice) }}
+
+						@elseif($lowestPrice = $item->discounted_price)
+
+							¥{{ $lowestPrice }}
+
+						@else
+							
+							通常価格：¥{{$item->price}} 	
+
+						@endif
 					</td>
+
+
+
 					@if($item->associatedModel->shipping_fee)
 						<td>Auction</td>
 					@else
@@ -48,19 +108,16 @@
 
 							</form>	
 						</td>
+						<td>合計：{{ $lowestPrice*$item->quantity  }}</td>
 					@endif				
 					<td>
 						<a href="{{ route('cart.destroy', $item->id) }}">Delete</a>
 					</td>
 					<td>
-						<a href="{{ route('shops.overview', $item->associatedModel->shop->id) }}">{{ $item->associatedModel->shop->name }}</a>
-						
+						<a href="{{ route('shops.overview', $item->associatedModel->shop->id) }}">{{ $item->associatedModel->shop->name }}</a>	
 					</td>
 
 				</tr>
-			
-			
-			
 			<br>	
 
 		@endforeach
@@ -120,11 +177,54 @@
 	    </div>
 	    </div>
 	 </div>
-　　　<div class="buffer"></div>
+　　<div class="buffer"></div>
+	@php
+	    $originalTotal = \Cart::session(auth()->id())->getSubTotalWithoutConditions();
+	    $discountAmount = $originalTotal - $total;
+	    $discountPercent = $originalTotal > 0 ? round(($discountAmount / $originalTotal) * 100) : 0;
 
-	<h3>
-		Total Price : $ {{ \Cart::session(auth()->id())->getTotal() }}
-	</h3><br>
+	    // 最も早く終了するキャンペーンを取得（カート内で割引があった場合）
+	    $cartCampaigns = $cartItems->pluck('campaign')->filter()->unique('id');
+	    $endingSoon = $cartCampaigns->sortBy('end_date')->first();
+	    $remainingHours = null;
+
+	    if ($endingSoon) {
+	        $remainingHours = now()->diffInHours(\Carbon\Carbon::parse($endingSoon->end_date), false);
+	    }
+	@endphp
+
+	    <h3 style="color: #b0c4de;">ご注文金額
+
+		    <div class="price-line">
+		        通常合計:
+		        <p class="original-price">
+		        	&nbsp;¥{{ number_format($originalTotal) }}
+		        </p>
+		         → 
+		         <p class="discounted-price">
+		         　割引適用後合計:　¥{{ number_format($total) }}
+		     	</p>
+		     	@if($discountPercent > 0)
+	                <p class="discount-badge">-{{ $discountPercent }}% OFF</p>
+	            @endif
+		    </div>
+
+		    @if($discountAmount > 0)
+		        <div class="save-note">
+		            🎉 ¥{{ number_format($discountAmount) }} お得になりました！
+		        </div>
+		    @endif
+
+		    @if(!is_null($remainingHours))
+		        <div class="campaign-end">
+		            ⏳ カート内の商品のキャンペーンは、 {{ $remainingHours }} 時間で終了するものがあります
+		        </div>
+		    @endif
+
+		    <div style="font-size: 0.75em; color: #b0c4de; margin-top: 0.6em;">
+		        ※キャンペーン割引が自動で適用されています。
+		    </div>
+		</h3>
 	@if(session('message'))
 		<div>
 			{{ session('message') }}
@@ -134,7 +234,4 @@
 	<button class="btn btn-primary" id="submitButton" onclick="location.href='{{ route('cart.checkout') }}' " role="button">Proceed to Checkout</button>
 	
 	
-
-
-
 @endsection

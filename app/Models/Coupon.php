@@ -13,4 +13,7 @@ class Coupon extends Model
     {
         return $this->hasMany(Mails::class, 'coupon_id');
     }
+
+
+    
 }
