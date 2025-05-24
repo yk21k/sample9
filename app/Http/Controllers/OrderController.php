@@ -247,6 +247,7 @@ class OrderController extends Controller
 
         // カートの合計金額をセッションから取得
         $cartTotal = session('cart_total');
+
         if (!$cartTotal) {
             return response()->json(['status' => 'error', 'message' => 'カートにアイテムがありません。'], 400);
         }
@@ -344,25 +345,86 @@ class OrderController extends Controller
 
                 // カートアイテムを保存
                 $cartItems = \Cart::session(auth()->id())->getContent();
+                // foreach ($cartItems as $item) {
+                //     $product = Product::find($item->id);
+                //     if (is_null($product->shop_id)) {
+                //         Log::warning("shop_id が null の商品があります: 商品ID={$product->id}");
+                //     }
+                    
+                //     // キャンペーン割引価格が設定されていればそれを使う
+                //     $priceToUse = $item->discounted_price ?? $item->price;
+
+
+                //         // クーポン割引
+                //     $couponDiscount = 0;
+                //     foreach ((array) $item->getConditions() as $condition) {
+                //         $value = $condition->getValue();
+                //         $couponDiscount += is_string($value) ? floatval($value) : 0;
+                //     }
+
+                //     $final_price = $item->price + $couponDiscount;
+
+                //     // 表示上の最終価格（割引がある方を選択）
+                //     $lowest_price = min($discounted_price, $final_price);
+
+                //     // 注文アイテムを関連付け
+                //     $order->items()->attach($item->id, [
+                //         'price' => $priceToUse,
+                //         'quantity' => $item->quantity
+                //     ]);
+
+                //     // 在庫を更新
+                //     $product = Product::find($item->id);
+                //     $product->decrement('stock', $item->quantity);
+                // }
+
                 foreach ($cartItems as $item) {
                     $product = Product::find($item->id);
                     if (is_null($product->shop_id)) {
                         Log::warning("shop_id が null の商品があります: 商品ID={$product->id}");
                     }
-                    
-                    // 割引価格が設定されていればそれを使う
-                    $priceToUse = $item->discounted_price ?? $item->price;
 
-                    // 注文アイテムを関連付け
+                    // デフォルトの価格（カート上の価格）
+                    $base_price = $item->price;
+
+                    // キャンペーン割引（存在すれば）
+                    $discounted_price = $base_price;
+
+                    $shopId = $product->shop_id ?? null;
+                    $campaign = \App\Models\Campaign::where('status', 1)
+                        ->where('shop_id', $shopId)
+                        ->where('start_date', '<=', now())
+                        ->where('end_date', '>=', now())
+                        ->orderByDesc('dicount_rate1')
+                        ->first();
+
+                    if ($campaign) {
+                        $discounted_price = ceil($base_price * (1 - $campaign->dicount_rate1));
+                    }
+
+                    // クーポン割引
+                    $couponDiscount = 0;
+                    foreach ((array) $item->getConditions() as $condition) {
+                        $value = $condition->getValue();
+                        $couponDiscount += is_string($value) ? floatval($value) : 0;
+                    }
+
+                    $final_price = $base_price + $couponDiscount;
+
+                    // 表示上の最終価格（割引がある方を選択）
+                    $lowest_price = min($discounted_price, $final_price);
+
+                    // 注文アイテムを保存（最終価格で）
                     $order->items()->attach($item->id, [
-                        'price' => $priceToUse,
-                        'quantity' => $item->quantity
+                        'price' => $lowest_price,
+                        'quantity' => $item->quantity,
                     ]);
 
-                    // 在庫を更新
+                    // 在庫更新
                     $product = Product::find($item->id);
                     $product->decrement('stock', $item->quantity);
                 }
+
 
                 // その他のオーダー関連処理
                 $order->generateSubOrders();
