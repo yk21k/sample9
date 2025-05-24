@@ -82,11 +82,11 @@
 						@endphp
 						@if($lowestPrice = $item->finalPrice)
 
-							¥{{ number_format($lowestPrice) }}
+							¥{{ number_format($item->finalPrice) }}
 
 						@elseif($lowestPrice = $item->discounted_price)
 
-							¥{{ $lowestPrice }}
+							¥{{ $item->discounted_price}}
 
 						@else
 							
