@@ -73,26 +73,58 @@
 					
 					<td>
 						@php
-							if((int)$item->discounted_price > $item->finalPrice){
-								$lowestPrice = $item->finalPrice;	
-							}else{
-								$lowestPrice = $item->discounted_price;
-							}	
+							
+							$shop_no = App\Models\Product::where('id', $item->id)->first();
+							$priceTest = App\Models\Campaign::where('shop_id', $shop_no->shop_id)->first();
+							$priceTest2 = App\Models\ShopCoupon::where('shop_id', $shop_no->shop_id)->first();
 
 						@endphp
-						@if($lowestPrice = $item->finalPrice)
+						@if($priceTest)
+							@php
+								if((int)$item->discounted_price > $item->finalPrice){
+									$lowestPrice = $item->finalPrice;	
+								}else{
+									$lowestPrice = $item->discounted_price;
+								}
+							@endphp
+							@if($lowestPrice = $item->finalPrice)
 
-							¥{{ number_format($item->finalPrice) }}
+								¥{{ number_format($item->finalPrice) }}
 
-						@elseif($lowestPrice = $item->discounted_price)
+							@elseif($lowestPrice = $item->discounted_price)
 
-							¥{{ $item->discounted_price}}
+								¥{{ $item->discounted_price}}
 
+							@else
+								
+								通常価格：¥{{$item->price}} 	
+
+							@endif
+						@elseif($priceTest2)
+							@php
+								if((int)$item->discounted_price > $item->finalPrice){
+									$lowestPrice = $item->finalPrice;	
+								}else{
+									$lowestPrice = $item->discounted_price;
+								}
+							@endphp
+							@if($lowestPrice = $item->finalPrice)
+
+								¥{{ number_format($item->finalPrice) }}
+
+							@elseif($lowestPrice = $item->discounted_price)
+
+								¥{{ $item->discounted_price}}
+
+							@else
+								
+								通常価格：¥{{$item->price}} 	
+
+							@endif
 						@else
-							
 							通常価格：¥{{$item->price}} 	
-
-						@endif
+								
+						@endif	
 					</td>
 
 
@@ -108,7 +140,7 @@
 
 							</form>	
 						</td>
-						<td>合計：{{ $lowestPrice*$item->quantity  }}</td>
+						
 					@endif				
 					<td>
 						<a href="{{ route('cart.destroy', $item->id) }}">Delete</a>
