@@ -155,7 +155,7 @@ class CartController extends Controller
 
             if ($matchingCampaign) {
                 $discountRate = $matchingCampaign->dicount_rate1;
-                $item->discounted_price = ceil($item->price * (1 - $discountRate));
+                $item->discounted_price = ceil($item->price - ($item->price*$discountRate));
                 $item->campaign = $matchingCampaign;
             } else {
                 $item->discounted_price = $item->price;
