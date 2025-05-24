@@ -87,7 +87,7 @@
             </select> 
 
             <label for="value">割引額（※半角ハイフン付き数字のみ）:</label>
-            <input type="text" id="value" name="value" placeholder="-100" required>
+            <input type="text" id="value" name="value" placeholder="例　-100 半角に変更してから入力ください" required>
 
 
             <label for="description">説明:</label>

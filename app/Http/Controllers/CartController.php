@@ -114,34 +114,36 @@ class CartController extends Controller
         foreach ($cartItems as $item) {
             $product = Product::find($item->id);
 
-            // if ($product) {
-            //     \Cart::remove($item->id);
-            //     $priceToUse = $product->offer_price ?? $product->price;
-
-            //     \Cart::add([
-            //         'id' => $product->id,
-            //         'name' => $product->name,
-            //         'price' => $priceToUse,
-            //         'quantity' => $item->quantity,
-            //         'attributes' => [],
-            //         'associatedModel' => $product, // ✅ ここで設定
-            //     ]);
-            // }
             if ($product) {
+                \Cart::remove($item->id);
                 $priceToUse = $product->offer_price ?? $product->price;
 
-                // price のみを更新。CartCondition は維持
-                \Cart::session(auth()->id())->update($item->id, [
-                    'price' => $priceToUse
+                \Cart::add([
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'price' => $priceToUse,
+                    'quantity' => $item->quantity,
+                    'attributes' => [],
+                    'associatedModel' => $product, // ✅ ここで設定
                 ]);
+            }
+            // if ($product) {
+            //     $priceToUse = $product->offer_price ?? $product->price;
 
-                // associatedModel の更新（必要なら session 書き換え）
-                $item->associatedModel = $product;
-            }            
+            //     // price のみを更新。CartCondition は維持
+            //     \Cart::session(auth()->id())->update($item->id, [
+            //         'price' => $priceToUse
+            //     ]);
+
+            //     // associatedModel の更新（必要なら session 書き換え）
+            //     $item->associatedModel = $product;
+            // }            
         }
 
         // ✅ 2. 再構築されたカートを取得
-        $items = \Cart::getContent();
+        // $items = \Cart::getContent();
+        $items = \Cart::session(auth()->id())->getContent();
+
 
         // ✅ 3. 割引処理（この時点で associatedModel は null ではない）
         $discountedCarts = $items->map(function ($item) use ($campaigns) {
