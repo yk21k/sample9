@@ -116,7 +116,8 @@ class CartController extends Controller
 
             if ($product) {
                 \Cart::remove($item->id);
-                $priceToUse = $product->offer_price ?? $product->price;
+                // $priceToUse = $product->offer_price ?? $product->price;
+                $priceToUse = $product->price;
 
                 \Cart::add([
                     'id' => $product->id,
