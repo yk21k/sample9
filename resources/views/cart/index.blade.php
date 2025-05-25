@@ -212,7 +212,7 @@
 　　<div class="buffer"></div>
 	@php
 	    $originalTotal = \Cart::session(auth()->id())->getSubTotalWithoutConditions();
-	    $discountAmount = $originalTotal - $total;
+	    $discountAmount = floor($originalTotal) - floor($total);
 	    $discountPercent = $originalTotal > 0 ? round(($discountAmount / $originalTotal) * 100) : 0;
 
 	    // 最も早く終了するキャンペーンを取得（カート内で割引があった場合）
