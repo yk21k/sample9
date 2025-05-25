@@ -230,11 +230,11 @@
 		    <div class="price-line">
 		        通常合計:
 		        <p class="original-price">
-		        	&nbsp;¥{{ number_format($originalTotal) }}
+		        	&nbsp;¥{{ ceil($originalTotal) }}
 		        </p>
 		         → 
 		         <p class="discounted-price">
-		         　割引適用後合計:　¥{{ number_format($total) }}
+		         　割引適用後合計:　¥{{ ceil($total) }}
 		     	</p>
 		     	@if($discountPercent > 0)
 	                <p class="discount-badge">-{{ $discountPercent }}% OFF</p>
@@ -243,7 +243,7 @@
 
 		    @if($discountAmount > 0)
 		        <div class="save-note">
-		            🎉 ¥{{ number_format($discountAmount) }} お得になりました！
+		            🎉 ¥{{ round($discountAmount) }} お得になりました！
 		        </div>
 		    @endif
 
