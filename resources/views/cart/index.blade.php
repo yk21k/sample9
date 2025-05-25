@@ -71,77 +71,80 @@
 
 					<td>{{ $item->name }}</td>
 					
-					<td>
-						@php
-							
-							$shop_no = App\Models\Product::where('id', $item->id)->first();
-							$priceTest = App\Models\Campaign::where('shop_id', $shop_no->shop_id)->first();
-							$priceTest2 = App\Models\ShopCoupon::where('shop_id', $shop_no->shop_id)->first();
+					
+					@php
+					    $shop = App\Models\Product::find($item->id);
+					    $hasCampaign = App\Models\Campaign::where('shop_id', $shop->shop_id)->exists();
+					    $hasCoupon = App\Models\ShopCoupon::where('shop_id', $shop->shop_id)->exists();
 
-						@endphp
-						@if($priceTest)
-							@php
-								if((int)$item->discounted_price > $item->finalPrice){
-									$lowestPrice = $item->finalPrice;	
-								}else{
-									$lowestPrice = $item->discounted_price;
-								}
-							@endphp
-							@if($lowestPrice = $item->finalPrice)
+					    $finalPrice = $item->final_price;
+					    $discountedPrice = $item->discounted_price;
 
-								¥{{ number_format($item->finalPrice) }}
+					    // 最安値を決定
+					    $lowestPrice = min($finalPrice, $discountedPrice);
+					@endphp
 
-							@elseif($lowestPrice = $item->discounted_price)
-
-								¥{{ $item->discounted_price}}
-
+					@if($hasCampaign || $hasCoupon)
+					    @if($lowestPrice == $finalPrice)
+					        <td>クーポン適用価格：¥{{ number_format($finalPrice) }}</td>
+						    @if($item->associatedModel->shipping_fee)
+								<td>Auction</td>
 							@else
+								<td>
+									<form action="{{ route('cart.update', $item->id) }}">
+
+										<input name="quantity" type="number" value="{{ $item->quantity }}" >
+										<input type="submit" value="save">
+
+									</form>	
+								</td>
 								
-								通常価格：¥{{$item->price}} 	
-
 							@endif
-						@elseif($priceTest2)
-							@php
-								if((int)$item->discounted_price > $item->finalPrice){
-									$lowestPrice = $item->finalPrice;	
-								}else{
-									$lowestPrice = $item->discounted_price;
-								}
-							@endphp
-							@if($lowestPrice = $item->finalPrice)
+					        <td>{{ number_format($finalPrice)*($item->quantity) }}</td>
 
-								¥{{ number_format($item->finalPrice) }}
-
-							@elseif($lowestPrice = $item->discounted_price)
-
-								¥{{ $item->discounted_price}}
-
+					    @elseif($lowestPrice == $discountedPrice)
+					        <td>キャンペーン価格：¥{{ number_format($discountedPrice) }}</td>
+						    @if($item->associatedModel->shipping_fee)
+								<td>Auction</td>
 							@else
+								<td>
+									<form action="{{ route('cart.update', $item->id) }}">
+
+										<input name="quantity" type="number" value="{{ $item->quantity }}" >
+										<input type="submit" value="save">
+
+									</form>	
+								</td>
 								
-								通常価格：¥{{$item->price}} 	
+							@endif					        
+					        <td>{{ number_format($discountedPrice)*($item->quantity) }}</td>
 
-							@endif
-						@else
-							通常価格：¥{{$item->price}} 	
+					    @else
+					        <td>通常価格：¥{{ number_format($item->price) }}</td>
+						    @if($item->associatedModel->shipping_fee)
+								<td>Auction</td>
+							@else
+								<td>
+									<form action="{{ route('cart.update', $item->id) }}">
+
+										<input name="quantity" type="number" value="{{ $item->quantity }}" >
+										<input type="submit" value="save">
+
+									</form>	
+								</td>
 								
-						@endif	
-					</td>
+							@endif					        
+					        <td>{{ number_format($item->price)*($item->quantity) }}</td>
 
-
-
-					@if($item->associatedModel->shipping_fee)
-						<td>Auction</td>
+					    @endif
 					@else
-						<td>
-							<form action="{{ route('cart.update', $item->id) }}">
+					    <td>通常価格：¥{{ number_format($item->price) }}</td>
+					    <td>{{ number_format($item->price)*($item->quantity) }}</td>
 
-								<input name="quantity" type="number" value="{{ $item->quantity }}" >
-								<input type="submit" value="save">
+									
+					
 
-							</form>	
-						</td>
-						
-					@endif				
+					@endif		
 					<td>
 						<a href="{{ route('cart.destroy', $item->id) }}">Delete</a>
 					</td>

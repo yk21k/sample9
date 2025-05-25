@@ -114,31 +114,31 @@ class CartController extends Controller
         foreach ($cartItems as $item) {
             $product = Product::find($item->id);
 
-            if ($product) {
-                \Cart::remove($item->id);
-                // $priceToUse = $product->offer_price ?? $product->price;
-                $priceToUse = $product->price;
-
-                \Cart::add([
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'price' => $priceToUse,
-                    'quantity' => $item->quantity,
-                    'attributes' => [],
-                    'associatedModel' => $product, // ✅ ここで設定
-                ]);
-            }
             // if ($product) {
-            //     $priceToUse = $product->offer_price ?? $product->price;
+            //     \Cart::remove($item->id);
+            //     // $priceToUse = $product->offer_price ?? $product->price;
+            //     $priceToUse = $product->price;
 
-            //     // price のみを更新。CartCondition は維持
-            //     \Cart::session(auth()->id())->update($item->id, [
-            //         'price' => $priceToUse
+            //     \Cart::add([
+            //         'id' => $product->id,
+            //         'name' => $product->name,
+            //         'price' => $priceToUse,
+            //         'quantity' => $item->quantity,
+            //         'attributes' => [],
+            //         'associatedModel' => $product, // ✅ ここで設定
             //     ]);
+            // }
+            if ($product) {
+                $priceToUse = $product->offer_price ?? $product->price;
 
-            //     // associatedModel の更新（必要なら session 書き換え）
-            //     $item->associatedModel = $product;
-            // }            
+                // price のみを更新。CartCondition は維持
+                \Cart::session(auth()->id())->update($item->id, [
+                    'price' => $priceToUse
+                ]);
+
+                // associatedModel の更新（必要なら session 書き換え）
+                $item->associatedModel = $product;
+            }            
         }
 
         // ✅ 2. 再構築されたカートを取得
@@ -155,7 +155,7 @@ class CartController extends Controller
 
             if ($matchingCampaign) {
                 $discountRate = $matchingCampaign->dicount_rate1;
-                $item->discounted_price = ceil($item->price - ($item->price*$discountRate));
+                $item->discounted_price = ceil($item->price - ceil($item->price*$discountRate));
                 $item->campaign = $matchingCampaign;
             } else {
                 $item->discounted_price = $item->price;
@@ -175,6 +175,10 @@ class CartController extends Controller
             foreach ((array) $item->getConditions() as $condition) {
                 $value = $condition->getValue();
                 $couponDiscount += is_string($value) ? floatval($value) : 0;
+                Log::debug("クーポン条件", [
+                '値' => $condition->getValue(),
+                '文字列か？' => is_string($condition->getValue()),
+                ]);
             }
 
             $item->final_price = $item->price + $couponDiscount;            
@@ -184,6 +188,21 @@ class CartController extends Controller
                 $item->discounted_price,
                 $item->final_price,
             ]); 
+
+            // ✅ デバッグログをここに書く
+            Log::debug("カート商品の割引データ確認", [
+                '商品ID' => $item->id,
+                '商品名' => $item->name,
+                '通常価格' => $item->price,
+                'クーポン割引' => $couponDiscount,
+                'キャンペーン割引後価格' => $item->discounted_price,
+                'クーポン適用後価格' => $item->final_price,
+                '最終表示価格（lowest_price）' => $item->lowest_price,
+            ]);
+
+            Log::debug("条件一覧", [
+                'conditions' => $item->getConditions()
+            ]);
 
             return $item;
         });
@@ -195,13 +214,13 @@ class CartController extends Controller
         // foreach ($discountedCarts as $item) {
         //     $total += $item->discounted_price * $item->quantity;
         // }
-        // dd($discountedCarts, $item->lowest_price, $item->quantity);
+        // dd($discountedCarts,$item->discounted_price, $item->final_price, $item->quantity);
         $total = $discountedCarts->reduce(function ($carry, $item) {
             return $carry + ($item->lowest_price * $item->quantity);
         }, 0);
 
         session(['cart_total' => $total]);
-
+        // dd(ceil($item->price - ceil($item->price*0.05)), number_format($item->price - ($item->price*0.05)));
 
         // ✅ 5. ビューに渡す
         // $cartItems = \Cart::getContent();
@@ -844,13 +863,13 @@ class CartController extends Controller
         $total = $cartItems->sum('final_price'); // 👈 ここで total を算出
 
 
-        return view('cart.index', [
-            'cartItems' => $cartItems,
-            'total' => $total, // 👈 Blade に渡す
-            'message' => 'クーポンを適用しました。対象商品の金額が割引されているかご確認ください。'
-        ]);
+        // return view('cart.index', [
+        //     'cartItems' => $cartItems,
+        //     'total' => $total, // 👈 Blade に渡す
+        //     'message' => 'クーポンを適用しました。対象商品の金額が割引されているかご確認ください。'
+        // ]);
         // 最後の return も `redirect()->route(...)`
-        // return redirect()->route('cart.index')->withMessage('クーポンを適用しました。');
+        return redirect()->route('cart.index')->withMessage('クーポンを適用しました。クーポンを適用しました。対象商品の金額が割引されているかご確認ください。');
     }
 
 
