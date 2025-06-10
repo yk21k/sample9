@@ -40,6 +40,7 @@ class CartController extends Controller
             'id' => (string)$product->id,
             'name' => $product->name,
             'price' => $product->price,
+            'shippnng_fee' => $product->shippnng_fee,
             'quantity' => 1,
             'attributes' => array(),
             // 'attributes' => [
@@ -114,20 +115,6 @@ class CartController extends Controller
         foreach ($cartItems as $item) {
             $product = Product::find($item->id);
 
-            // if ($product) {
-            //     \Cart::remove($item->id);
-            //     // $priceToUse = $product->offer_price ?? $product->price;
-            //     $priceToUse = $product->price;
-
-            //     \Cart::add([
-            //         'id' => $product->id,
-            //         'name' => $product->name,
-            //         'price' => $priceToUse,
-            //         'quantity' => $item->quantity,
-            //         'attributes' => [],
-            //         'associatedModel' => $product, // ✅ ここで設定
-            //     ]);
-            // }
             if ($product) {
                 $priceToUse = $product->offer_price ?? $product->price;
 
@@ -157,19 +144,13 @@ class CartController extends Controller
                 $discountRate = $matchingCampaign->dicount_rate1;
                 $item->discounted_price = ceil($item->price - ceil($item->price*$discountRate));
                 $item->campaign = $matchingCampaign;
+                $item->shipping_fee = $item->associatedModel->shipping_fee;
             } else {
                 $item->discounted_price = $item->price;
+                $item->shipping_fee = $item->associatedModel->shipping_fee;
+
                 $item->campaign = null;
             }
-
-            // // --- クーポン割引の反映（CartCondition） ---
-            // $couponDiscount = 0;
-            // foreach ((array) $item->getConditions() as $condition) {
-            //     $couponDiscount += floatval($condition->getValue());
-            // }
-            // // dd($couponDiscount);
-            // $item->final_price = $item->price + $couponDiscount; // 例: price=1000, value=-100 ⇒ 900
-
 
             $couponDiscount = 0;
             foreach ((array) $item->getConditions() as $condition) {
@@ -180,7 +161,7 @@ class CartController extends Controller
                 '文字列か？' => is_string($condition->getValue()),
                 ]);
             }
-
+            // dd($item->associatedModel->shipping_fee);
             $item->final_price = $item->price + $couponDiscount;            
 
             // --- 最終的な表示価格を選ぶ ---
@@ -204,27 +185,39 @@ class CartController extends Controller
                 'conditions' => $item->getConditions()
             ]);
 
+               // ✅ ここで lowest_price が 0 未満なら削除
+            if ($item->lowest_price < 0) {
+                \Cart::session(auth()->id())->remove($item->id);
+
+
+                Log::debug("商品が割引により0円未満のため削除されました", [
+                    '商品ID' => $item->id,
+                    '商品名' => $item->name,
+                    '最終価格' => $item->lowest_price
+                ]);
+
+                return null; // return null にすると map の結果からも除外される
+            }
+
             return $item;
-        });
+        })->filter(); // null を除外
+        // dd($item);
 
 
 
         // ✅ 4. 合計を再計算してセッションに保存
         $total = 0;
-        // foreach ($discountedCarts as $item) {
-        //     $total += $item->discounted_price * $item->quantity;
-        // }
-        // dd($discountedCarts,$item->discounted_price, $item->final_price, $item->quantity);
-        $total = $discountedCarts->reduce(function ($carry, $item) {
-            return $carry + ($item->lowest_price * $item->quantity);
-        }, 0);
 
+        $total = $discountedCarts->reduce(function ($carry, $item) {
+            return $carry + ($item->lowest_price*$item->quantity);
+        }, 0);
+        // dd($item->associatedModel->shipping_fee);
         session(['cart_total' => $total]);
-        // dd(ceil($item->price - ceil($item->price*0.05)), number_format($item->price - ($item->price*0.05)));
+
+
+
 
         // ✅ 5. ビューに渡す
-        // $cartItems = \Cart::getContent();
-        // dd($cartItems);
 
         $cartItems = collect(session('cart_items'))->map(function ($item) {
             return (object) $item;
@@ -232,118 +225,17 @@ class CartController extends Controller
 
         session(['cart_items' => $cartItems]);
 
-
-        // foreach ($cartItems as $item) {
-        //     echo "商品名: {$item->name}, 数量: {$item->quantity}, 小計: {$item->discounted_price}{$item->price}円<br>";
-        // }
         $cartItems = $discountedCarts;
+        // dd($cartItems);
         
+        // 削除された商品がある場合、セッションにメッセージ保存（flash ではなく put）
+        if (!empty($removedItems)) {
+            session()->put('removed_message', '以下の商品は割引により削除されました：' . implode(', ', $removedItems));
+        }
 
        return view('cart.index', compact('cartItems', 'items', 'discountedCarts', 'total'));
     }
 
-
-
-
-
-    //     public function index()
-    // {   
-    //     $cartItems = \Cart::session(auth()->id())->getContent();
-
-    //     $today = Carbon::today();
-
-    //     // 有効なキャンペーン取得
-    //     $campaigns = Campaign::where('status', 1)
-    //         ->where('start_date', '<=', $today)
-    //         ->where('end_date', '>=', $today)
-    //         ->get();
-
-    //     // ✅ 1. カートの商品を提供価格 or 通常価格で再構築
-    //     foreach ($cartItems as $item) {
-    //         $product = Product::find($item->id);
-
-    //         if ($product) {
-    //             \Cart::remove($item->id);
-
-    //             $priceToUse = $product->offer_price ?? $product->price;
-
-    //             \Cart::add([
-    //                 'id' => $product->id,
-    //                 'name' => $product->name,
-    //                 'price' => $priceToUse,
-    //                 'quantity' => $item->quantity,
-    //                 'attributes' => [],
-    //                 'associatedModel' => $product, // ✅ ここで設定
-    //             ]);
-    //         }
-    //     }
-
-    //     // ✅ 2. 再構築されたカートを取得
-    //     $items = \Cart::getContent();
-
-    //     // ✅ 3. 割引処理（この時点で associatedModel は null ではない）
-    //     $discountedCarts = $items->map(function ($item) use ($campaigns) {
-    //         $shopId = $item->associatedModel?->getOriginal('shop_id');
-
-    //         // --- キャンペーン価格の算出 ---
-    //         $matchingCampaign = $campaigns->where('shop_id', $shopId)->sortByDesc('dicount_rate1')->first();
-
-    //         if ($matchingCampaign) {
-    //             $discountRate = $matchingCampaign->dicount_rate1;
-    //             $item->discounted_price = ceil($item->price * (1 - $discountRate));
-    //             $item->campaign = $matchingCampaign;
-    //         } else {
-    //             $item->discounted_price = $item->price;
-    //             $item->campaign = null;
-    //         }
-
-    //         // --- クーポン割引の反映（CartCondition） ---
-    //         $couponDiscount = 0;
-    //         foreach ((array) $item->getConditions() as $condition) {
-    //             $couponDiscount += floatval($condition->getValue());
-    //         }
-
-    //         $item->final_price = $item->price + $couponDiscount; // 例: price=1000, value=-100 ⇒ 900
-
-    //         // --- 最終的な表示価格を選ぶ ---
-    //         $item->lowest_price = min([
-    //             $item->discounted_price,
-    //             $item->final_price,
-    //         ]);    
-
-    //         return $item;
-    //     });
-
-    //     // ✅ 4. 合計を再計算してセッションに保存
-    //     $total = 0;
-    //     // foreach ($discountedCarts as $item) {
-    //     //     $total += $item->discounted_price * $item->quantity;
-    //     // }
-
-    //     $total = $discountedCarts->reduce(function ($carry, $item) {
-    //         return $carry + ($item->lowest_price * $item->quantity);
-    //     }, 0);
-        
-    //     session(['cart_total' => $total]);
-
-
-    //     // ✅ 5. ビューに渡す
-    //     $cartItems = \Cart::getContent();
-    //     // dd($cartItems);
-
-    //     // $cartItems = collect(session('cart_items'))->map(function ($item) {
-    //     //     return (object) $item;
-    //     // });
-
-    //     session(['cart_items' => $cartItems]);
-
-
-    //     // foreach ($cartItems as $item) {
-    //     //     echo "商品名: {$item->name}, 数量: {$item->quantity}, 小計: {$item->discounted_price}{$item->price}円<br>";
-    //     // }
-
-    //    return view('cart.index', compact('cartItems', 'items', 'discountedCarts', 'total'));
-    // }
 
 
 
@@ -419,23 +311,89 @@ class CartController extends Controller
 
     }
 
-    public function checkout(Request $request, Product $product)
+
+    public function checkout(Request $request)
     {
-        // dd(\Cart::session(auth()->id())->getContent());
-        // dd(\Cart::session(auth()->id())->getTotalQuantity());
-        // dd(Session::get('coupon101'));
+        $cartItems = \Cart::session(auth()->id())->getContent();
+        $today = \Carbon\Carbon::today();
 
+        // キャンペーン取得
+        $campaigns = \App\Models\Campaign::where('status', 1)
+            ->where('start_date', '<=', $today)
+            ->where('end_date', '>=', $today)
+            ->get();
 
-        $cartProducts = \Cart::session(auth()->id())->getContent();
-        $cartPrices = \Cart::getTotal();
-        // dd($cartPrices);
-        // session(['cart_total' => $cartPrices]);ここでセッションに保存している 
-        // dd($cartProducts); shop_coupon
-        // dd($cartPrices);
-        
-        // dd($cartProducts); 
+        $discountedCarts = $cartItems->map(function ($item) use ($campaigns) {
+            $shopId = $item->associatedModel?->getOriginal('shop_id');
+            $shipping = (float) ($item->associatedModel->shipping_fee ?? 0);
+            $productPrice = (float) $item->price;
+            $quantity = $item->quantity;
 
-        $cartItems = \Cart::getContent();
+            // --- キャンペーン価格（最初の1点用） ---
+            $matchingCampaign = $campaigns->where('shop_id', $shopId)->sortByDesc('dicount_rate1')->first();
+            $campaignPrice = $productPrice;
+            if ($matchingCampaign) {
+                $rate = $matchingCampaign->dicount_rate1;
+                $campaignPrice = ceil($productPrice - ceil($productPrice * $rate));
+            }
+
+            // --- クーポン価格（最初の1点用） ---
+            $couponDiscount = 0;
+            foreach ((array) $item->getConditions() as $condition) {
+                $value = $condition->getValue();
+                if (is_string($value)) {
+                    if (str_contains($value, '%')) {
+                        $rate = floatval(str_replace(['-', '%'], '', $value)) / 100;
+                        $couponDiscount += $productPrice * $rate;
+                    } else {
+                        $couponDiscount += abs(floatval($value));
+                    }
+                }
+            }
+            $couponPrice = $productPrice - $couponDiscount;
+
+            // --- 最小価格を選択（0円未満を防ぐ） ---
+            $lowestPrice = max(min($productPrice, $campaignPrice, $couponPrice), 0);
+
+            // --- 商品小計 ---
+            $productSubtotal = ($quantity > 1)
+                ? $lowestPrice + $productPrice * ($quantity - 1)
+                : $lowestPrice;
+
+            // --- 配送料小計 ---
+            $shippingTotal = $shipping * $quantity;
+
+            // --- 合計 ---
+            $total = $productSubtotal + $shippingTotal;
+
+            $item->lowest_price = $lowestPrice;
+            $item->shipping_fee = $shipping;
+            $item->total_price = $total;
+
+            // --- デバッグログ ---
+            \Log::debug('カート商品の割引内訳', [
+                '商品名' => $item->name,
+                '商品価格' => $productPrice,
+                'キャンペーン適用後' => $campaignPrice,
+                'クーポン適用後' => $couponPrice,
+                '最終適用価格（lowest_price）' => $lowestPrice,
+                '数量' => $quantity,
+                '商品小計（割引＋通常）' => $productSubtotal,
+                '送料合計' => $shippingTotal,
+                '合計金額' => $total
+            ]);
+
+            return $item;
+        });
+
+        // dd($discountedCarts);
+        $cartTotal = $discountedCarts->sum('total_price');
+        // dd($cartTotal);
+        session()->put('total_and_shipping', $cartTotal);
+
+        // 配送先情報など他の処理（省略）
+
+        $cartItems = \Cart::session(auth()->id())->getContent();
         Log::debug('カートのアイテム:', ['cart_items' => $cartItems]);
         $allCouponCodes = [];
 
@@ -454,59 +412,49 @@ class CartController extends Controller
         // 重複を削除してセッションに保存（文字列としても配列としてもOK）
         $allCouponCodes = array_unique($allCouponCodes);
         Log::debug('重複を削除後のクーポンコード:', ['coupon_codes' => $allCouponCodes]);
-            // ログで確認
 
-        // 例: カンマ区切り文字列で保存
-        // Session::put('applied_coupon_codes', implode(',', $allCouponCodes));
-
+        $cartProducts = \Cart::session(auth()->id())->getContent();
 
         // または配列のまま保存したいなら　重要
         Session::put('applied_coupon_codes', $allCouponCodes);
 
-        
-            $searchStock = [];
-            foreach ($cartProducts as $cartProduct) {
-                // dd($cartProduct);
-                // dd($cartProduct->associatedModel->shipping_fee);
-                $searchStocks = $cartProduct->pluck('id')->toArray();
-                // dd($searchStocks);
-                foreach($searchStocks as $searchStock){
-                    if($cartProduct->associatedModel->shipping_fee){
+        $searchStock = [];
+        foreach ($cartProducts as $cartProduct) {
+            // dd($cartProduct);
+            // dd($cartProduct->associatedModel->shipping_fee);
+            $searchStocks = $cartProduct->pluck('id')->toArray();
+            // dd($searchStocks);
+            foreach($searchStocks as $searchStock){
+                if($cartProduct->associatedModel->shipping_fee){
 
-                    }else{
-                        $stockProducts = Product::where('id', $searchStock)->get();
-                        foreach($stockProducts as $stockProduct){
-                            // dd($stockProduct->stock);
+                }else{
+                    $stockProducts = Product::where('id', $searchStock)->get();
+                    foreach($stockProducts as $stockProduct){
+                        // dd($stockProduct->stock);
 
-                            if($stockProduct->stock <= 0){
-                                return back()->withMessage(" I'm sorry. You cannot purchase the item because the item in your cart was paid for first or there has been a change in inventory. Please empty your cart again and continue shopping. ");   
-                            }    
+                        if($stockProduct->stock <= 0){
+                            return back()->withMessage(" I'm sorry. You cannot purchase the item because the item in your cart was paid for first or there has been a change in inventory. Please empty your cart again and continue shopping. ");   
                         }    
-                    }   
-                }        
-            }    
+                    }    
+                }   
+            }        
+        }    
         
-        
-
         $deliveryAddresses = DeliveryAddress::where('user_id', Auth::user()->id)->get();
         // dd($deliveryAddresses);
         
         $setDeliPlaces = DeliveryAddress::setDeliPlaces();
-        // dd($setDeliPlaces);
-        // dd(!isset($setDeliPlaces));
         if(!isset($setDeliPlaces)){
             $setDeliPlaces;
         }
 
         $setCart = \Cart::session(auth()->id())->isEmpty();
-        // dd($setCart);
         if($setCart){
-            // dd('empty');
             return back()->withMessage('You cannot proceed to checkout. Please continue shopping');
         }else{
-            return view('cart.checkout', compact('deliveryAddresses', 'setDeliPlaces', 'setCart'));
+            return view('cart.checkout', compact('deliveryAddresses', 'setDeliPlaces', 'setCart', 'discountedCarts', 'cartTotal'));
+        }
 
-        }    
     }
 
     public function deliPlace(Request $request)
@@ -553,182 +501,6 @@ class CartController extends Controller
 
     }
 
-    // public function applyShopCoupon()
-    // {
-    //     $shopCouponCode = request('code');
-    //     // dd($shopCouponCode);
-
-    //     $shopCouponData = ShopCoupon::where('code', $shopCouponCode)->first();
-    //     // dd($shopCouponData->product_id);
-
-    //     if(!$shopCouponData) {
-    //         return back()->withMessage('申し訳ございません。クーポンは存在しません');
-    //     }
-
-    //     // $shopCouponOrder = Order::where('coupon_code', $shopCouponCode)->first();
-    //     $shopCouponOrder = Order::where(function ($query) use ($shopCouponCode) {
-    //         $query->where('coupon_code', $shopCouponCode)
-    //               ->orWhere('coupon_code', 'LIKE', "$shopCouponCode,%")
-    //               ->orWhere('coupon_code', 'LIKE', "%,$shopCouponCode")
-    //               ->orWhere('coupon_code', 'LIKE', "%,$shopCouponCode,%");
-    //     })->first();
-
-    //     // dd($shopCouponOrder);
-
-    //     if($shopCouponOrder) {
-    //         return back()->withMessage('申し訳ございません。このクーポンはすでに支払い済みなのでご利用いただけません。');
-    //     }    
-
-    //     $cartItems = \Cart::session(auth()->id())->getContent();
-    //     // foreach ($cartItems as $item) {
-    //     //     dd($item->id); // ← ここが Cart に保存された ID
-    //     // }
-    //     $items = \Cart::getContent();
-    //     // dd($cartItems, $items);
-    //     // dd($shopCouponData->product_shop_coupon->name);
-    //     // dd($shopCouponData->product_id);
-    //     $pre_productID = $shopCouponData->product_id;
-
-    //     $cartItems_toArray = $cartItems->toArray();
-
-    //     // if (is_array($cartItems_toArray)) { 
-    //     //     dd('array'); 
-    //     // }
-    //     // dd($cartItems_toArray);
-
-    //     $filtered_items = array_filter($cartItems_toArray, function($item, $pre_productID) {
-    //         return $item['id'] == $pre_productID;
-    //     }, ARRAY_FILTER_USE_BOTH);
-
-    //     // dd(!empty($filtered_items));
-
-
-
-    //     // 条件を満たす要素が存在するか判定
-    //     if (!empty($filtered_items)) {
-
-    //             $productID = $shopCouponData->product_id;
-    //             \Cart::clearItemConditions($productID);
-
-    //             $condition = new \Darryldecode\Cart\CartCondition(array(
-    //                 'name' => $shopCouponData->name,
-    //                 'type' => $shopCouponData->type,
-    //                 'target' => 'item',
-    //                 'value' => $shopCouponData->value,
-    //                 'attributes' => [
-    //                     'code' => $shopCouponData->code,
-    //                     'coupon_id' => $shopCouponData->id,
-    //                     'product_id' => $shopCouponData->product_id,
-    //                 ],
-    //             ));
-
-    //             \Cart::addItemCondition($productID, $condition);
-
-    //             $appliedCoupons = Session::get('applied_coupon_codes', []);
-    //             // 文字列だった場合は explode で配列に変換
-    //             if (!is_array($appliedCoupons)) {
-    //                 $appliedCoupons = explode(',', $appliedCoupons);
-    //             }
-    //             $appliedCoupons[] = $shopCouponData->code;
-    //             $appliedCoupons = array_unique($appliedCoupons);
-
-    //             Session::put('applied_coupon_codes', $appliedCoupons);
-
-    //             // dd($condition, $appliedCoupons, $cartItems, $items);
-    //             return back()->withMessage('クーポンを適用しました。.....もしも金額に変更がない場合は、その商品はクーポン対象外となります。店舗へご確認下さい。');
-
-    //     } else {
-    //             return back()->withMessage('注意！クーポンに該当する商品はありません。');
-
-                
-    //     }
-
-    // }
-
-    // public function applyShopCoupon()
-    // {
-    //     $shopCouponCode = request('code');
-        
-    //     // クーポンコードが存在するか確認
-    //     $shopCouponData = ShopCoupon::where('code', $shopCouponCode)->first();
-
-    //     if (!$shopCouponData) {
-    //         return back()->withMessage('申し訳ございません。クーポンは存在しません');
-    //     }
-
-    //     // このクーポンがすでに使われたことがあるか確認（Orderに記録されているか）
-    //     $shopCouponOrder = Order::where(function ($query) use ($shopCouponCode) {
-    //         $query->where('coupon_code', $shopCouponCode)
-    //               ->orWhere('coupon_code', 'LIKE', "$shopCouponCode,%")
-    //               ->orWhere('coupon_code', 'LIKE', "%,$shopCouponCode")
-    //               ->orWhere('coupon_code', 'LIKE', "%,$shopCouponCode,%");
-    //     })->first();
-
-    //     if ($shopCouponOrder) {
-    //         return back()->withMessage('申し訳ございません。このクーポンはすでに使用済みです。');
-    //     }
-
-    //     // カート内の商品を取得
-    //     $cartItems = \Cart::session(auth()->id())->getContent();
-    //     $targetProductId = (string) $shopCouponData->product_id; 
-    //     // dd($targetProductId);
-    //     // カート内の該当商品にクーポン適用
-    //     $matched = false;
-
-    //     foreach ($cartItems as $item) {
-    //         // associatedModel に product_id を保存している前提（なければ $item->id を直接比較）
-    //         // $cartProductId = $item->associatedModel->id ?? null;
-    //         // dd($item->id, $item->associatedModel->id ?? null, $shopCouponData->product_id);
-    //         // $cartProductId = $item->associatedModel->id ?? $item->id;
-    //         // 商品IDをstring型で比較
-    //         $cartProductId = (string) ($item->associatedModel->id ?? null);
-
-    //         if ($cartProductId == $targetProductId) {
-    //             $matched = true;
-
-    //             // 既存の条件を削除してからクーポンを適用
-    //             \Cart::session(auth()->id())->clearItemConditions($item->id);
-
-    //             $condition = new \Darryldecode\Cart\CartCondition([
-    //                 'name' => $shopCouponData->name,
-    //                 'type' => $shopCouponData->type, // e.g. 'discount'
-    //                 'target' => 'item',
-    //                 'value' => $shopCouponData->value, // e.g. '-10%' or '-100'
-    //                 'attributes' => [
-    //                     'code' => $shopCouponData->code,
-    //                     'coupon_id' => $shopCouponData->id,
-    //                     'product_id' => $shopCouponData->product_id,
-    //                 ],
-    //             ]);
-
-    //             \Cart::session(auth()->id())->addItemCondition((string)$item->id, $condition);
-    //             $cartItemAfter = \Cart::session(auth()->id())->get((string)$item->id);
-    //             // dd($cartItemAfter->getConditions(), $item->id, $condition);
-
-    //             // デバッグ出力
-    //             dd(\Cart::session(auth()->id())->get($item->id));
-    //         }
-    //     }
-        
-
-    //     if (!$matched) {
-    //         return back()->withMessage('注意！カート内にクーポン対象商品が見つかりませんでした。');
-    //     }
-
-    //     // セッションにクーポンコードを保存（重複しないように）
-    //     $appliedCoupons = Session::get('applied_coupon_codes', []);
-    //     if (!is_array($appliedCoupons)) {
-    //         $appliedCoupons = explode(',', $appliedCoupons);
-    //     }
-    //     $appliedCoupons[] = $shopCouponData->code;
-    //     $appliedCoupons = array_unique($appliedCoupons);
-
-    //     Session::put('applied_coupon_codes', $appliedCoupons);
-    //     // dd(\Cart::session(auth()->id())->getContent());
-
-    //     return back()->withMessage('クーポンを適用しました。対象商品の金額が割引されているかご確認ください。');
-    // }
-
     public function applyShopCoupon()
     {
         $shopCouponCode = request('code');
@@ -755,7 +527,7 @@ class CartController extends Controller
         $cartItems = \Cart::session(auth()->id())->getContent();
         $targetProductId = (string) $shopCouponData->product_id;
         $matched = false;
-
+        $totalAll = 0;
         foreach ($cartItems as $item) {
             $cartProductId = (string) ($item->associatedModel->id ?? null);
 
@@ -821,18 +593,29 @@ class CartController extends Controller
 
                 $finalPrice = $basePrice + $discountTotal;
 
-                // アイテムの価格を更新
-                // \Cart::session(auth()->id())->update($item->id, [
-                //     'price' => $finalPrice
-                // ]);
-
                 // 最終的な価格をアイテムに追加しておく
                 $item->finalPrice = $finalPrice; // Bladeで表示できるようにfinalPriceを追加
 
                  // デバッグ出力
-                // dd(\Cart::session(auth()->id())->getContent(), $item->id, $condition, $finalPrice);
             }
+            $shippingFee = (float) ($item->associatedModel->shipping_fee ?? 0);
+            $originalPrice = (float) $item->price + $shippingFee;
+            $finalPrice = isset($item->final_price) ? (float) $item->final_price + $shippingFee : $originalPrice;
+            $discountedPrice = isset($item->discounted_price) ? (float) $item->discounted_price + $shippingFee : $originalPrice;
+            $lowestPrice = min($finalPrice, $discountedPrice);
+
+            $quantity = $item->quantity;
+
+            if ($lowestPrice < $originalPrice && $quantity > 1) {
+                $totalPrice = $lowestPrice + $originalPrice * ($quantity - 1);
+            } else {
+                $totalPrice = $lowestPrice * $quantity;
+            }
+
+            $totalAll += $totalPrice;
         }
+        // ✅ セッションに保存
+        session(['total_and_shipping' => $totalAll]);
 
         if (!$matched) {
             return back()->withMessage('注意！カート内にクーポン対象商品が見つかりませんでした。');
@@ -860,20 +643,8 @@ class CartController extends Controller
 
             return $item;
         });
-        $total = $cartItems->sum('final_price'); // 👈 ここで total を算出
 
-
-        // return view('cart.index', [
-        //     'cartItems' => $cartItems,
-        //     'total' => $total, // 👈 Blade に渡す
-        //     'message' => 'クーポンを適用しました。対象商品の金額が割引されているかご確認ください。'
-        // ]);
-        // 最後の return も `redirect()->route(...)`
-        return redirect()->route('cart.index')->withMessage('クーポンを適用しました。クーポンを適用しました。対象商品の金額が割引されているかご確認ください。');
+        return redirect()->route('cart.index')->withMessage('クーポンを適用しました。対象商品の金額が割引されているかご確認ください。クーポン適用後に該当商品がカートにない場合は、金額に満たないため削除されてます。');
     }
-
-
-
-
-
+    
 }

@@ -9,7 +9,11 @@ class Shop extends Model
 {
     use HasFactory;
 
-    protected $fillable=['name', 'description', 'representative', 'location_1', 'location_2', 'telephone', 'email', 'identification_1', 'identification_2', 'identification_3','photo_1', 'photo_2', 'photo_3', 'photo_4', 'photo_5', 'photo_6', 'photo_7', 'file_1', 'file_2', 'file_3',  'file_4', 'manager', 'product_type', 'volume', 'note', 'license_expiry', 'person_1', 'person_2', 'person_3'];
+    protected $fillable=['name', 'is_active', 'is_draft', 'description', 'representative', 'location_1', 'location_2', 'telephone', 'email', 'identification_1', 'identification_2', 'identification_3','photo_1', 'photo_2', 'photo_3', 'photo_4', 'photo_5', 'photo_6', 'photo_7', 'file_1', 'file_2', 'file_3',  'file_4', 'manager', 'product_type', 'volume', 'note', 'license_expiry', 'person_1', 'person_2', 'person_3'];
+
+    protected $casts = [
+        'is_draft' => 'boolean',
+    ];
 
     public function owner()
     {
@@ -49,6 +53,11 @@ class Shop extends Model
     public function auction()
     {
         return $this->hasMany(Auction::class, 'shop_id');
+    }
+
+    public function commition()
+    {
+        return $this->hasMany(Commition::class, 'shop_id');
     }
 
 }

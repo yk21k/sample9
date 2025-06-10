@@ -65,7 +65,10 @@ public function generateSubOrders()
     $couponCodeList = array_map('trim', array_filter($couponCodeList)); // 空白・空文字除去
 
     foreach ($orderItems->groupBy('shop_id') as $shopId => $products) {
+
         Log::debug("処理中のshop_id: {$shopId}", ['商品数' => $products->count()]);
+        
+
 
         if (is_null($shopId)) {
             Log::warning("shop_id が null の商品をスキップしました。");
@@ -119,11 +122,20 @@ public function generateSubOrders()
             $couponCodeString = implode(',', array_unique($couponCodesToApply));
 
 
+            $productAll = 0; // 合計金額を初期化
+
+            foreach ($products as $product) {
+                Log::debug("商品ID: {$product->id} | 数量: {$product->pivot->quantity}");
+
+                $itemTotal = $product->pivot->price * $product->pivot->quantity;
+                $productAll += $itemTotal;
+            }
+
             Log::debug('サブオーダー作成前のデータ', [
                 'order_id'     => $this->id,
                 'seller_id'    => $shop->user_id ?? 1,
                 'user_id'      => auth()->id(),
-                'grand_total'  => $products->sum('pivot.price'),
+                'grand_total'  => $productAll,
                 'item_count'   => $products->count(),
                 // 'coupon_code'  => $couponCodeToApply,
                 'coupon_code'  => $couponCodeString,
@@ -133,7 +145,7 @@ public function generateSubOrders()
                 'order_id'     => $this->id,
                 'seller_id'    => $shop->user_id ?? 1,
                 'user_id'      => auth()->id(),
-                'grand_total'  => $products->sum('pivot.price'),
+                'grand_total'  => $productAll,
                 'item_count'   => $products->count(),
                 // 'coupon_code'  => $couponCodeToApply,
                 'coupon_code'  => $couponCodeString,

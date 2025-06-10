@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Mail;
 
 use Illuminate\Support\Facades\Validator;
 
+use Auth;
+
 class ShopController extends Controller
 {
     /**
@@ -29,20 +31,23 @@ class ShopController extends Controller
      */
     public function create()
     {
-        return view('shops.create');
+        $shop_sets = Shop::where('user_id', Auth::user()->id)->first();
+        // dd($shop_sets);
+        return view('shops.create', compact('shop_sets'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
 
-    // store メソッド
+    // store メソッド　validatorは、Requestにある。
     public function store(StoreShopRequest $request)
     {
-        // dd($request->input('person_3'));
+        // dd($request->input('save_type'));
         // $data = $request->all();
         // dd($data);
-
+        $isDraft = $request->input('save_type') === 'draft';
+        // dd($isDraft);
         // 本日の日付フォルダ（例：20250420）
         $dateFolder = now()->format('Ymd');
         $userEmail = auth()->user()->email;
@@ -163,6 +168,7 @@ class ShopController extends Controller
 
         // Shop 作成
         $shop = auth()->user()->shop()->create([
+            'is_draft' => $isDraft,
             'name' => $request->input('name'),
             'description' => $request->input('description'),
             'location_1' => $request->input('location_1'),
@@ -196,14 +202,17 @@ class ShopController extends Controller
             'file_4' => $file_4_name ?? 'no_file.txt',
         ]);
 
-        // 管理者へメール通知
-        $admins = User::whereHas('role', function ($q) {
-            $q->where('name', 'admin');
-        })->get();
+        if ($request->input('save_type') !== 'draft') {
+            // 管理者へメール通知
+            $admins = User::whereHas('role', function ($q) {
+                $q->where('name', 'admin');
+            })->get();
 
-        Mail::to($admins)->send(new ShopActivationRequest($shop));
+            Mail::to($admins)->send(new ShopActivationRequest($shop));
 
-        return redirect()->route('home')->withMessage('Create shop request sent');
+            return back()->withMessage('Shop開設に伴うオーナー情報を送信しました');
+        }
+        return back()->withMessage('下書きを保存しました。');
     }
 
     /**

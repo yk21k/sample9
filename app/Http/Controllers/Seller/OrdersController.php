@@ -22,28 +22,52 @@ use App\Http\Controllers\Controller;
 
 class OrdersController extends Controller
 {
-    public function index(SubOrder $suborder)
+
+    public function index(Request $request)
     {
-        // dd(auth()->user()->id);
-        if(auth()->user()->id == 1){
-            $orders = SubOrder::latest()->paginate(15);
-
+        // 初期クエリ（ユーザーによって分岐）
+        if (auth()->user()->id == 1) {
+            $query = SubOrder::with('order');
             $coupons = ShopCoupon::get()->toArray();
-
             $campaigns = Campaign::get()->toArray();
-
-        }else{
-            $orders = SubOrder::where('seller_id', auth()->id())->latest()->paginate(15);
-
+        } else {
+            $query = SubOrder::with('order')->where('seller_id', auth()->id());
             $coupons = ShopCoupon::where('shop_id', auth()->user()->shop->id)->get()->toArray();
-
             $campaigns = Campaign::where('shop_id', auth()->user()->shop->id)->get()->toArray();
-            // dd(isset($campaigns), isset($coupons), empty($campaigns), empty($coupons), is_null($campaigns), is_null($coupons));
-            // dd($campaigns);
         }
 
-        return view('sellers.orders.index', compact(['orders', 'coupons', 'campaigns']));
+        // 🔍 検索処理
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->whereHas('order', function ($q) use ($search) {
+                $q->where('shipping_fullname', 'like', "%{$search}%")
+                  ->orWhere('shipping_phone', 'like', "%{$search}%")
+                  ->orWhere('shipping_address', 'like', "%{$search}%")
+                  ->orWhere('shipping_zipcode', 'like', "%{$search}%");
+            });
+        }
 
+        // 🔽 ソート処理
+        $sortField = $request->get('sort', 'id');
+        $direction = $request->get('direction', 'desc');
+        $allowedSorts = ['order_number', 'id', 'status', 'shipping_fullname'];
+
+        if (!in_array($sortField, $allowedSorts)) {
+            $sortField = 'id';
+        }
+
+        if (in_array($sortField, ['order_number', 'shipping_fullname'])) {
+            $query->join('orders', 'sub_orders.order_id', '=', 'orders.id')
+                  ->orderBy("orders.{$sortField}", $direction)
+                  ->select('sub_orders.*');
+        } else {
+            $query->orderBy($sortField, $direction);
+        }
+
+        // 📦 ページネーション + パラメータ保持
+        $orders = $query->paginate(8)->appends($request->all());
+
+        return view('sellers.orders.index', compact('orders', 'coupons', 'campaigns'));
     }
 
     public function show(SubOrder $order)
@@ -64,6 +88,31 @@ class OrdersController extends Controller
         
         
     }
+
+    // PostAjaxController.php
+    public function fetch(Request $request)
+    {
+        $querySubOrder = SubOrder::query();
+
+        if ($request->filled('search')) {
+            $querySubOrder->where('title', 'like', '%' . $request->search . '%')
+                  ->orWhere('content', 'like', '%' . $request->search . '%');
+        }
+
+        $sortField = $request->get('sort', 'created_at');
+        $sortDirection = $request->get('direction', 'desc');
+
+        // ★ソート対応（安全なカラムのみ許可）
+        $allowedSorts = ['title', 'created_at'];
+        if (!in_array($sortField, $allowedSorts)) {
+            $sortField = 'created_at';
+        }
+
+        $partSubOrder = $querySubOrder->orderBy($sortField, $sortDirection)->paginate(10);
+
+        return view('order.suborder.partials', compact('partSubOrder'))->render();
+    }
+
 
     public function markAccepted(SubOrder $suborder)
     {

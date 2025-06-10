@@ -5,153 +5,47 @@
     <div class="bg-secondary text-white">
         <h4 class="bg-primary text-white"> Orders</h4>
 
+        <!-- 🔍 検索ボックス -->
+        <div class="form-inline mb-2">
+            
+            <input type="text" name="search" id="orderSearch" class="form-control mb-3" placeholder="名前や電話番号で検索" value="{{ request('search') }}">
 
-        <table class="table table-striped">
+
+
+        </div>
+        <!-- ここまで🔍 検索ボックス -->
+
+        <a href="{{ route('seller.orders.export.full') }}" class="btn btn-warning mb-3">注文一覧＋アイテムをExcel出力</a>
+
+
+        <table class="table table-striped" id="orderTable">
             <thead>
                 <tr class="table-secondary">
-                    <th>Order number</th>
-                    <th>Order ID</th>
-                    <th>Status</th>
+                    <th><a href="#" class="sortable" data-sort="order_number">Order number</a></th>
+                    <th><a href="#" class="sortable" data-sort="id">Order ID</a></th>
+                    <th><a href="#" class="sortable" data-sort="status">Status</a></th>
                     <th>Item count</th>
-                    <th>Shipping Name</th>
+                    <th><a href="#" class="sortable" data-sort="shipping_name">Shipping Name</a></th>
                     <th>Shipping Phone</th>
                     <th>Shipping Zipcode</th>
                     <th>Shipping Address</th>
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody>
-                @forelse ($orders as $subOrder)
-                    <tr class="table-secondary">
-                        <td scope="row">
-
-                            {{$subOrder->order->order_number}}
-                        </td>
-                        <td>
-                            {{$subOrder->order->id}}  
-                        </td>
-                        <td>
-                            {{$subOrder->status}}<br>
-
-                            @if($subOrder->status=="pending" && $subOrder->payment_status=="")
-                                <a href=" {{route('seller.order.delivered_accepted', $subOrder)}} " class="btn btn-info btn-sm" style="margin: 2px;">Mark as Accepted</button><br>
-                            @endif
-
-
-                            @if($subOrder->status == 'pending' && !empty($subOrder->shipping_company) && !empty($subOrder->invoice_number))
-
-                                <a href=" {{route('seller.order.delivered_arranged', $subOrder)}} " class="btn btn-success btn-sm" style="margin: 2px;">Mark as Delivery Arranged</button><br>
-                            @elseif(($subOrder->status == 'pending') && $subOrder->payment_status=="accepted")
-                                <a href=" {{route('seller.order.delivered_arranged', $subOrder)}} " class="btn btn-success btn-sm disabled" style="margin: 2px;">Mark as Delivery Arranged</button><br>
-                                <a class="btn btn-warning btn-sm" id="hide_bill_button" style="margin: 2px;">Air Waybill</button></a><br> 
-                                <div class="form_bill">
-                                <form action=" {{route('seller.order.delivered_company', $subOrder)}} " method="get">@csrf
-                                    <label for="shipping_company">Shipping Company</label>
-                                    <input type="text" class="form-control" name="shipping_company" id="">
-                                    <label for="invoice_number">Invoice Number</label>
-                                    <input type="text" class="form-control" name="invoice_number" id="">
-                                    <button type="submit" class="btn btn-primary mb-2 mr-2">Submit</button>
-
-                                </form>    
-                                </div>
-                            @endif
-
-
-                            @if($subOrder->status == 'processing')
-                                <a href=" {{route('seller.order.delivered', $subOrder)}} " class="btn btn-primary btn-sm" style="margin: 2px;">Mark as delivered</button><br>
-                                        
-                            @endif
-                            
-                        </td>
-
-                        <td>
-                            {{$subOrder->item_count}}
-                        </td>
-
-                        <td>
-                           {!! $subOrder->order->shipping_fullname !!}
-                        </td>
-                        <td>
-                           {!! $subOrder->order->shipping_phone !!}
-                        </td>
-                        <td>
-                           {!! $subOrder->order->shipping_zipcode !!}
-                        </td>
-                        <td>
-                           {!! $subOrder->order->shipping_state !!}
-                        
-                           {!! $subOrder->order->shipping_city !!}
-                          
-                           {!! $subOrder->order->shipping_address !!}
-                        </td>
-                        
-                        <td>
-
-                            <!-- 1. メール送信ボタン（ファザード） -->
-                            <button class="btn btn-primary" data-toggle="modal" data-target="#templateModal">Mail</button>
-
-                            <!-- 2. テンプレート選択モーダル -->
-                            <div class="modal" id="templateModal" tabindex="-1" role="dialog" aria-labelledby="templateModalLabel" aria-hidden="true">
-                              <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                  <div class="modal-header">
-                                    <h5 class="modal-title" id="templateModalLabel">テンプレート選択</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                      <span aria-hidden="true">&times;</span>
-                                    </button>
-                                  </div>
-                                  <div class="modal-body">
-                                    <!-- 2種類のテンプレート選択 -->
-                                    <form id="templateForm">@csrf
-                                      <div class="form-group">
-                                        <label for="templateSelect">テンプレートを選択</label>
-                                        <select class="form-control" id="templateSelect">
-
-                                          @if(empty($coupons)) 
-                                            <option value="template1" disabled>テンプレート1 (挨拶とクーポン)</option>
-                                          @else
-                                            <option value="template1">テンプレート1 (挨拶とクーポン)</option>
-                                          @endif  
-                                          @if(empty($campaigns)) 
-                                            <option value="template2" disabled>テンプレート2 (キャンペーン開催)</option>
-                                          @else
-                                            <option value="template2" >テンプレート2 (キャンペーン開催)</option>
-                                          @endif
-                                          <option value="template3">テンプレート3 (商品レビュー依頼)</option>
-                                        </select>
-                                      </div>
-                                      <button type="button" class="btn btn-info" id="confirmBtn">確認</button>
-                                    </form>
-                                    <!-- 3. 確認ページ -->
-                                    <form action=" {{route('seller.order.shop_mail', $subOrder)}} " method="get">@csrf
-                                        <div id="confirmationPage" class="d-none">
-                                          <h3>確認ページ</h3>
-                                          <p id="selectedTemplate"></p>
-                                          <input type="hidden" name="user_id" value="{{ $subOrder->user_id }}">
-                                          <input type="hidden" name="shop_id" value="{{ $subOrder->seller_id }}">
-                                          <input type="hidden" name="template" id="templateValue">
-                                          <button class="btn btn-success" id="sendBtn">送信</button>
-                                        </div>
-                                    </form>    
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            <br>&nbsp;
-                            <a name="" id="" class="btn btn-primary btn-sm" href="{{route('seller.orders.show', $subOrder)}}" role="button">View</a>
-                        </td>
-                    </tr>
-                @empty
-
-                @endforelse
-                {{ $orders->links() }}
-
+            
+            <tbody id="orders-table-body">
+                @include('sellers.orders.suborders.order_partials')
             </tbody>
+
+               
+            
         </table>
+
         
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
     <script>
         $(function() {
             $("#hide_bill_button").click(function() {
@@ -159,6 +53,7 @@
             });
         });
     </script>
+
     <script>
       // 確認ボタンが押されたときの処理
       document.getElementById('confirmBtn').addEventListener('click', function() {
@@ -230,6 +125,71 @@
         document.getElementById('templateModal').classList.remove('show');
       });
     </script>
-    
+
+    <script>
+        let sortField = 'id';
+        let sortDirection = 'desc';
+        let currentPage = 1;
+
+        function fetchOrders() {
+            $.ajax({
+                url: "{{ route('seller.orders.index') }}",
+                type: 'GET',
+                data: {
+                    search: $('#orderSearch').val(),
+                    sort: sortField,
+                    direction: sortDirection,
+                    page: currentPage
+                },
+                success: function (html) {
+                    // デバッグ用ログ（必要に応じて）
+                    console.log("✅ 成功:", html);
+
+                    // tbody 部分の差し替え
+                    $('#orders-table-body').html($(html).find('tbody').html());
+                    $('#pagination-links').html($(html).find('#pagination-links').html());
+                },
+                error: function (xhr, status, error) {
+                    console.error("❌ エラーが発生しました:");
+                    console.error("ステータスコード:", xhr.status);
+                    console.error("ステータス:", status);
+                    console.error("エラー内容:", error);
+                    console.error("レスポンス本文:", xhr.responseText);
+                    alert('データの取得中にエラーが発生しました。開発者ツールを確認してください。');
+                }
+            });
+        }
+
+
+        $(document).ready(function () {
+            // 🔍 入力検索
+            $('#orderSearch').on('input', function () {
+                currentPage = 1;
+                fetchOrders();
+            });
+
+            // 🔃 ソートクリック
+            $(document).on('click', '.sortable', function (e) {
+                e.preventDefault();
+                const clickedField = $(this).data('sort');
+
+                if (sortField === clickedField) {
+                    sortDirection = (sortDirection === 'asc') ? 'desc' : 'asc';
+                } else {
+                    sortField = clickedField;
+                    sortDirection = 'asc';
+                }
+
+                fetchOrders();
+            });
+
+            // ⏭️ ページネーション
+            $(document).on('click', '.pagination a', function (e) {
+                e.preventDefault();
+                currentPage = $(this).attr('href').split('page=')[1];
+                fetchOrders();
+            });
+        });
+    </script>
     
 @endsection

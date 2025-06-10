@@ -14,7 +14,7 @@
 		<form id="payment-form" action="{{ route('orders.store') }}" method="post" class="h-adr shadow-lg p-4 rounded-lg ">
 		    @csrf
 		    <h4 class="text-center text-primary mb-3">⭐️ Please enter your postal code within Japan to proceed with your purchase.</h4>
-
+            <input type="hidden" name="amount" value="{{ $cartTotal }}">
 		    <div class="form-group">
 		        <label for="shipping_fullname" class="font-weight-bold">Full Name</label>
 		        <input type="text" name="shipping_fullname" class="form-control shadow-sm" id="outputBox1" 
@@ -75,6 +75,8 @@
 	</div>
 
 	<script src="https://js.stripe.com/v3/"></script>
+
+
     <script>
         // var stripe = Stripe('{{ env('STRIPE_KEY') }}');
         var stripe = Stripe(@json(config('services.stripe.key')));
@@ -96,15 +98,15 @@
                 document.getElementById('payment-message').classList.add('payment-error');
                 return;
             }
-
+            var customerName = document.querySelector('input[name="shipping_fullname"]').value;
             // 支払い方法作成
             stripe.createPaymentMethod({
                 type: 'card',
                 card: card,
                 billing_details: {
+                    name: customerName, // 👈 ここが重要
                     address: {
-                        postal_code: postalCode // 入力された郵便番号を使用
-
+                        postal_code: postalCode
                     }
 
                 }
@@ -120,31 +122,82 @@
                     var formData = new FormData(form);
                     formData.append('payment_method', paymentMethodId);
 
-                    fetch(form.action, {
+                    const amount = document.querySelector('input[name="amount"]').value;
+
+                    fetch('/create-payment-intent', {
                         method: 'POST',
                         headers: {
+                            'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                         },
-                        body: formData,
+                        body: JSON.stringify({
+                            amount: amount,
+                            payment_method: paymentMethodId
+                        })
                     })
-                    .then(response => response.text())  
-                    .then(text => {
-                        console.log(text);
-                        try {
-                            const data = JSON.parse(text);
-                            if (data.status === 'success') {
-                                document.getElementById('payment-message').textContent = "決済が成功しました！";
-                                document.getElementById('payment-message').classList.add('payment-success');
-                                setTimeout(function() {
-                                    window.location.href = "{{ route('payment.success') }}";
-                                }, 3000);
-                            } else {
-                                document.getElementById('payment-message').textContent = "決済に失敗しました: " + data.message;
-                                document.getElementById('payment-message').classList.add('payment-error');
-                            }
-                        } catch (error) {
-                            console.error('JSONパースエラー:', error);
-                            document.getElementById('payment-message').textContent = "通信エラーが発生しました";
+                    .then(response => response.json())  
+                    .then(data => {
+                        if (data.clientSecret) {
+                            stripe.confirmCardPayment(data.clientSecret, {
+                                payment_method: {
+                                    card: card,
+                                    billing_details: {
+                                        address: {
+                                            postal_code: postalCode
+                                        }
+                                    }
+                                }
+                            }).then(function(result) {
+                                if (result.error) {
+                                    console.error(result.error.message);
+                                    document.getElementById('payment-message').textContent = result.error.message;
+                                    document.getElementById('payment-message').classList.add('payment-error');
+                                } else if (result.paymentIntent && result.paymentIntent.status === 'succeeded') {
+                                    document.getElementById('payment-message').textContent = "決済が成功しました！";
+                                    document.getElementById('payment-message').classList.add('payment-success');
+                                    setTimeout(function() {
+                                        window.location.href = "{{ route('payment.success') }}";
+                                    }, 3000);
+                                    
+                                    // 注文情報送信
+                                    fetch('/orders', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                        },
+                                        body: JSON.stringify({
+                                            shipping_fullname: document.querySelector('input[name="shipping_fullname"]').value,
+                                            shipping_state: document.querySelector('input[name="shipping_state"]').value,
+                                            shipping_city: document.querySelector('input[name="shipping_city"]').value,
+                                            shipping_address: document.querySelector('input[name="shipping_address"]').value,
+                                            shipping_phone: document.querySelector('input[name="shipping_phone"]').value,
+                                            shipping_zipcode: document.querySelector('input[name="shipping_zipcode"]').value,
+                                            payment_method: paymentMethodId
+                                        })
+                                    })
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        if (data.status === 'success') {
+                                            document.getElementById('payment-message').textContent = "決済と注文が完了しました！";
+                                            document.getElementById('payment-message').classList.add('payment-success');
+                                            setTimeout(function () {
+                                                window.location.href = "{{ route('payment.success') }}";
+                                            }, 3000);
+                                        } else {
+                                            document.getElementById('payment-message').textContent = data.message || "注文作成に失敗しました";
+                                            document.getElementById('payment-message').classList.add('payment-error');
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.error(err);
+                                        document.getElementById('payment-message').textContent = "注文作成中にエラーが発生しました";
+                                        document.getElementById('payment-message').classList.add('payment-error');
+                                    });
+                                }
+                            });
+                        } else {
+                            document.getElementById('payment-message').textContent = "決済の準備に失敗しました";
                             document.getElementById('payment-message').classList.add('payment-error');
                         }
                     })

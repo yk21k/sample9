@@ -56,6 +56,11 @@ class User extends \TCG\Voyager\Models\User
         return $this->hasOne(Shop::class, 'user_id');
     }
 
+    public function shops()
+    {
+        return $this->hasMany(Shop::class); // 店舗が複数ならこれ
+    }
+
     /**
      * @return void
      */

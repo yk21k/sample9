@@ -28,7 +28,7 @@
 @endif
 
 <div class="container mt-3">
-  <form class="h-adr" action="{{route('shops.store')}}" method="post" enctype="multipart/form-data">@csrf
+  <form class="h-adr" id="shopForm" action="{{route('shops.store')}}" method="post" enctype="multipart/form-data">@csrf
     {{-- {{ csrf_field() }} --}}
 
     <div class="form-group">
@@ -54,19 +54,19 @@
 
     <div class="form-group">
         <label for="name"><h3>店名 * 上記の登録区分を必ず選択して下さい</h3></label>
-        <input type="text" class="form-control" name="name" id="name" aria-describedby="helpId" placeholder="" required>
+        <input type="text" class="form-control" name="name" id="name" aria-describedby="helpId" value="{{ old('name', $shop_sets->name ?? '') }}" required>
     </div>
     &nbsp;
 
     <div class="form-group">
         <label for="description"><h3>店舗概要 *</h3></label>
-        <textarea class="form-control" name="description" id="description" rows="3" required></textarea>
+        <textarea class="form-control" name="description" id="description" rows="3" required>{{ old('description', $shop_sets->description ?? '') }}</textarea>
     </div>
     &nbsp;
 
     <div class="form-group">
         <label for="representative"> <h3>代表 *</h3></label>
-        <input type="text" class="form-control" name="representative" id="representative" aria-describedby="helpId" placeholder="" required>
+        <input type="text" class="form-control" name="representative" id="representative" aria-describedby="helpId" value="{{ old('representative', $shop_sets->representative ?? '') }}" required>
     </div>
     <br>
 
@@ -75,30 +75,30 @@
         <span class="p-country-name" style="display:none;">Japan</span>
         <label for="post-code">郵便番号:</label>
         <input type="text" class="p-postal-code" size="8" maxlength="8"><br>
-        <input type="text" class="form-control p-region p-locality p-street-address p-extended-address" name="location_1" id="location_1" aria-describedby="helpId" placeholder="" required>
+        <input type="text" class="form-control p-region p-locality p-street-address p-extended-address" name="location_1" id="location_1" aria-describedby="helpId" value="{{ old('location_1', $shop_sets->location_1 ?? '') }}" required>
     </div>
     &nbsp;
 
     <div class="form-group">
         <label for="location_2"> <h3>配送先 </h3></label>
-        <input type="text" class="form-control" name="location_2" id="location_2" aria-describedby="helpId" placeholder="Please enter the address if different from the address above.">
+        <input type="text" class="form-control" name="location_2" id="location_2" aria-describedby="helpId" placeholder="Please enter the address if different from the address above." value="{{ old('location_2', $shop_sets->location_2 ?? '') }}">
     </div>
     &nbsp;
 
     <div class="form-group">
         <label for="telephone"> <h3>電話番号 *</h3></label>
-        <input type="text" class="form-control" id="telephone" name="telephone" aria-describedby="helpId" placeholder="You can accept numbers with HYPHEN from both mobile and landline phones." required>
+        <input type="text" class="form-control" id="telephone" name="telephone" aria-describedby="helpId" placeholder="You can accept numbers with HYPHEN from both mobile and landline phones." value="{{ old('telephone', $shop_sets->telephone ?? '') }}" required>
     </div>
     &nbsp;
 
     <div class="form-group">
         <label for="email"> <h3>Email *</h3></label>
-        <input type="email" class="form-control" name="email" id="email" aria-describedby="helpId" placeholder="" required>
+        <input type="email" class="form-control" name="email" id="email" aria-describedby="helpId" value="{{ old('email', $shop_sets->email ?? '') }}" required>
     </div>
     <br>
     <div id="idGroup1" style="display: none;">
         <label for="identification_1" class="form-label"><h3>ID card (運転免許証　or パスポート)</h3></label>
-        <input class="form-control" list="identification1" name="identification_1" id="identification_1" >
+        <input class="form-control" list="identification1" name="identification_1" id="identification_1" value="{{ old('identification_1', $shop_sets->identification_1 ?? '') }}">
           <datalist id="identification1">
               <option value="運転免許証">
               <option value="パスポート">
@@ -123,7 +123,8 @@
         <br>
 
         <label for="license_expiry" class="form-label"><h3>上記の運転免許証/パスポートの有効期限</h3></label>
-        <input class="form-control" type="date" name="license_expiry" id="license_expiry" >
+        <input class="form-control" type="date" name="license_expiry" id="license_expiry" value="{{ old('license_expiry', optional($shop_sets)->license_expiry ? \Carbon\Carbon::parse($shop_sets->license_expiry)->format('Y-m-d') : '') }}"
+>
     </div> 
     &nbsp;  
     <div id="identificationGroup1" style="display: none;">
@@ -169,7 +170,7 @@
 
     <div class="form-group">
         <label for="person_1">  <h3>(担当者氏名１) *</h3></label>
-        <input type="text" class="form-control" id="person_1" name="person_1" class="form-control" multiple>
+        <input type="text" class="form-control" id="person_1" name="person_1" class="form-control" value="{{ old('person_1', $shop_sets->person_1 ?? '') }}" multiple>
         <br>
         <label for="id_1_1" class="form-label"><h3>担当者1の証明</h3></label>
         <select class="form-control" name="id_1_1" id="id_1_1" required>
@@ -192,7 +193,7 @@
 
     <div class="form-group">
         <label for="person_2">  <h3>(担当者氏名２) *</h3></label>
-        <input type="text" class="form-control" id="person_2" name="person_2" class="form-control" multiple>
+        <input type="text" class="form-control" id="person_2" name="person_2" class="form-control" value="{{ old('person_2', $shop_sets->person_2 ?? '') }}" multiple>
         <label for="id_2_1" class="form-label"><h3>担当者2の証明</h3></label>
         <select class="form-control" name="id_2_1" id="id_2_1" required>
             <option value="選択して下さい">選択して下さい</option>
@@ -214,7 +215,7 @@
 
     <div class="form-group">
         <label for="person_3">  <h3>(担当者氏名３) *</h3></label>
-        <input type="text" class="form-control" id="person_3" name="person_3" class="form-control" multiple>
+        <input type="text" class="form-control" id="person_3" name="person_3" class="form-control" value="{{ old('person_3', $shop_sets->person_3 ?? '') }}" multiple>
         <label for="id_3_1" class="form-label"><h3>担当者3の証明</h3></label>
         <select class="form-control" name="id_3_1" id="id_3_1" required>
             <option value="選択して下さい">選択して下さい</option>
@@ -250,29 +251,31 @@
     <div id="extraFields" style="display: none;">
         <div class="form-group">
             <label for="manager">  <h3>manager *</h3></label>
-            <input type="text" class="form-control" name="manager" id="manager" aria-describedby="helpId" placeholder="" >
+            <input type="text" class="form-control" name="manager" id="manager" aria-describedby="helpId" value="{{ old('manager', $shop_sets->manager ?? '') }}" >
         </div>
         &nbsp;
 
         <div class="form-group">
             <label for="product_type">  <h3>product_type *</h3></label>
-            <input type="text" class="form-control" name="product_type" id="product_type" aria-describedby="helpId" placeholder="" >
+            <input type="text" class="form-control" name="product_type" id="product_type" aria-describedby="helpId" value="{{ old('product_type', $shop_sets->product_type ?? '') }}" >
         </div>
         &nbsp;
 
         <div class="form-group">
             <label for="volume">  <h3>volume *</h3></label>
-            <input type="text" class="form-control" name="volume" id="volume" aria-describedby="helpId" placeholder="">
+            <input type="text" class="form-control" name="volume" id="volume" aria-describedby="helpId" value="{{ old('volume', $shop_sets->volume ?? '') }}">
         </div>
         &nbsp;
 
         <div class="form-group">
             <label for="note">  <h3>note</h3></label>
-            <input type="text" class="form-control" name="note" id="" aria-describedby="helpId" placeholder="">
+            <input type="text" class="form-control" name="note" id="" aria-describedby="helpId" value="{{ old('note', $shop_sets->note ?? '') }}">
         </div>
         &nbsp;
+        
 
-        <button type="submit" class="btn btn-primary mt-3">Submit</button>
+        <button type="submit" name="save_type" value="submit" class="btn btn-primary">申請する</button>
+        <button type="button" id="saveDraftBtn" class="btn btn-secondary">下書き保存</button>
     </div>    
   </form>
 </div>
@@ -378,20 +381,23 @@
   });
 </script>
 
+<script>
+document.getElementById('saveDraftBtn').addEventListener('click', function () {
+    // フォーム内の全ての required 属性を一時的に無効に
+    document.querySelectorAll('#shopForm [required]').forEach(el => {
+        el.removeAttribute('required');
+    });
 
+    // 下書き保存用に hidden を追加
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'save_type';
+    input.value = 'draft';
+    document.getElementById('shopForm').appendChild(input);
 
-
-
-
-
-
-
-
-
-
-
-
-
+    document.getElementById('shopForm').submit();
+});
+</script>
 
 
 @endsection

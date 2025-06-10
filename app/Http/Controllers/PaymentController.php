@@ -8,6 +8,9 @@ use Stripe\Customer;
 use Stripe\PaymentIntent;
 use Stripe\Exception\ApiErrorException;
 use App\Models\Order;  // Order モデルをインポート
+use Illuminate\Support\Facades\Auth;
+
+
 
 class PaymentController extends Controller
 {
@@ -19,31 +22,43 @@ class PaymentController extends Controller
 
     public function createPaymentIntent(Request $request)
     {
-        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        \Log::info("Stripe決済処理スタート");
 
-        // ★ 例：セッションからカート合計金額を取得（あなたのロジックに合わせて調整）
-        $cartTotal = session('cart_total', 0); // 例：¥2980 が入っている想定
+        Stripe::setApiKey(config('services.stripe.secret'));
 
-        // Stripeは最小単位（円単位ならそのままでOK）
-        $amount = intval($cartTotal); // 念のため整数にしておく
-        
-        // dd($cartTotal, $amount);
+        $cartTotal = session('total_and_shipping', 0);
+        $amount = intval($cartTotal);
+
+        \Log::info("Stripe決済金額（受信）: " . $amount);
+
+        $user = Auth::user();
 
         try {
-            $paymentIntent = \Stripe\PaymentIntent::create([
+            // 👤 顧客を作成（または取得）
+            $customer = Customer::create([
+                'email' => $user->email,
+                'name'  => $user->name ?? 'No Name',
+            ]);
+
+            // 💳 PaymentIntent に顧客を関連付ける
+            $paymentIntent = PaymentIntent::create([
                 'amount' => $amount,           // 例：2980 → ¥2,980
                 'currency' => 'jpy',
                 'automatic_payment_methods' => ['enabled' => true],
             ]);
+            \Log::info("Stripe PaymentIntent 作成成功: " . $paymentIntent->id);
 
             return response()->json([
                 'clientSecret' => $paymentIntent->client_secret,
             ]);
 
         } catch (\Stripe\Exception\ApiErrorException $e) {
+            \Log::error("Stripe APIエラー: " . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+
 
 
     

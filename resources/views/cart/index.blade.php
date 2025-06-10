@@ -41,124 +41,86 @@
 	        margin-top: 0.4em;
 	    }
 	</style>
-
+	@if(session('removed_message'))
+    <div class="alert alert-warning">
+        {{ session('removed_message') }}
+    </div>
+	@endif
 	<h2> Your Cart </h2>
-	<table class="table">
-		<thead>
-			<tr>
-				<th>Photo</th>
-				<th>Name</th>
-				<th>Price</th>
-				<th>Quantity</th>
-				<th>Total</th>
-				<th>Action</th>
-				<th>Shop Name</th>
-			</tr>
-		</thead>
 
-		<tbody>
-		@foreach($cartItems as $item)
-			
-				<tr>
-					<td>
-						@if($item->associatedModel->shipping_fee)
-							<img style="width: 96px; height: 65px;" class="card-img-top" src="{{ asset( 'storage/'.$item->associatedModel->cover_img1 ) }}" alt="Card image cap">
-						@else
-							<img style="width: 96px; height: 65px;" class="card-img-top" src="{{ asset( 'storage/'.$item->associatedModel->cover_img ) }}" alt="Card image cap">
+	@php
+	    $totalAll = 0;
+	@endphp
 
-						@endif
-					</td>
+	<table class="table table-bordered">
+	    <thead>
+	        <tr>
+	            <th>画像</th>
+	            <th>商品名</th>
+	            <th>価格</th>
+	            <th>数量</th>
+	            <th>小計</th>
+	            <th>操作</th>
+	            <th>ショップ</th>
+	        </tr>
+	    </thead>
+	    <tbody>
+	        @foreach ($cartItems as $item)
+	            @php
+	                $shippingFee = (float) ($item->associatedModel->shipping_fee ?? 0);
+	                $originalPrice = (float) $item->price + $shippingFee;
+	                $finalPrice = isset($item->final_price) ? (float) $item->final_price + $shippingFee : $originalPrice;
+	                $discountedPrice = isset($item->discounted_price) ? (float) $item->discounted_price + $shippingFee : $originalPrice;
+	                $lowestPrice = min($finalPrice, $discountedPrice);
 
-					<td>{{ $item->name }}</td>
-					
-					
-					@php
-					    $shop = App\Models\Product::find($item->id);
-					    $hasCampaign = App\Models\Campaign::where('shop_id', $shop->shop_id)->exists();
-					    $hasCoupon = App\Models\ShopCoupon::where('shop_id', $shop->shop_id)->exists();
+	                $isDiscounted = $lowestPrice < $originalPrice;
+	                $quantity = $item->quantity;
 
-					    $finalPrice = $item->final_price;
-					    $discountedPrice = $item->discounted_price;
+	                // 割引価格は1点のみ、それ以外は通常価格で計算
+	                if ($quantity > 1 && $isDiscounted) {
+	                    $totalPrice = $lowestPrice + $originalPrice * ($quantity - 1);
+	                } else {
+	                    $totalPrice = $lowestPrice * $quantity;
+	                }
 
-					    // 最安値を決定
-					    $lowestPrice = min($finalPrice, $discountedPrice);
-					@endphp
-
-					@if($hasCampaign || $hasCoupon)
-					    @if($lowestPrice == $finalPrice)
-					        <td>クーポン適用価格：¥{{ number_format($finalPrice) }}</td>
-						    @if($item->associatedModel->shipping_fee)
-								<td>Auction</td>
-							@else
-								<td>
-									<form action="{{ route('cart.update', $item->id) }}">
-
-										<input name="quantity" type="number" value="{{ $item->quantity }}" >
-										<input type="submit" value="save">
-
-									</form>	
-								</td>
-								
-							@endif
-					        <td>{{ number_format($finalPrice)*($item->quantity) }}</td>
-
-					    @elseif($lowestPrice == $discountedPrice)
-					        <td>キャンペーン価格：¥{{ number_format($discountedPrice) }}</td>
-						    @if($item->associatedModel->shipping_fee)
-								<td>Auction</td>
-							@else
-								<td>
-									<form action="{{ route('cart.update', $item->id) }}">
-
-										<input name="quantity" type="number" value="{{ $item->quantity }}" >
-										<input type="submit" value="save">
-
-									</form>	
-								</td>
-								
-							@endif					        
-					        <td>{{ number_format($discountedPrice)*($item->quantity) }}</td>
-
-					    @else
-					        <td>通常価格：¥{{ number_format($item->price) }}</td>
-						    @if($item->associatedModel->shipping_fee)
-								<td>Auction</td>
-							@else
-								<td>
-									<form action="{{ route('cart.update', $item->id) }}">
-
-										<input name="quantity" type="number" value="{{ $item->quantity }}" >
-										<input type="submit" value="save">
-
-									</form>	
-								</td>
-								
-							@endif					        
-					        <td>{{ number_format($item->price)*($item->quantity) }}</td>
-
-					    @endif
-					@else
-					    <td>通常価格：¥{{ number_format($item->price) }}</td>
-					    <td>{{ number_format($item->price)*($item->quantity) }}</td>
-
-									
-					
-
-					@endif		
-					<td>
-						<a href="{{ route('cart.destroy', $item->id) }}">Delete</a>
-					</td>
-					<td>
-						<a href="{{ route('shops.overview', $item->associatedModel->shop->id) }}">{{ $item->associatedModel->shop->name }}</a>	
-					</td>
-
-				</tr>
-			<br>	
-
-		@endforeach
-				
-
-		</tbody>
+	                $totalAll += $totalPrice;
+	            @endphp
+	            <tr>
+	                <td>
+	                    <img style="width: 96px; height: 65px;" class="card-img-top"
+	                        src="{{ asset('storage/' . $item->associatedModel->cover_img) }}" alt="商品画像">
+	                </td>
+	                <td>{{ $item->name }}</td>
+	                <td>
+	                    ¥{{ number_format($isDiscounted ? $lowestPrice : $originalPrice) }}
+	                    @if ($isDiscounted && $quantity > 1)
+	                        <br><small class="text-danger">※割引価格は1点のみ</small>
+	                    @endif
+	                </td>
+	                <td>
+	                    <form action="{{ route('cart.update', $item->id) }}" method="GET">
+	                        <input name="quantity" type="number" value="{{ $quantity }}" min="1" style="width: 60px;">
+	                        <button type="submit" class="btn btn-sm btn-primary">更新</button>
+	                    </form>
+	                </td>
+	                <td>¥{{ number_format($totalPrice) }}</td>
+	                <td>
+	                    <a href="{{ route('cart.destroy', $item->id) }}" class="btn btn-sm btn-danger">削除</a>
+	                </td>
+	                <td>
+	                    <a href="{{ route('shops.overview', $item->associatedModel->shop->id) }}">
+	                        {{ $item->associatedModel->shop->name }}
+	                    </a>
+	                </td>
+	            </tr>
+	        @endforeach
+	    </tbody>
+	    <tfoot>
+	        <tr>
+	            <td colspan="4" class="text-right"><strong>合計金額：</strong></td>
+	            <td colspan="3"><strong>¥{{ number_format($totalAll) }}</strong></td>
+	        </tr>
+	    </tfoot>
 	</table>
 
 	<div class="coupon">
@@ -215,58 +177,84 @@
 　　<div class="buffer"></div>
 	@php
 	    $originalTotal = \Cart::session(auth()->id())->getSubTotalWithoutConditions();
-	    $discountAmount = floor($originalTotal) - floor($total);
+	    
+
+	    $shippingTotal = $cartItems->sum(function ($item) {
+		    $shippingFee = (float) ($item->associatedModel->shipping_fee ?? 0);
+		    return $shippingFee * $item->quantity;
+		});
+
+	    $originalTotalWithShipping = $originalTotal + $shippingTotal;
+
+	    
+
+	    $discountAmount = floor($totalAll) - floor($originalTotalWithShipping);
 	    $discountPercent = $originalTotal > 0 ? round(($discountAmount / $originalTotal) * 100) : 0;
 
-	    // 最も早く終了するキャンペーンを取得（カート内で割引があった場合）
 	    $cartCampaigns = $cartItems->pluck('campaign')->filter()->unique('id');
 	    $endingSoon = $cartCampaigns->sortBy('end_date')->first();
-	    $remainingHours = null;
+	    $remainingHours = $endingSoon ? now()->diffInHours(\Carbon\Carbon::parse($endingSoon->end_date), false) : null;
 
-	    if ($endingSoon) {
-	        $remainingHours = now()->diffInHours(\Carbon\Carbon::parse($endingSoon->end_date), false);
-	    }
+	    session(['total_and_shipping' => $totalAll]); 
+	    Log::info('total_and_shipping: ' . session('total_and_shipping')); 
 	@endphp
 
-	    <h3 style="color: #b0c4de;">ご注文金額
+	<h3 style="color: #b0c4de;">ご注文金額
 
-		    <div class="price-line">
-		        通常合計:
-		        <p class="original-price">
-		        	&nbsp;¥{{ ceil($originalTotal) }}
-		        </p>
-		         → 
-		         <p class="discounted-price">
-		         　割引適用後合計:　¥{{ ceil($total) }}
-		     	</p>
-		     	@if($discountPercent > 0)
-	                <p class="discount-badge">-{{ $discountPercent }}% OFF</p>
-	            @endif
-		    </div>
+	    <div class="price-line">
+	        通常合計:
+	        <p class="original-price">
+	            &nbsp;¥{{ ceil($originalTotalWithShipping) }}
+	        </p>
+	        →
+	        <p class="discounted-price">
+	            割引適用後合計:　¥{{ number_format($totalAll) }}
+	        </p>
 
-		    @if($discountAmount > 0)
-		        <div class="save-note">
-		            🎉 ¥{{ round($discountAmount) }} お得になりました！
-		        </div>
-		    @endif
+	    </div>
 
-		    @if(!is_null($remainingHours))
-		        <div class="campaign-end">
-		            ⏳ カート内の商品のキャンペーンは、 {{ $remainingHours }} 時間で終了するものがあります
-		        </div>
-		    @endif
+	    @if($discountAmount > 0)
+	        <div class="save-note" style="color:tomato;">
+	            🎉 ¥{{ ceil($originalTotalWithShipping - $totalAll)  }} お得になりました！
+	        </div>
+	    @endif
 
-		    <div style="font-size: 0.75em; color: #b0c4de; margin-top: 0.6em;">
-		        ※キャンペーン割引が自動で適用されています。
-		    </div>
-		</h3>
+	    @if(!is_null($remainingHours))
+	        <div class="campaign-end">
+	            ⏳ カート内の商品のキャンペーンは、{{ $remainingHours }} 時間で終了するものがあります
+	        </div>
+	    @endif
+
+	    <div style="font-size: 0.75em; color: #b0c4de; margin-top: 0.6em;">
+	        ※キャンペーン割引が自動で適用されています。
+	    </div>
+	</h3>
+
+
+
 	@if(session('message'))
 		<div>
 			{{ session('message') }}
 		</div>
 	@endif
-	
+
 	<button class="btn btn-primary" id="submitButton" onclick="location.href='{{ route('cart.checkout') }}' " role="button">Proceed to Checkout</button>
-	
+		
+	<script>
+	    const totalAmount = {{ session('total_and_shipping', 0) }};  // または $totalAll
+	</script>
+	<script>
+		console.log("送信するtotal金額", totalAmount); // ← ここを確認
+		fetch('/create-payment-intent', {
+		  method: 'POST',
+		  headers: {
+		    'Content-Type': 'application/json',
+		    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+		  },
+		  body: JSON.stringify({ total: totalAmount })
+		});
+
+
+	</script>
 	
 @endsection

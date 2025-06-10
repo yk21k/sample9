@@ -215,20 +215,30 @@
             </div>
 
     <!--====== Noscript ======-->
+    <style>
+        /* JavaScriptが無効なときにmain要素やbodyを非表示にする */
+        .no-js body {
+            display: none !important;
+        }
+    </style>
+
     <noscript>
-        <div class="app-setting">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="app-setting__wrap">
-                            <h1 class="app-setting__h1">JavaScript is disabled in your browser.</h1>
-                            <span class="app-setting__text">Please enable JavaScript in your browser or upgrade to a JavaScript-capable browser.</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <style>
+            body {
+                display: none !important;
+            }
+            html::before {
+                content: "このサイトはJavaScriptが必要です。JavaScriptを有効にしてください。";
+                display: block;
+                padding: 2rem;
+                font-size: 1.5rem;
+                color: red;
+                background: #fff3f3;
+                text-align: center;
+            }
+        </style>
     </noscript>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>

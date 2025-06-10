@@ -194,6 +194,26 @@
         </div>
     </div>
     <!-- End Delete File Modal -->
+    
+    <div class="modal fade" id="priceModal" tabindex="-1" role="dialog" aria-labelledby="priceModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="priceModalLabel">価格確認</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+                <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="modalMessage">
+            <!-- メッセージがここに入ります -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End price Modal -->
 @stop
 
 @section('javascript')
@@ -269,4 +289,88 @@
             $('[data-toggle="tooltip"]').tooltip();
         });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const priceInput = document.querySelector('input[name="price"]');
+            const shippingInput = document.querySelector('input[name="shipping_fee"]');
+
+            function checkInputsAndShowModal() {
+                const price = parseFloat(priceInput?.value || '');
+                const shipping = parseFloat(shippingInput?.value || '');
+
+                // 値が有効な数値か確認
+                if (!isNaN(price) && !isNaN(shipping)) {
+                    const maxShipping = price * 0.7;
+
+                    // 配送料が70%を超えていたらモーダルを表示しない
+                    if (shipping > maxShipping) {
+                        alert(`配送料は価格の70%（最大 ${maxShipping.toFixed(2)} 円）を超えることはできません。`);
+                        return;
+                    }
+
+                    // 合計金額を表示するモーダル
+                    const total = price + shipping;
+                    const message = `商品ページの表示価格は、入力の価格 (${price.toFixed(2)} 円) と配送料 (${shipping.toFixed(2)} 円) の合計で <strong>${total.toFixed(2)} 円</strong> になります。`;
+
+                    document.getElementById('modalMessage').innerHTML = message;
+
+                    $('#priceModal').modal('show');
+                }
+            }
+
+            priceInput?.addEventListener('blur', checkInputsAndShowModal);
+            shippingInput?.addEventListener('blur', checkInputsAndShowModal);
+        });
+    </script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const priceInput = document.querySelector('input[name="price"]');
+            const shippingInput = document.querySelector('input[name="shipping_fee"]');
+
+            function validateShippingFee() {
+                const price = parseFloat(priceInput?.value || '');
+                const shipping = parseFloat(shippingInput?.value || '');
+
+                const maxShipping = price * 0.7;
+
+                if (!isNaN(price) && !isNaN(shipping)) {
+                    if (shipping > maxShipping) {
+                        // 超過している場合：エラー表示して値をリセット
+                        alert(`配送料は価格の70%（最大 ${maxShipping.toFixed(2)} 円）を超えることはできません。`);
+                        shippingInput.value = '';
+                        shippingInput.focus();
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            function checkInputsAndShowModal() {
+                const price = parseFloat(priceInput?.value || '');
+                const shipping = parseFloat(shippingInput?.value || '');
+
+                if (!isNaN(price) && !isNaN(shipping)) {
+                    const total = price + shipping;
+                    const message = `商品ページの表示価格は、入力の価格 (${price.toFixed(2)} 円) と配送料 (${shipping.toFixed(2)} 円) の合計で <strong>${total.toFixed(2)} 円</strong> になります。`;
+
+                    document.getElementById('modalMessage').innerHTML = message;
+                    $('#priceModal').modal('show');
+                }
+            }
+
+            // バリデーションとモーダル表示両方を発火
+            shippingInput?.addEventListener('blur', function () {
+                if (validateShippingFee()) {
+                    checkInputsAndShowModal();
+                }
+            });
+
+            priceInput?.addEventListener('blur', function () {
+                validateShippingFee(); // 価格変更後にも一応チェック
+                checkInputsAndShowModal();
+            });
+        });
+    </script>
+
 @stop

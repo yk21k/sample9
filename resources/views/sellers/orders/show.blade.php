@@ -4,33 +4,136 @@
 @section('content')
 <h3>Order Summary</h3>
 
+
+
+@php
+    use Carbon\Carbon;
+    use App\Models\Campaign;
+    use App\Models\Shop;
+    use App\Models\ShopCoupon;
+
+    $today = Carbon::today();
+    $originalTotal = 0;
+    $finalTotal = 0;
+@endphp
+
 <table class="table">
     <thead>
         <tr>
-            <th>Name</th>
-            <th>Qty</th>
-            <th>Price</th>
+            <th>商品名</th>
+            <th>数量</th>
+            <th>手数料対象価格</th>
+            <th>配送料</th>
+            <th>手数料</th>
+            <th>通常価格</th>
+            <th>キャンペーン価格</th>
+            <th>クーポン価格</th>
+            <th>最終価格</th>
+            <th>適用</th>
         </tr>
     </thead>
     <tbody>
         @foreach ($items as $item)
-        <tr>
-            @if($item->shop_id == $shopMane)
-            <td scope="row">
-                {{$item->name}}
-            </td>
-            <td>
-                {{$item->pivot->quantity}}
-            </td>
-            <td>
-                {{$item->pivot->price*$item->pivot->quantity}}
-            </td>
-            @endif
-        </tr>
+            @php
+                $quantity = $item->pivot->quantity;
+                $basePrice = (float) $item->price;
+                $shippingFee = (float) $item->shipping_fee;
+                $originalPriceWithShipping = $basePrice + $shippingFee;
+
+                // --- 店舗とクーポンの取得 ---
+                $shopSubOrder = App\Models\SubOrder::where('id', $item->pivot->sub_order_id)->first();
+                $preShopId = App\Models\Shop::where('user_id', $shopSubOrder->seller_id)->first();
+                $shopId = $preShopId->id;
+
+                $preThisOrderCoupon = $shopSubOrder->coupon_code;
+                $thisOrderCoupon = App\Models\ShopCoupon::where('code', $shopSubOrder->coupon_code)->first();
+
+                // --- キャンペーン価格 ---
+                $campaign = Campaign::where('shop_id', $shopId)
+                    ->where('status', 1)
+                    ->where('start_date', '<=', $today)
+                    ->where('end_date', '>=', $today)
+                    ->orderByDesc('dicount_rate1')
+                    ->first();
+
+                $discountedPrice = $basePrice;
+                if ($campaign) {
+                    $discountedPrice = ceil($basePrice - ($basePrice * $campaign->dicount_rate1));
+                }
+                $campaignPrice = $discountedPrice + $shippingFee;
+
+                // --- クーポン価格 ---
+                $couponPrice = $basePrice;
+                if ($thisOrderCoupon) {
+                    $couponPrice = $basePrice + $thisOrderCoupon->value;
+                    $couponPrice = max($couponPrice, 0); // 負にならないように
+                }
+                $couponPriceWithShipping = $couponPrice + $shippingFee;
+
+                // --- 最終価格（1点だけ割引） ---
+                $lowestUnitPrice = min($originalPriceWithShipping, $campaignPrice, $couponPriceWithShipping);
+                $isDiscounted = $lowestUnitPrice < $originalPriceWithShipping;
+
+                if ($isDiscounted && $quantity > 1) {
+                    $finalLineTotal = $lowestUnitPrice + $originalPriceWithShipping * ($quantity - 1);
+                } else {
+                    $finalLineTotal = $lowestUnitPrice * $quantity;
+                }
+
+                $originalLineTotal = $originalPriceWithShipping * $quantity;
+                $originalTotal += $originalLineTotal;
+                $finalTotal += $finalLineTotal;
+
+                // --- 適用判定 ---
+                $appliedLabel = '適用なし';
+                if ($campaign && $campaignPrice <= $couponPriceWithShipping) {
+                    $appliedLabel = 'キャンペーン適用';
+                } elseif ($thisOrderCoupon) {
+                    $appliedLabel = 'クーポン適用';
+                }
+            @endphp
+            <tr>
+                @if($item->shop_id == $shopMane)
+                    <td scope="row">
+                        {{$item->name}}
+                    </td>
+                    <td>
+                        {{$item->pivot->quantity}}
+                    </td>
+                    <td>
+                        {{ $item->pivot->price*$item->pivot->quantity }}
+                    </td>
+                    <td>
+                        {{ $item->shipping_fee }}
+                    </td>
+                    <td>
+                        {{ ($item->pivot->price*$item->pivot->quantity)*0.1 }}
+                    </td>
+                @endif
+
+                <td>¥{{ number_format($originalPriceWithShipping) }}</td>
+                <td>¥{{ number_format($campaignPrice) }}</td>
+                <td>¥{{ number_format($couponPriceWithShipping) }}</td>
+                <td>¥{{ number_format($lowestUnitPrice) }}</td>
+                <td>
+                    @if ($appliedLabel === 'キャンペーン適用')
+                        <span class="label label-success">キャンペーン</span>
+                    @elseif ($appliedLabel === 'クーポン適用')
+                        <span class="label label-info">クーポン</span>
+                    @else
+                        <span class="label label-default">なし</span>
+                    @endif
+                </td>
+
+            </tr>
         @endforeach
-
-
     </tbody>
 </table>
+
+<div class="text-right">
+    <p><strong>通常価格合計:</strong> ¥{{ number_format($originalTotal) }}</p>
+    <p><strong>決済金額合計:</strong> ¥{{ number_format($finalTotal) }}　<small>（クーポンまたはキャンペーン適用後）</small></p>
+</div>
+
 
 @endsection

@@ -166,7 +166,7 @@
             <div class="guaranteed-product" style="border: 2px solid gold; padding: 20px; margin-bottom: 30px; background: darkslategray;">
                 <h2>🏆 保証品（1位）</h2>
                 <p style="font-size: 1.2em;">Name: {{ $attr->name }}</p>
-                <p style="font-size: 1.2em;">Price: {{ $attr->price }}</p>
+                <p style="font-size: 1.2em;">Price: {{ $attr->price+$attr->shippng_fee }}</p>
                 <p style="font-size: 1.2em;">Score: {{ $score }}</p>
 
                 @foreach ($movies as $movie)
@@ -202,7 +202,7 @@
 
                 <div class="product" style="flex: 1; border: 1px solid #ccc; padding: 10px;">
                     <p>Name: {{ $attr->name }}</p>
-                    <p>Price: {{ $attr->price }}</p>
+                    <p>Price: {{ $attr->price+$attr->shippng_fee }}</p>
                     <p>Score: {{ $score }}</p>
 
                     @foreach ($movies as $movie)
@@ -285,15 +285,15 @@
                                 
                                 @if ($product->campaign)
                                     <div class="price-box">
-                                        <span class="original-price"> ${{ $product->price }} </span>
-                                        <span class="discount-price" style="display: none;">{{ ($product->campaign->dicount_rate1)*100 }}%&nbsp;割引後価格: ¥{{ number_format($product->discounted_price) }}</span>
+                                        <span class="original-price"> ¥{{ $product->price+$product->shipping_fee }} </span>
+                                        <span class="discount-price" style="display: none;">キャンペーン価格: ¥{{ number_format($product->discounted_price+$product->shipping_fee) }}</span>
                                         <div class="ribbon1"> Campaign !! </div>
                                         <div class="ribbon2">
                                              <small>Up to: {{Carbon\Carbon::parse($product->campaign->end_date)->format('Y/m/d')}}</small>
                                         </div>
                                     </div>
                                 @else
-                                    ${{ $product->price }}   
+                                    ¥{{ $product->price+$product->shipping_fee }}   
 
                                 @endif
 

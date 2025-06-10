@@ -146,12 +146,11 @@
 
                 </div>
             </div>
-            
+         
             <div class="col-md-4">
                 <div class="panel panel-default">
-                    <div class="panel-heading"> Order Items </div>
+                    <div class="panel-heading">Order Items</div>
                     <h4>User: {{ $dataTypeContent->user->name }}</h4>
-
                     <div class="panel-body">
                         <table class="table table-hover">
                             <thead>
@@ -159,24 +158,39 @@
                                     <th>Name</th>
                                     <th>Quantity</th>
                                     <th>Price</th>
+                                    <th>Fee</th>
                                 </tr>
                             </thead>
                             <tbody>
+
+                                @php $calculatedTotal = 0; @endphp
                                 @foreach($dataTypeContent->items as $item)
-                                <tr>
-                                    <td>{{ $item->name }}</td>
-                                    <td>{{ $item->pivot->quantity }}</td>
-                                    <td>{{ $item->pivot->price }}</td>
-                                </tr>
+                                    @php
+                                        $lineTotal = ($item->pivot->price+$item->shipping_fee) * $item->pivot->quantity;
+                                        $calculatedTotal += $lineTotal;
+                                        $payment = App\Models\Order::where('id', $item->pivot->order_id)->first();
+                                    @endphp
+                                    <tr>
+                                        <td>{{ $item->name }}</td>
+                                        <td>{{ $item->pivot->quantity }}</td>
+                                        <td>{{ number_format($item->pivot->price) }}</td>
+                                        <td>{{ number_format($item->shipping_fee) }}</td>
+                                            
+                                    </tr>
                                 @endforeach
                             </tbody>
                         </table>
                         <p>Note: {{ $dataTypeContent->notes }}</p>
-                        <p>Total: $ {{ $dataTypeContent->grand_total }}</p>
-                    </div>               
-                    
+                        <p><strong>Total: $ {{ number_format($calculatedTotal) }}</strong></p>
+                        <p><strong>手数料: $ {{ number_format($calculatedTotal*) }}</strong></p>
+                        <p><strong>決済金額: $ {{ number_format($payment->grand_total) }}</strong></p>
+                    </div>
                 </div> 
             </div>
+
+
+
+
         </div>
     </div>
 

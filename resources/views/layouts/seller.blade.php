@@ -165,20 +165,50 @@
                             <a href=" {{ url('/seller/shop_charts') }} " class="list-group-item list-group-item-action">Shop Charts</a>
 
                             <a href=" {{ url('/seller/shop_mail') }} " class="list-group-item list-group-item-action">Shop Mail</a>
+
+                            <a href=" {{ url('/seller/shop_setting') }} " class="list-group-item list-group-item-action">Shop Setting</a>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-9">
                     @yield('content')
+                    
                 </div>
 
             </div>
         </main>
     </div>
 </body>
+
+    <!--====== Noscript ======-->
+    <style>
+        /* JavaScriptが無効なときにmain要素やbodyを非表示にする */
+        .no-js body {
+            display: none !important;
+        }
+    </style>
+
+    <noscript>
+        <style>
+            body {
+                display: none !important;
+            }
+            html::before {
+                content: "このサイトはJavaScriptが必要です。JavaScriptを有効にしてください。";
+                display: block;
+                padding: 2rem;
+                font-size: 1.5rem;
+                color: red;
+                background: #fff3f3;
+                text-align: center;
+            }
+        </style>
+    </noscript>
+
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js" integrity="sha384-fbbOQedDUMZZ5KreZpsbe1LCZPVmfTnH7ois6mU1QK+m14rQ1l2bGBq41eYeM/fS" crossorigin="anonymous"></script>
+<script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
 
 </html>
 

@@ -59,6 +59,10 @@ Route::post('register/main_register', [App\Http\Controllers\Auth\RegisterControl
 Route::get('/payment/success', [App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');
 
 
+Route::post('/create-payment-intent', [PaymentController::class, 'createPaymentIntent'])->name('create.payment.intent');
+
+
+
 Route::match(['get', 'post'], '/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::match(['get', 'post'], '/botman', [App\Http\Controllers\BotManController::class, 'handle'])->name('handle');
@@ -236,6 +240,10 @@ Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', '
     Route::get('/shop_setting', 'ShopSettingController@index')->name('shop.shop_setting');
 
     Route::post('/shop_setting', 'ShopSettingController@shopUpdate')->name('shop.shop_setting.update');
+
+    Route::get('/seller/orders/export/full', [OrderController::class, 'exportFullOrders'])->name('orders.export.full');
+
+
 
 
 
