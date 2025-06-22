@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\SubOrder;
+use App\Models\SubOrderItem;
 use App\Models\Fovorite;
 use App\Models\DeliveryAddress;
 use App\Models\Product;
@@ -23,9 +24,25 @@ class AccountController extends Controller
     {
         $profiles = User::where('id', Auth::user()->id)->first();
 
-        $order_histories = SubOrder::where('user_id', Auth::user()->id)->get();
+        $order_histories = SubOrder::where('user_id', Auth::user()->id)->orderBy('created_at', 'desc')->get();
         // dd($order_histories->subOrders);
+
+        $subOrderIds = $order_histories->pluck('id');
+
+        $itemsGrouped = \App\Models\SubOrderItem::whereIn('sub_order_id', $subOrderIds)->get()->groupBy('sub_order_id');
+
+
         $shipping_names = Order::where('user_id', Auth::user()->id)->get();
+
+        // SubOrder 一覧を取得
+        $sub_orders = SubOrder::where('user_id', Auth::id())->get();
+
+        // SubOrder の ID 一覧を取得
+        $sub_ordersIds = $sub_orders->pluck('id');
+
+        // SubOrderItem を一括取得
+        $subOrder_items = SubOrderItem::whereIn('sub_order_id', $sub_ordersIds)->first();
+            
         
         $firstDelis = Order::where('user_id', Auth::user()->id)->latest()->first();
 
@@ -45,7 +62,7 @@ class AccountController extends Controller
         // $arrival = SubOrdersArrivalReport::where('sub_order_id', )->first();
 
 
-        return view('account.account', compact('profiles', 'order_histories', 'firstDelis', 'savedDelis', 'shipping_names', 'favaoriteItems'));
+        return view('account.account', compact('profiles', 'order_histories', 'firstDelis', 'savedDelis', 'shipping_names', 'favaoriteItems', 'subOrder_items', 'itemsGrouped'));
     }
 
     public function updateProf(Request $request, $id)

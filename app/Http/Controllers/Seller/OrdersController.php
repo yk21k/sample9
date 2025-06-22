@@ -39,13 +39,20 @@ class OrdersController extends Controller
         // 🔍 検索処理
         if ($request->filled('search')) {
             $search = $request->input('search');
-            $query->whereHas('order', function ($q) use ($search) {
-                $q->where('shipping_fullname', 'like', "%{$search}%")
-                  ->orWhere('shipping_phone', 'like', "%{$search}%")
-                  ->orWhere('shipping_address', 'like', "%{$search}%")
-                  ->orWhere('shipping_zipcode', 'like', "%{$search}%");
+
+            $query->where(function ($q) use ($search) {
+                // order テーブルに対する検索
+                $q->whereHas('order', function ($q2) use ($search) {
+                    $q2->where('shipping_fullname', 'like', "%{$search}%")
+                        ->orWhere('shipping_phone', 'like', "%{$search}%")
+                        ->orWhere('shipping_address', 'like', "%{$search}%")
+                        ->orWhere('shipping_zipcode', 'like', "%{$search}%");
+                })
+                // sub_orders テーブルの status に対する検索
+                ->orWhere('status', 'like', "%{$search}%");
             });
         }
+
 
         // 🔽 ソート処理
         $sortField = $request->get('sort', 'id');

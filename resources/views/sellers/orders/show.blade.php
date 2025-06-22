@@ -25,7 +25,7 @@
             <th>手数料対象価格</th>
             <th>配送料</th>
             <th>手数料</th>
-            <th>通常価格</th>
+            <th>通常価格（配送料込）</th>
             <th>キャンペーン価格</th>
             <th>クーポン価格</th>
             <th>最終価格</th>
@@ -39,6 +39,10 @@
                 $basePrice = (float) $item->price;
                 $shippingFee = (float) $item->shipping_fee;
                 $originalPriceWithShipping = $basePrice + $shippingFee;
+                $rate_and_fixed = App\Models\Commition::first();
+                $feeRate = $rate_and_fixed->rate;
+                $feeFixed = $rate_and_fixed->fixed;
+
 
                 // --- 店舗とクーポンの取得 ---
                 $shopSubOrder = App\Models\SubOrder::where('id', $item->pivot->sub_order_id)->first();
@@ -107,7 +111,8 @@
                         {{ $item->shipping_fee }}
                     </td>
                     <td>
-                        {{ ($item->pivot->price*$item->pivot->quantity)*0.1 }}
+                        {{ (int) ($item->pivot->price*$item->pivot->quantity*$feeRate+$feeFixed) }}
+
                     </td>
                 @endif
 
@@ -126,8 +131,26 @@
                 </td>
 
             </tr>
+            <tr>
+                <td colspan="10" style="background-color: #f9f9f9;">
+                    <strong>決済金額の内訳（{{ $item->name }}）:</strong><small>手数料は通常価格を対象にします。</small><br>
+
+                    1個目（割引適用）: ¥{{ number_format($lowestUnitPrice) }}
+
+                    @if ($quantity > 1)
+                        <br>
+                        2個目以降（{{ $quantity - 1 }}個 × 通常単価 ¥{{ number_format($originalPriceWithShipping) }}) = 
+                        ¥{{ number_format($originalPriceWithShipping * ($quantity - 1)) }}
+                    @endif
+                    <br>
+                    <strong>小計:</strong> ¥{{ number_format($finalLineTotal) }}
+                </td>
+            </tr>
+
         @endforeach
     </tbody>
+
+
 </table>
 
 <div class="text-right">

@@ -19,13 +19,20 @@ use App\Http\Controllers\Seller\HolidaySettingController;
 use App\Http\Controllers\Seller\ExtraHolidaySettingController;
 use App\Http\Controllers\Seller\DesplayController;
 use App\Http\Controllers\Seller\ShopSettingController;
+use App\Http\Controllers\Seller\StripeConnectController;
+
 
 use App\Http\Controllers\Auth\RegisterController;
-
 use App\Http\Controllers\ShopProfController;
 use App\Http\Controllers\ShopCouponsController;
 use App\Http\Controllers\SubOrderController;
 use App\Http\Controllers\BotManController;
+use App\Http\Controllers\Admin\StripeTransferController;
+use App\Http\Controllers\StripeOnboardingController;
+use App\Http\Controllers\ProductImportController;
+
+
+
 
 use App\Models\Order;
 
@@ -195,6 +202,8 @@ Route::group(['prefix' => 'admin'], function () {
 
     Route::post('/shop-coupon-create', [App\Http\Controllers\ShopCouponsController::class, 'makeCoupon'])->name('order.make_coupon');
 
+    Route::get('/stripe-transfer/{id}', [StripeTransferController::class, 'transfer'])
+     ->name('admin.stripe.transfer');
 
 });
 
@@ -243,11 +252,40 @@ Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', '
 
     Route::get('/seller/orders/export/full', [OrderController::class, 'exportFullOrders'])->name('orders.export.full');
 
-
-
-
-
 });
+
+Route::get('/dashboard', function () {
+    return view('dashboard'); // 適切なビューやコントローラーに変更
+})->name('dashboard');
+
+// 認証必要なルートグループ
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::get('/stripe/connect', [StripeConnectController::class, 'redirectToStripe'])->name('stripe.connect');
+});
+
+// コールバックルートは auth なしに分離
+Route::middleware('web')->group(function () {
+    Route::get('/stripe/oauth/callback', [StripeConnectController::class, 'handleCallback'])->name('stripe.callback');
+});
+
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/stripe/onboarding', [StripeOnboardingController::class, 'redirectToStripe'])->name('stripe.onboarding');
+    Route::get('/stripe/onboarding/refresh', function () {
+        return redirect()->route('stripe.onboarding')->with('message', '再度Stripeに接続してください。');
+    });
+    Route::get('/stripe/onboarding/complete', function () {
+        return redirect()->route('dashboard')->with('message', 'Stripe連携が完了しました！');
+    });
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/product/import', [App\Http\Controllers\ProductImportController::class, 'showForm'])->name('products.import.form');
+    Route::post('/admin/product/import', [App\Http\Controllers\ProductImportController::class, 'import'])->name('products.import');
+});
+
+
 
 
 

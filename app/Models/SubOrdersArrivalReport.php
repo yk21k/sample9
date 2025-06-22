@@ -13,6 +13,7 @@ class SubOrdersArrivalReport extends Model
         'confirmed_at',
         'arrival_reported',
         'comments',
+        'payment_clicked_at',
     ];
 
     // public static function boot()

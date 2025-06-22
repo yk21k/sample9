@@ -144,7 +144,7 @@
                             <a href="/seller" class="list-group-item list-group-item-action active">Dashboard</a>
 
                             <a href=" {{ route('seller.shop.shop_setting') }} " class="list-group-item list-group-item-action">Your Shop</a>
-
+                            
                             <a href=" {{url('/seller/orders')}} " class="list-group-item list-group-item-action">Orders</a>
 
                             <a href=" {{url('/admin/shops')}} " class="list-group-item list-group-item-action">Go to Shop</a>
@@ -167,6 +167,32 @@
                             <a href=" {{ url('/seller/shop_mail') }} " class="list-group-item list-group-item-action">Shop Mail</a>
 
                             <a href=" {{ url('/seller/shop_setting') }} " class="list-group-item list-group-item-action">Shop Setting</a>
+
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    @if (auth()->user()->stripe_account_id)
+                                        <div class="alert alert-success d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>Stripeに接続済み</strong><br>
+                                                <span class="text-muted">アカウントID: {{ auth()->user()->stripe_account_id }}</span>
+                                            </div>
+                                            <a href="{{ route('stripe.connect') }}" class="btn btn-outline-secondary btn-sm">
+                                                再接続
+                                            </a>
+                                        </div>
+                                    @else
+                                        <div class="alert alert-warning d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>Stripe未接続</strong><br>
+                                                <span class="text-muted">売上の受け取りには接続が必要です。</span>
+                                            </div>
+                                            <a href="{{ route('stripe.connect') }}" class="btn btn-primary btn-sm">
+                                                Stripeと接続する
+                                            </a>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

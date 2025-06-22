@@ -25,8 +25,13 @@ use App\Models\Product;
 use App\Models\SubOrder;
 
 use TCG\Voyager\Facades\Voyager;
-use Illuminate\Pagination\Paginator;
 
+use App\Actions\SendStripeTransfer;
+use App\Actions\ImportCsvProducts;
+
+
+
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -53,8 +58,9 @@ class AppServiceProvider extends ServiceProvider
         DeleteShop::observe(DeleteShopObserver::class);
         Mails::observe(MailsObserver::class);
         Product::observe(ProductObserver::class); 
-        SubOrder::observe(SubOrderObserver::class); 
-
+        SubOrder::observe(SubOrderObserver::class);
+        Voyager::addAction(SendStripeTransfer::class);
+        Voyager::addAction(ImportCsvProducts::class);
         
         Voyager::useModel('Category', \App\Models\Categories::class);
         Voyager::useModel('Menu', \App\Models\Menu::class);

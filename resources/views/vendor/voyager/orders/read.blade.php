@@ -169,6 +169,7 @@
                                         $lineTotal = ($item->pivot->price+$item->shipping_fee) * $item->pivot->quantity;
                                         $calculatedTotal += $lineTotal;
                                         $payment = App\Models\Order::where('id', $item->pivot->order_id)->first();
+                                        $fee = App\Models\Commition::first();
                                     @endphp
                                     <tr>
                                         <td>{{ $item->name }}</td>
@@ -182,7 +183,7 @@
                         </table>
                         <p>Note: {{ $dataTypeContent->notes }}</p>
                         <p><strong>Total: $ {{ number_format($calculatedTotal) }}</strong></p>
-                        <p><strong>手数料: $ {{ number_format($calculatedTotal*) }}</strong></p>
+                        <p><strong>手数料: $ {{ $fee->fixed+(int)($calculatedTotal*$fee->rate) }}</strong></p>
                         <p><strong>決済金額: $ {{ number_format($payment->grand_total) }}</strong></p>
                     </div>
                 </div> 

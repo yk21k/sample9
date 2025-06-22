@@ -11,6 +11,10 @@ class SubOrder extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'transferred_at' => 'datetime',
+    ];
+
     public function items()
     {
         return $this->belongsToMany(Product::class, 'sub_order_items', 'sub_order_id', 'product_id')

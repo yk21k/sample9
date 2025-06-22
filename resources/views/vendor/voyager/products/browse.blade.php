@@ -1,5 +1,8 @@
 @extends('voyager::master')
 
+
+
+
 @section('page_title', __('voyager::generic.viewing').' '.$dataType->getTranslatedAttribute('display_name_plural'))
 
 @section('page_header')
@@ -20,6 +23,7 @@
     <a href="{{ route('voyager.'.$dataType->slug.'.order') }}" class="btn btn-primary btn-add-new">
         <i class="voyager-list"></i> <span>{{ __('voyager::bread.order') }}</span>
     </a>
+
     @endif
     @endcan
     @can('delete', app($dataType->model_name))
@@ -42,7 +46,14 @@
     @include('voyager::alerts')
     <div class="row">
         <div class="col-md-12">
-            
+            <div>
+                <a href="{{url('/seller/orders')}}" class="">Order Management</a>
+            </div>
+            {{-- browse.blade.php のどこかに追加（例：上部ツールバー） --}}
+            <a href="{{ route('products.import.form') }}" class="btn btn-primary" style="margin-right: 10px;">
+                <i class="voyager-upload"></i> CSV一括登録
+            </a>
+
             <div class="panel panel-bordered">
                 <div class="panel-body">
                     @if ($isServerSide)
@@ -126,8 +137,7 @@
                                     }
                                     @endphp
                                     <td>
-                                        
-                                        
+
                                         @if (isset($row->details->view))
 
                                             
@@ -142,17 +152,12 @@
                                             style="width:100px">
                                         @elseif($row->type == 'relationship')
                                             
-                                            @if($row->display_name == 'Shop')
-                                                @php
-                                                    $seller_id_shop = App\Models\Shop::where('user_id', $data->seller_id)->first();
-                                                @endphp    
-                                                {{ $seller_id_shop->name }}
+                                            
 
-                                            @else
                                                 @include('voyager::formfields.relationship', ['view' => 'browse','options' =>
                                                 $row->details])
-                                            @endif
 
+                                            
                                             
                                         @elseif($row->type == 'select_multiple')
                                         @if(property_exists($row->details, 'relationship'))
@@ -307,41 +312,16 @@
                                         @include('voyager::bread.partials.actions', ['action' => $action])
                                         @endif
                                         @endforeach
-                                        
-                                        @php
-                                            $payActives = App\Models\SubOrdersArrivalReport::where('sub_order_id', $data->id)->first();
-                                            $isCompletedWithPay = $data->status === 'completed' && isset($payActives);
-                                            $isPastConfirmationDeadline = false;
-                                            $arrivalReported = isset($payActives->arrival_reported) && $payActives->arrival_reported == 1;
-                                            $alreadyPaid = isset($payActives->payment_clicked_at);
 
-                                            if ($isCompletedWithPay) {
-                                                $confirmationDate = \Carbon\Carbon::parse($payActives->confirmation_deadline);
-                                                $today = \Carbon\Carbon::today();
-                                                $isPastConfirmationDeadline = $today->greaterThan($confirmationDate);
-                                            }
-
-                                            $showPayButton = $isCompletedWithPay && ($isPastConfirmationDeadline || $arrivalReported) && !$alreadyPaid;
-                                        @endphp
-                                        @if ($showPayButton)
+                                        @if($data->status == 'completed')
                                             <a href="{{ route('order.pay', $data) }}"
-                                                class="btn btn-sm btn-dark" style="margin-right: 5px;">
-                                                <i class="{{ $action->getIcon() }}"></i>
-                                                <span class="hidden-xs hidden-sm">Payment possible</span>
-                                                @if ($isPastConfirmationDeadline)
-                                                    <span class="badge bg-danger">期限超過</span>
-                                                @endif
+                                                class="btn btn-sm btn-success pull-right" style="margin-right: 5px;">
+                                                <i class="{{ $action->getIcon() }}"></i> <span class="hidden-xs hidden-sm">Pay</span>
                                             </a>
-                                        @endif
 
-                                        @if (isset($payActives->arrival_reported))
-                                            <td>{{ \Carbon\Carbon::parse($payActives->confirmation_deadline)->format('Y年m月d日') }}</td>
-                                        @else
-                                            <td>到着確認なし</td>
                                         @endif
                                     </td>
 
- 
                                 </tr>
                                 @endforeach
                             </tbody>

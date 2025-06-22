@@ -8,7 +8,7 @@
         <!-- 🔍 検索ボックス -->
         <div class="form-inline mb-2">
             
-            <input type="text" name="search" id="orderSearch" class="form-control mb-3" placeholder="名前や電話番号で検索" value="{{ request('search') }}">
+            <input type="text" name="search" id="orderSearch" class="form-control mb-3" placeholder="名前や電話番号、郵便番号、statusで検索" value="{{ request('search') }}">
 
 
 

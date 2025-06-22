@@ -27,7 +27,7 @@
 
 			@if($open_shops && $open_shops->is_draft == 1)
 			    <li class="nav-item">
-			        <h3><a class="nav-link link-secondary" href="{{ route('shops.create') }}">Open Your Shop</a></h3>
+			        <h3><a class="nav-link link-secondary" href="{{ route('shops.create') }}">店舗開設申請</a></h3>
 			    </li>
 			@elseif($open_shops)
 			    <li class="nav-item">
@@ -40,19 +40,19 @@
 			@endif
 
 		  <li class="nav-item">
-		    <h3><a class="nav-link link-secondary" href="{{ route('inquiries.create', ['id' => auth()->user()->id]) }}">Contact Us</a></h3>
+		    <h3><a class="nav-link link-secondary" href="{{ route('inquiries.create', ['id' => auth()->user()->id]) }}">お問合せをする</a></h3>
 		  </li>
 		  <li class="nav-item">
-		    <h3><a class="nav-link link-secondary" href="#wishlist">Wish list</a></h3>
+		    <h3><a class="nav-link link-secondary" href="#wishlist">欲しいものに登録</a></h3>
 		  </li>
 		  <li class="nav-item">
 		    <h3><a class="nav-link link-secondary" href="#payment-methods">-----</a></h3>
 		  </li>
 		  <li class="nav-item">
-		    <h3><a class="nav-link link-secondary" href="#account-settings">Account Settings</a></h3>
+		    <h3><a class="nav-link link-secondary" href="#account-settings">Accountの設定</a></h3>
 		  </li>
 		  <li class="nav-item">
-		    <h3><a class="nav-link link-secondary" href="#support">Support</a></h3>
+		    <h3><a class="nav-link link-secondary" href="#support">サポート</a></h3>
 		  </li>
 		</ul>
         
@@ -67,38 +67,40 @@
 	            	<thead>	
 		        	    <tr>
 
-		        	    	<td>Delivery Status</td>
-		        	    	<td>Shipping Company</td>
-		        	    	<td>Invoice Number</td>
+		        	    	<td>発送状況</td>
+		        	    	<td>配達業者</td>
+		        	    	<td>Invoice Number　会社によって異なる</td>
 					        <td>Order Number</td>
-					        <td>Purchase Date</td>
-					        <td>Name</td>
-					        <td>Zip-code</td>
-					        <td>Address</td>
+					        <td>購入日</td>
+					        <td>名前</td>
+					        <td>郵便番号</td>
+					        <td>住所</td>
+					        <td>商品名/個数</td>
 					        
 				        </tr>
 			        </thead>
 		        	@foreach($order_histories as $order_history)
+		        	    
 		        	<tbody id="myTable">
 		        		<tr>
 		        			@if($order_history->status=="pending" && $order_history->payment_status=="")
 		        				
-		        				<td>*Under preparation</td>
+		        				<td>*配送前（オーダー確認中を含む）</td>
 
 		        			@elseif($order_history->status=="pending" && $order_history->payment_status=="accepted")
 		        				
-		        				<td>**Accepted</td>	
+		        				<td>**配送前（配送準備中）</td>	
 
 		        			@elseif($order_history->status=="pending" && $order_history->payment_status=="arranging delivery")
 		        				
-		        				<td>⭐　Arranging Delivery</td>
+		        				<td>⭐　配送会社へ手配中</td>
 
 		        			@elseif($order_history->status=="processing" && $order_history->payment_status=="delivery arranged")
 
-		        				<td>⭐⭐️　Delivery Arranged</td>
+		        				<td>⭐⭐️　配送会社へ手配済み</td>
 
 		        			@elseif($order_history->status=="completed")	
-		        				<td>*Delivered* 
+		        				<td>*配達完了* 
 			        				<a class="btn btn-warning btn-sm" id="hide_arrival_button" style="margin: 2px;">到着確認</button></a><br> 
 	                                <div class="form_arrival">
 								    	@php
@@ -134,6 +136,7 @@
 		        			@else
 		        				<td>Details Unknown</td>
 		        			@endif
+
 		        			<td>{{ $order_history->shipping_company }}</td>
 		        			<td>{{ $order_history->invoice_number }}</td>
 		        			<td>{{ $order_history->order_id }}</td>
@@ -141,6 +144,23 @@
 		        			<td>{{ $order_history->order->shipping_fullname }}</td>
 		        			<td>{{ $order_history->order->shipping_zipcode }}</td>
 		        			<td>{{ $order_history->order->shipping_state }} {{ $order_history->order->shipping_city }} {{ $order_history->order->shipping_address }}</td>
+						    @php
+						        $items = $itemsGrouped[$order_history->id] ?? collect();
+						    @endphp
+						    
+			                {{-- 商品名／個数 --}}
+			                <td>
+			                    @foreach($items as $item)
+			                        @php
+			                            $product = \App\Models\Product::find($item->product_id);
+			                        @endphp
+			                        <div>
+			                            {{ $product->name ?? '商品ID:'.$item->product_id }}
+			                            <span class="badge bg-secondary">x{{ $item->quantity }}</span>
+			                        </div>
+			                    @endforeach
+			                </td>
+						    
 		        		</tr>
 			        </tbody>
 			        @endforeach
@@ -264,6 +284,7 @@
         </section>
     </main>
 </div>	
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 <script>
