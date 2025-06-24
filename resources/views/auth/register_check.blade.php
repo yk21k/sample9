@@ -31,7 +31,7 @@
 
                         <div class="form-group row mb-0">
                             <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary" id="submit-button">
                                     仮登録
                                 </button>
                             </div>
@@ -42,4 +42,30 @@
         </div>
     </div>
 </div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log("DOMContentLoaded fired"); // ← ページ読込確認
+
+        const form = document.querySelector('form');
+        const submitButton = document.getElementById('submit-button');
+
+        form.addEventListener('submit', function (e) {
+            console.log("Form submitted"); // ← 送信イベント検知確認
+
+            if (submitButton.disabled) {
+                console.log("Button already disabled. Preventing duplicate submit.");
+                e.preventDefault(); // 二重送信を防止
+                return;
+            }
+
+            submitButton.disabled = true;
+            console.log("Button disabled after submit.");
+        });
+    });
+</script>
+
+
+
 @endsection

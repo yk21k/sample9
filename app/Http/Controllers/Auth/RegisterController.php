@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Auth\Events\Registered;
 
+use Illuminate\Validation\ValidationException;
+
 class RegisterController extends Controller
 {
     /*
@@ -86,7 +88,15 @@ class RegisterController extends Controller
         return $user;
     }
 
-    public function pre_check(Request $request){
+    public function pre_check(Request $request)
+    {
+        $email = $request->input('email');
+
+        // 同じメールで仮登録済みかどうかチェック
+        if (User::where('email', $email)->exists()) {
+            return redirect()->back()->withErrors(['email' => 'このメールアドレスはすでに登録されています。']);
+        }
+
         $this->validator($request->all())->validate();
         //flash data
         $request->flashOnly( 'email');
@@ -98,12 +108,33 @@ class RegisterController extends Controller
         return view('auth.register_check')->with($bridge_request);
     }
 
+
     public function register(Request $request)
     {
-        event(new Registered($user = $this->create( $request->all() )));
+        $data = $request->all();
+
+        // 既存ユーザーを探す
+        $user = \App\Models\User::where('email', $data['email'])->first();
+
+        if (!$user) {
+            // いなければcreate()を使って新規作成
+            $user = $this->create($data);
+        } else {
+            // 既存ならupdateしたい場合はここで更新処理を書く
+        }
+
+        event(new Registered($user));
 
         return view('auth.registered');
     }
+
+
+    // public function register(Request $request)
+    // {
+    //     event(new Registered($user = $this->create( $request->all() )));
+
+    //     return view('auth.registered');
+    // }
 
     public function showForm($email_token)
     {

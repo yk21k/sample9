@@ -52,7 +52,7 @@ Route::redirect('/', '/home');
 
 Auth::routes();
 
-Route::post('register/pre_check', [App\Http\Controllers\Auth\RegisterController::class, 'pre_check'])->name('register.pre_check');
+Route::post('register/pre_check', [App\Http\Controllers\Auth\RegisterController::class, 'pre_check'])->middleware('throttle:1,1')->name('register.pre_check');
 
 Route::get('register/verify/{token}', [App\Http\Controllers\Auth\RegisterController::class, 'showForm']);
 

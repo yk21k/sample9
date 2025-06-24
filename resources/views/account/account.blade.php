@@ -61,8 +61,34 @@
         <section id="order-history" class="section_accocnt">
             <h2>注文履歴　Order history</h2>
             <ul>
-            	<h4>Search</h4>
-            	<input id="myInput" type="date">&nbsp;&nbsp;&nbsp;<button type="button" class="btn btn-info" id="hide_button">Hide/Display</button><br><br>
+			<h4>Search</h4>
+
+			{{-- 日付フィルタ（formの外） --}}
+			<input id="myInput" type="date" class="form-control mr-2 mb-2" style="width: 200px; display: inline-block;">
+
+			{{-- 検索フォーム --}}
+			<div class="d-flex flex-wrap align-items-center mb-4">
+			    
+			    <div class="d-flex flex-wrap align-items-center mb-3">
+				    <input type="text" id="productInput" class="form-control mr-2 mb-2" placeholder="商品名" style="width: 200px;">
+				    
+				    <select id="statusSelect" class="form-control mr-2 mb-2" style="width: 150px;">
+				        <option value="">発送状況</option>
+				        <option value="*配送前（オーダー確認中を含む）">*配送前（オーダー確認中を含む）</option>
+				        <option value="**配送前（配送準備中）">**配送前（配送準備中）</option>
+				        <option value="***配送会社へ手配中">***配送会社へ手配中</option>
+				        <option value="*配達完了* ">*配達完了* </option>
+				    </select>
+				</div>
+			    	
+			</div>
+
+			{{-- Hide/Display ボタン --}}
+			<button type="button" class="btn btn-sm btn-info" id="hide_button">Hide/Display</button>
+
+
+
+				<br><br>
             	<table class="table table-bordered table-striped" id="table_order1">
 	            	<thead>	
 		        	    <tr>
@@ -85,22 +111,22 @@
 		        		<tr>
 		        			@if($order_history->status=="pending" && $order_history->payment_status=="")
 		        				
-		        				<td>*配送前（オーダー確認中を含む）</td>
+		        				<td class="status-cell">*配送前（オーダー確認中を含む）</td>
 
 		        			@elseif($order_history->status=="pending" && $order_history->payment_status=="accepted")
 		        				
-		        				<td>**配送前（配送準備中）</td>	
+		        				<td class="status-cell">**配送前（配送準備中）</td>	
 
 		        			@elseif($order_history->status=="pending" && $order_history->payment_status=="arranging delivery")
 		        				
-		        				<td>⭐　配送会社へ手配中</td>
+		        				<td class="status-cell">***配送会社へ手配中</td>
 
 		        			@elseif($order_history->status=="processing" && $order_history->payment_status=="delivery arranged")
 
-		        				<td>⭐⭐️　配送会社へ手配済み</td>
+		        				<td class="status-cell">****配送会社へ手配済み</td>
 
 		        			@elseif($order_history->status=="completed")	
-		        				<td>*配達完了* 
+		        				<td class="status-cell">*配達完了* 
 			        				<a class="btn btn-warning btn-sm" id="hide_arrival_button" style="margin: 2px;">到着確認</button></a><br> 
 	                                <div class="form_arrival">
 								    	@php
@@ -287,6 +313,8 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
 $(document).ready(function(){
   $("#myInput").on("keyup", function() {
@@ -297,6 +325,7 @@ $(document).ready(function(){
   });
 });
 </script>
+
 <script>
 $(function() {
     $("#hide_button").click(function() {
@@ -323,5 +352,29 @@ $(function() {
         });
     });
 </script>
+<script>
+$(document).ready(function () {
+    function filterTable() {
+        var keyword = $('#productInput').val().toLowerCase();
+        var status = $('#statusSelect').val();
+
+        $("#table_order1 tbody tr").each(function () {
+            var row = $(this);
+            var statusText = row.find(".status-cell").text().trim();
+            var productText = row.find("td:last").text().toLowerCase(); // 商品名/個数欄（最終列）
+
+            var matchKeyword = !keyword || productText.indexOf(keyword) !== -1;
+            var matchStatus = !status || statusText.includes(status);
+
+            row.toggle(matchKeyword && matchStatus);
+        });
+    }
+
+    $('#productInput, #statusSelect').on('input change keyup', filterTable);
+});
+</script>
+
+
+
 
 @endsection
