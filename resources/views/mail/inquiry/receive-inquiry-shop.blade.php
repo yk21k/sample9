@@ -21,7 +21,7 @@ Subject : {{ $subjectLabel }}
 Email : {{ $inquiryAnswers->inqUser->email }}
 Subject : {{ $inquiryAnswers->inquiry_details }}
 
-@component('mail::button', ['url' => url('/admin/customer-inquiries')])
+@component('mail::button', ['url' => url('/admin')])
 Manage Inquiries
 @endcomponent
 

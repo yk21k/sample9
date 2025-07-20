@@ -66,6 +66,7 @@
 	    </thead>
 	    <tbody>
 	        @foreach ($cartItems as $item)
+
 	            @php
 	                $shippingFee = (float) ($item->associatedModel->shipping_fee ?? 0);
 	                $originalPrice = (float) $item->price + $shippingFee;
@@ -85,6 +86,7 @@
 
 	                $totalAll += $totalPrice;
 	            @endphp
+
 	            <tr>
 	                <td>
 	                    <img style="width: 96px; height: 65px;" class="card-img-top"
@@ -113,6 +115,7 @@
 	                    </a>
 	                </td>
 	            </tr>
+		           
 	        @endforeach
 	    </tbody>
 	    <tfoot>
@@ -123,13 +126,13 @@
 	    </tfoot>
 	</table>
 
-	<div class="coupon">
+<!-- 	20250719休止中<div class="coupon">
 		<form action="{{ route('cart.coupon') }}" method="get">
 			<input class="input-text" type="text" id="coupon_code" name="coupon_code" value="" placeholder="Coupon code" required>
 			<input class="button" name="apply_coupon" value="Apply coupon" type="submit">
 		</form>
 	</div>
-	<br>
+	<br> -->
 	<br>
 	<div class="shopcoupon">
 		<form action="{{ route('cart.shopcoupon') }}" method="get">
@@ -137,7 +140,7 @@
 			<input class="button" name="apply_coupon" value="Apply coupon" type="submit">
 		</form>
 	</div>
-
+	<br><br>
 
 	
 	<button class="btn btn-danger button modalOpen" >Confirm payment details</button>
@@ -148,13 +151,11 @@
 
 	      <div class="modal-header">
 	      	<div>
-	      		<h2>Please confirm </h2>
+	      		<h2>決済に進む前にご確認ください </h2>
 	      		<div id="modalClose" class="modalClose">
 			      close
 			    </div>
-	        	<h3>Order cancellations cannot be made on this website, so if the item you received does not match your order (type, quantity, etc.), please contact the individual seller. Please note that this website does not guarantee returns or refunds after an inquiry.
-
-				If you agree, please check the checkbox below. You will be able to enter your shipping address and move to the payment page only after checking the checkbox.</h1>
+	        	<h3>当サイトではご注文のキャンセルは承っておりませんので、万が一、お届けした商品がご注文内容（種類、数量など）と異なる場合は、各出品者へお問い合わせください。なお、お問い合わせ後の返品・返金は保証いたしかねますのでご了承ください。ご同意いただける場合は、以下のチェックボックスにチェックを入れてください。チェックを入れた後のみ、配送先住所の入力やお支払いページへ移動できます。</h3>
 	      	</div>
 	        			
 	      </div>
@@ -175,6 +176,7 @@
 	    </div>
 	 </div>
 　　<div class="buffer"></div>
+	<br>
 	@php
 	    $originalTotal = \Cart::session(auth()->id())->getSubTotalWithoutConditions();
 	    
@@ -202,17 +204,24 @@
 	<h3 style="color: #b0c4de;">ご注文金額
 
 	    <div class="price-line">
-	        通常合計:
-	        <p class="original-price">
-	            &nbsp;¥{{ ceil($originalTotalWithShipping) }}
-	        </p>
-	        →
-	        <p class="discounted-price">
-	            割引適用後合計:　¥{{ number_format($totalAll) }}
-	        </p>
 
+	    	@if(ceil($totalAll)===ceil($originalTotalWithShipping))
+	    		合計:
+				<p class="text-body fw-bold">
+				    &nbsp;¥{{ number_format(ceil($originalTotalWithShipping)) }}
+				</p>
+	    	@else
+	    		通常合計:
+	    		<p class="original-price">
+	            	&nbsp;¥{{ ceil($originalTotalWithShipping) }}
+		        </p>
+		        →
+		        <p class="discounted-price">
+		            割引適用後合計:　¥{{ number_format($totalAll) }}
+		        </p>
+	    	@endif
 	    </div>
-
+	    <br>
 	    @if($discountAmount > 0)
 	        <div class="save-note" style="color:tomato;">
 	            🎉 ¥{{ ceil($originalTotalWithShipping - $totalAll)  }} お得になりました！
@@ -226,7 +235,7 @@
 	    @endif
 
 	    <div style="font-size: 0.75em; color: #b0c4de; margin-top: 0.6em;">
-	        ※キャンペーン割引が自動で適用されています。
+	        ※キャンペーン割引適用時は割引が自動で適用されます。
 	    </div>
 	</h3>
 

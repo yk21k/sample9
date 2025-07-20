@@ -9,30 +9,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>オークションサイト</title>
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <style>
+        p {
+            word-break: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+                    
+        }
+        .limited-description {
+          max-height: 150px !important;
+          overflow-y: auto !important;
+          word-break: break-word !important;
+        }
+        .limited-description::-webkit-scrollbar {
+            width: 15px;               /* スクロールバーの幅 */
+        }
+
+        .limited-description::-webkit-scrollbar-track {
+            background: #f0f0f0;       /* トラックの色（スクロールバーの背景） */
+        }
+
+        .limited-description::-webkit-scrollbar-thumb {
+            background-color: #4A90E2; /* つまみの色 */
+            border-radius: 6px;        /* つまみの角丸 */
+            border: 3px solid #f0f0f0; /* つまみの周りの余白（トラック色と同じにする） */
+        }
+
+        .limited-description::-webkit-scrollbar-thumb:hover {
+            background-color: #357ABD; /* ホバー時のつまみの色 */
+        }
+
+    </style>
 </head>
 <body>
     <header>
         <h1>オークションサイト</h1>   
     </header>
 
-    <main>
+    
 <main>
     <div class="product-list-auction">
         @foreach($auction_items as $auction_item)
-            <div class="product-card-auction">
-                <img class="card-img-top" src="{{ asset('storage/' . str_replace(['[', ']', '"'], '', $auction_item->cover_img1)) }}" alt="Card image cap">
-                <h2>{{ $auction_item->name }}</h2>
-                <p>{{ $auction_item->description }}</p>
-                <p class="price-auction">¥{{ $auction_item->suggested_price }}</p>
-                <a href="{{ route('home.auction.show', $auction_item->id) }}" class="btn-details-auction">詳細を見る</a>
-            </div>
+            @if($auction_item->event_ended == 1)
+                <div class="product-card-auction" >
+                    <img class="card-img-top" src="{{ asset('storage/' . str_replace(['[', ']', '"'], '', $auction_item->cover_img1)) }}" alt="Card image cap">
+                    <h2>{{ $auction_item->name }}</h2>
+                    <p class="limited-description">{{ $auction_item->description }}</p>
+                    <p class="price-auction">決済価格　¥{{ $auction_item->final_price }}</p>
+                    <a>決済され終了しました</a>
+                </div>
+            @else
+                <div class="product-card-auction">
+                    <img class="card-img-top" src="{{ asset('storage/' . str_replace(['[', ']', '"'], '', $auction_item->cover_img1)) }}" alt="Card image cap">
+                    <h2>{{ $auction_item->name }}</h2>
+                    <p class="limited-description">{{ $auction_item->description }}</p>
+                    <p class="price-auction">¥{{ $auction_item->suggested_price }}</p>
+                    <a href="{{ route('home.auction.show', $auction_item->id) }}" class="btn-details-auction">詳細を見る</a>
+                </div>
+            @endif
         @endforeach
     </div>
 
     @if ($auction)
         <div class="container mt-4">
             <h2>{{ $auction->name }}</h2>
-            <p>{{ $auction->description }}</p>
+            <p class="limited-description">{{ $auction->description }}</p>
 
             <ul class="list-group">
                 <li class="list-group-item">開始日時：{{ $auction->start }}</li>

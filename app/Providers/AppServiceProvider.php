@@ -12,6 +12,7 @@ use App\Observers\DesplayObserver;
 use App\Observers\MailsObserver;
 use App\Observers\ProductObserver;
 use App\Observers\SubOrderObserver;
+use App\Observers\AuctionObserver;
 
 use App\Models\Shop;
 use App\Models\CustomerInquiry;
@@ -23,11 +24,14 @@ use App\Models\Desplay;
 use App\Models\Mails;
 use App\Models\Product;
 use App\Models\SubOrder;
+use App\Models\Auction;
 
 use TCG\Voyager\Facades\Voyager;
 
 use App\Actions\SendStripeTransfer;
 use App\Actions\ImportCsvProducts;
+use App\Actions\PayToSeller;
+
 
 
 
@@ -59,6 +63,9 @@ class AppServiceProvider extends ServiceProvider
         Mails::observe(MailsObserver::class);
         Product::observe(ProductObserver::class); 
         SubOrder::observe(SubOrderObserver::class);
+        Auction::observe(AuctionObserver::class);
+        
+        Voyager::addAction(PayToSeller::class);
         Voyager::addAction(SendStripeTransfer::class);
         Voyager::addAction(ImportCsvProducts::class);
         

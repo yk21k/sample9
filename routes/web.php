@@ -20,6 +20,7 @@ use App\Http\Controllers\Seller\ExtraHolidaySettingController;
 use App\Http\Controllers\Seller\DesplayController;
 use App\Http\Controllers\Seller\ShopSettingController;
 use App\Http\Controllers\Seller\StripeConnectController;
+use App\Http\Controllers\Seller\AuctionOrderController;
 
 
 use App\Http\Controllers\Auth\RegisterController;
@@ -27,6 +28,9 @@ use App\Http\Controllers\ShopProfController;
 use App\Http\Controllers\ShopCouponsController;
 use App\Http\Controllers\SubOrderController;
 use App\Http\Controllers\BotManController;
+
+use App\Http\Controllers\Admin\StripePayController;
+
 use App\Http\Controllers\Admin\StripeTransferController;
 use App\Http\Controllers\StripeOnboardingController;
 use App\Http\Controllers\ProductImportController;
@@ -104,10 +108,19 @@ Route::post('/auction/{auction}/bid', [AuctionController::class, 'storeBid'])->n
 
 // 入札処理の後、即決金額が設定されていれば決済画面に遷移
 Route::post('/auction/{id}/bid', [AuctionController::class, 'storeBid'])->name('auction.bid.store');
+
 Route::get('/auction/{id}/payment', [AuctionController::class, 'payment'])->name('auction.payment');
 
 // 入札キャンセル用のルート
 Route::delete('/auction/bid/{bidId}/cancel', [AuctionController::class, 'cancelBid'])->name('auction.bid.cancel');
+
+Route::post('/add-to-auction-cart/{auction}', [App\Http\Controllers\CartController::class, 'addAuction'])->name('cart.add.auction')->middleware('auth');
+
+Route::post('/auction-charge/{auction}', [App\Http\Controllers\AuctionController::class, 'charge'])->name('auction.charge')->middleware('auth');
+
+Route::get('/auction/payment/success', [AuctionController::class, 'success'])->name('auction.payment.success');
+
+Route::post('/auction/confirm/{auction}', [AuctionController::class, 'confirmDelivery'])->name('auction.delivery.confirm');
 
 
 Route::get('products/search', [App\Http\Controllers\ProductController::class, 'search'])->name('products.search');
@@ -123,7 +136,7 @@ Route::resource('products', ProductController::class);
 
 Route::get('/add-to-cart/{product}', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add')->middleware('auth');
 
-Route::get('/add-to-auction-cart/{auction}', [App\Http\Controllers\CartController::class, 'addAuction'])->name('cart.add.auction')->middleware('auth');
+
 
 Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index')->middleware('auth');
 
@@ -205,6 +218,10 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('/stripe-transfer/{id}', [StripeTransferController::class, 'transfer'])
      ->name('admin.stripe.transfer');
 
+    Route::get('/pay-to-seller/{id}', [StripePayController::class, 'handle'])->name('admin.pay.to.seller'); 
+
+
+
 });
 
 Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', 'namespace' => 'App\Http\Controllers\Seller'], function () {
@@ -251,6 +268,19 @@ Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', '
     Route::post('/shop_setting', 'ShopSettingController@shopUpdate')->name('shop.shop_setting.update');
 
     Route::get('/seller/orders/export/full', [OrderController::class, 'exportFullOrders'])->name('orders.export.full');
+
+
+    Route::get('/shop_auction_orders', 'AuctionOrderController@index')->name('auction.shop_auction_orders');
+
+    Route::get('/shop_auction_orders/delivered-accepted/{auctionOrder}', 'AuctionOrderController@markAccepted')->name('auction.delivered_accepted');
+
+    Route::post('/shop_auction_orders/delivered-company/{auctionOrder}', 'AuctionOrderController@markDeliveryCom')->name('auction.delivered_company');
+
+    Route::post('/shop_auction_orders/delivered-arranged/{auctionOrder}', 'AuctionOrderController@markArranged')->name('auction.delivered_arranged');
+
+    Route::post('/shop_auction_orders/delivered/{auctionOrder}', 'AuctionOrderController@markDelivered')->name('auction.delivered');
+
+
 
 });
 

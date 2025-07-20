@@ -15,6 +15,9 @@ use App\Models\Fovorite;
 use App\Models\DeliveryAddress;
 use App\Models\Product;
 use App\Models\SubOrdersArrivalReport;
+use App\Models\Auction;
+use App\Models\AuctionOrder;
+
 use Auth;
 
 
@@ -54,6 +57,8 @@ class AccountController extends Controller
         // $favaoriteItems = Product::with('user_favo')->find($userId);
         $favaoriteItems = Product::with('user_favo')->get();
 
+        $auction_orders = Auction::where('winner_user_id', auth()->user()->id)->get();
+        // dd($auction_orders);
         // dd($favaoriteItems);
         
         // $favaoriteItems = Fovorite::where('user_id', Auth::user()->id)->get();
@@ -62,7 +67,7 @@ class AccountController extends Controller
         // $arrival = SubOrdersArrivalReport::where('sub_order_id', )->first();
 
 
-        return view('account.account', compact('profiles', 'order_histories', 'firstDelis', 'savedDelis', 'shipping_names', 'favaoriteItems', 'subOrder_items', 'itemsGrouped'));
+        return view('account.account', compact('profiles', 'order_histories', 'firstDelis', 'savedDelis', 'shipping_names', 'favaoriteItems', 'subOrder_items', 'itemsGrouped', 'auction_orders'));
     }
 
     public function updateProf(Request $request, $id)

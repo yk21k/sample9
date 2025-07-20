@@ -1,8 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-
-
+<style>
+    p {
+      word-break: break-word;      /* 長い単語の途中でも改行を入れる */
+      overflow-wrap: break-word;   /* word-wrapの新しいプロパティ名 */
+      white-space: normal;         /* 連続スペースを折り返して表示 */
+    }
+</style>
 <main class="product-detail-auction-container">
     
     @php
@@ -27,27 +32,45 @@
                 <p>終了日時: {{ Carbon::parse($endTime)->format('Y年m月d日 H:i') }}</p>
             @endif
         </div>
+    @elseif($winBuyer->winner_user_id)
+        <div class="alert alert-danger auction-alert w-100">
+            <i class="fas fa-times-circle"></i>
+            <strong>オークションは￥{{ $winBuyer->final_price }}で決済され終了しました。</strong>
+                <p>終了日時: {{ $winBuyer->payment_at }}</p>
+        </div>    
     @else
         <div class="alert alert-info auction-alert w-100">
             <i class="fas fa-gavel"></i>
             <strong>オークションは現在進行中です。</strong>
-            <p>入札できます！</p>
         </div>
     @endif
 
     <div class="product-info-auction">
-        <div class="row">
-            <div class="col-md-15">
-                <h2>{{ $auction_bid_items->name }}</h2><br>
-                <h4>終了日：{{ Carbon::parse($auction_bid_items->end)->format('Y年m月d日 H:i') }} <br>--<small>{{ Carbon::parse($auction_bid_items->updated_at)->format('Y年m月d日 H:i') }}に更新されました--</small></h4>
-                <p>説明：{{ $auction_bid_items->description }}</p>
-            </div>
-            <div class="col-md-4">    
-                <p class="price-auction">初期価格：¥  {{ number_format($auction_bid_items->suggested_price) }}</p>
-                <p class="price-auction" id="current-price-auction">即決価格：¥ {{ number_format($auction_bid_items->spot_price) }}</p> <!-- 即決価格 -->
-            </div>
-        </div> 
-    </div> 
+      <div class="row">
+        <div class="col-md-12" style="max-width:100%;">
+          <h2>{{ $auction_bid_items->name }}</h2><br>
+          <h4>
+            終了日：{{ Carbon::parse($auction_bid_items->end)->format('Y年m月d日 H:i') }}<br>
+            --<small>{{ Carbon::parse($auction_bid_items->updated_at)->format('Y年m月d日 H:i') }}に更新されました--</small>
+          </h4>
+          <p>
+            説明：{{ $auction_bid_items->description }}
+          </p>
+        </div>
+        
+        <div class="col-md-12">
+          <p class="price-auction">
+            <strong>初期価格：¥{{ number_format($auction_bid_items->suggested_price+$auction_bid_items->shipping_fee) }}円</strong>&nbsp;<small><a style="color: cadetblue;">内訳(¥{{ number_format($auction_bid_items->suggested_price) }}円 ＋ 配送料：{{number_format($auction_bid_items->shipping_fee)  }}円)</a></small>
+            
+          </p>
+          <p class="price-auction" id="current-price-auction">
+            <strong>即決価格：¥{{ number_format($auction_bid_items->spot_price+$auction_bid_items->shipping_fee) }}円</strong>&nbsp;<small><a style="color: cadetblue;">内訳(¥{{ number_format($auction_bid_items->spot_price) }}円 ＋ 配送料：{{number_format($auction_bid_items->shipping_fee) }}円)</small> </a> 
+        　</p>
+        </div>
+      </div>
+    </div>
+
+ 
     <div class="row">
         <!-- 2/3 幅のカルーセル -->
         <div class="col-md-6">
@@ -125,13 +148,22 @@
                     </tbody>
                 </table>    
             </div><br>
-
+            @php
+                $now = Carbon::now();
+                $endDate = Carbon::parse($auction_bid_items->end);
+                $oneWeekLater = $endDate->copy()->addWeek();
+            @endphp
             
-
             @if(now()->greaterThan($auction_bid_items->end) && Auth::check() && optional($topBids->first())->user_id === Auth::id())
-                <p class="text-info">お客様は、入札順位一位でオークションが終了したので、購入することが可能です。</p>
+                <p class="text-info">
+                    お客様は、入札順位一位でオークションが終了したので、購入することが可能です。
+                    期限は、{{$oneWeekLater->format('Y年m月d日 H:i')}} です
+                </p>
                 
-                <button class="btn btn-success" onclick="openPostAuctionModal()">購入手続きへ進む</button>
+                @if ($now->between($endDate, $oneWeekLater))
+                    <button class="btn btn-success" onclick="openPostAuctionModal()">購入手続きへ進む</button>
+                @endif
+
 
                 <!-- モーダル表示 -->
                 <div id="postAuctionModal" style="display: none; position: fixed; top: 30%; left: 30%; width: 40%; background: #fff; border: 1px solid #aaa; padding: 20px; z-index: 1000;">
@@ -143,26 +175,40 @@
                 </div>
                 <div id="postAuctionBackdrop" style="display: none; position: fixed; top: 0; left: 0; height: 100%; width: 100%; background-color: rgba(0,0,0,0.5); z-index: 999;"></div>
             
-            @elseif(now()->greaterThan($auction_bid_items->end))
+            @elseif(isset($winBuyer->winner_user_id) || now()->greaterThan($auction_bid_items->end))
+
                 <p class="text-danger">オークションは終了しました。</p>
 
             @elseif(Auth::check() && optional($topBids->first())->user_id === Auth::user()->id)
                 <p class="text-primary">現在入札順位一位です。</p>
             @else
                 {{-- 即決入札フォーム --}}
-                <form method="POST" action="{{ route('auction.bid.store', $auction_bid_items->id) }}" id="buyNowForm">
-                    @csrf
-                    <input type="hidden" name="bid_amount" value="{{ $auction_bid_items->spot_price }}">
-                    <button type="button" class="btn btn-danger" onclick="openBuyNowModal()">
-                        即決価格で入札（¥{{ number_format($auction_bid_items->spot_price) }}）
+                @if($delivery_addresses)
+                    <form method="POST" action="{{ route('auction.bid.store', $auction_bid_items->id) }}" id="buyNowForm">
+                        @csrf
+                        <input type="hidden" name="bid_amount" value="{{ (int)($auction_bid_items->spot_price+$auction_bid_items->shipping_fee) }}">
+                        <button type="button" class="btn btn-danger" onclick="openBuyNowModal()">
+                            即決価格で入札（¥{{ number_format($auction_bid_items->spot_price+$auction_bid_items->shipping_fee) }}）
+                        </button>
+                    </form>
+                @else
+                    <button type="button" class="btn btn-danger" disabled>
+                        即決価格で入札（¥{{ number_format($auction_bid_items->spot_price+$auction_bid_items->shipping_fee) }}）
                     </button>
-                </form>
+                    購入には、送付先住所の登録が必要です。
+                    <a href="{{ route('account.account', ['id'=>Auth::user()->id]) }}"><small>登録ページへ</small></a>
+                @endif    
 
                 {{-- 通常入札フォーム --}}
-                
+                @php
+                    $suggestedPrice = $auction_bid_items->suggested_price;
+                    $spotPrice = $auction_bid_items->spot_price;
+                    $minimumBidUnit = $suggestedPrice >= 10000 ? 1000 : 100;
+                @endphp
+
                 <form method="POST" action="{{ route('auction.bid.store', $auction_bid_items->id) }}" id="regularBidForm" class="mt-4">
                     @csrf
-
+                    即決金額を超える入札額は、即決金額で決済画面に進みます
                     <div class="form-group">
                         <label for="bid_amount">入札金額</label>
                         <input type="number"
@@ -170,7 +216,8 @@
                                id="bid_amount"
                                class="form-control"
                                required
-                               min="{{ $auction_bid_items->suggested_price }}"
+                               min="{{ $suggestedPrice+$auction_bid_items->shipping_fee+$minimumBidUnit }}"
+                               step="{{ $minimumBidUnit }}"
                                placeholder="¥金額を入力">
                     </div>
 
@@ -184,21 +231,28 @@
                                placeholder="もう一度同じ金額を入力">
                     </div>
 
-                    <p id="confirm-error" style="color: red; display: none;">確認金額が一致しません。</p>
 
-                    <button type="button" class="btn btn-primary" onclick="handleRegularBid()">入札する</button>
+                    <p id="confirm-error" style="color: red; display: none;">確認金額が一致しません。</p>
+                    @if($delivery_addresses)
+                        <button type="submit" class="btn btn-primary" onclick="handleRegularBid()">入札する</button>
+                    @else
+                        <button type="submit" class="btn btn-primary" disabled>入札する</button>購入には、送付先住所の登録が必要です。
+                        <a href="{{ route('account.account', ['id'=>Auth::user()->id]) }}"><small>登録ページへ</small></a>
+                    @endif    
                 </form>
-                
+
+
                 <!-- 即決確認モーダル -->
                 <div id="confirmModal" style="display: none; position: fixed; top: 30%; left: 30%; width: 40%; background: #fff; border: 1px solid #aaa; padding: 20px; z-index: 1000;">
                     <p style="color: red;">この金額で即決入札しますか？</p>
-                    <h3 style="color: red;" id="modalAmount">¥{{ number_format($auction_bid_items->spot_price) }}</h3>
-                    <button onclick="submitBuyNow()" style="color: red;">はい</button>
-                    <button onclick="closeModal()" style="color: red;">キャンセル</button>
+                    <h3 style="color: red;" id="modalAmount">¥{{ number_format($auction_bid_items->spot_price+$auction_bid_items->shipping_fee) }}</h3>
+                    <button id="confirmModalButtonYes" style="color: red;">はい</button>
+                    <button id="confirmModalButtonNo" style="color: red;">キャンセル</button>
                 </div>
 
                 <!-- モーダル背景 -->
-                <div id="modalBackdrop" style="display: none; position: fixed; top: 0; left: 0; height: 100%; width: 100%; background-color: rgba(0,0,0,0.5); z-index: 999;"></div>
+                <div id="modalBackdrop" style="display: none; position: fixed; top: 0; left: 0; height: 100%; width: 100%; background-color: rgba(0,0,0,0.5); z-index: 999;">
+                </div>
 
             @endif
 
@@ -213,14 +267,53 @@
 
 </main>
 
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const bidInput = document.getElementById('bid_amount');
         const confirmInput = document.getElementById('bid_amount_confirm');
         const confirmError = document.getElementById('confirm-error');
+        const buyNowForm = document.getElementById('buyNowForm');
 
-        const rawBase = @json($topBids->first()->amount ?? $auction_bid_items->suggested_price);
+        const rawDeliveryFee = @json($auction_bid_items->shipping_fee ?? 0);
+        const rawBase = @json($topBids->first()->amount ?? $auction_bid_items->suggested_price)+rawDeliveryFee;
+        const spotPrice = @json($auction_bid_items->spot_price);
+        const auctionStart = new Date("{{ $auction_bid_items->start }}");
+
         const baseAmount = parseInt(rawBase, 10);
+        const deliveryFee = parseInt(rawDeliveryFee, 10);
+        const suggestedPrice = {{ $auction_bid_items->suggested_price }};
+        const now = new Date();
+        const twoDaysLater = new Date(auctionStart.getTime() + 2 * 24 * 60 * 60 * 1000);
+
+        const minimumBidUnit = suggestedPrice >= 10000 ? 1000 : 100;
+        const total = spotPrice + deliveryFee;
+
+        // モーダル「はい」ボタン
+        const yesButton = document.getElementById('confirmModalButtonYes');
+        const noButton = document.getElementById('confirmModalButtonNo');
+        const modal = document.getElementById('confirmModal');
+        const backdrop = document.getElementById('modalBackdrop');
+
+
+        let forbiddenPrices = [];
+
+        if (now < twoDaysLater) {
+            const isNotRound = total % minimumBidUnit !== 0;
+
+            if (isNotRound) {
+                // 禁止したい価格：total から100円単位で減らし、3つだけ弾く
+                const max = Math.floor(total / minimumBidUnit) * minimumBidUnit;
+                const count = 3; // 明示的にNGにしたい個数
+                for (let i = 0; i < count; i++) {
+                    const price = max - (i * minimumBidUnit);
+                    if (price > baseAmount) {
+                        forbiddenPrices.push(price);
+                    }
+                }
+            }
+        }
+
 
         function getMinimumBidUnit(amount) {
             if (amount >= 10000) return 1000;
@@ -228,17 +321,11 @@
             return 10;
         }
 
+        // 入札ボタン押下時処理
         window.handleRegularBid = function () {
-            // alert("クリックされました");
-
             const bid = parseInt(bidInput.value, 10);
             const confirm = parseInt(confirmInput.value, 10);
             const minimumUnit = getMinimumBidUnit(baseAmount);
-
-            // console.log("bid:", bid);
-            // console.log("confirm:", confirm);
-            // console.log("baseAmount:", baseAmount);
-            // console.log("minimumUnit:", minimumUnit);
 
             if (isNaN(bid) || isNaN(confirm)) {
                 alert("金額を正しく入力してください。");
@@ -253,21 +340,66 @@
                 confirmError.style.display = 'none';
             }
 
-            const diff = bid - baseAmount;
-
-            if (diff < minimumUnit || diff % minimumUnit !== 0) {
-                alert(
-                    // "最低入札単位は " + minimumUnit + " 円です。\n" +
-                    "現在の価格（" + baseAmount + " 円）より " + minimumUnit + " 円以上の増額で、" +
-                    minimumUnit + " 円単位で入札してください。"
-                );
+            if (now < twoDaysLater && forbiddenPrices.includes(bid)) {
+                alert("この金額（¥" + bid + "）では、開始から2日以内は入札できません。");
                 return;
+            }
+
+            const diff = bid - baseAmount;
+            if (bid !== total) { // 即決価格ちょうどでない場合のみチェック
+                if (diff < minimumUnit || diff % minimumUnit !== 0) {
+                    alert(
+                        "現在の価格（入札基準額：" + baseAmount + " 円）より " + minimumUnit + " 円以上の増額で、" +
+                        minimumUnit + " 円単位で入札してください。"
+                    );
+                    return;
+                }
             }
 
             document.getElementById('regularBidForm').submit();
         };
 
+        // 入力中に即時チェック
+        bidInput.addEventListener('input', function () {
+            const bid = parseInt(this.value, 10);
+            if (now < twoDaysLater && forbiddenPrices.includes(bid)) {
+                this.setCustomValidity("この金額では入札できません（開始から2日以内）。");
+            } else {
+                this.setCustomValidity("");
+            }
+        });
+
+        yesButton.addEventListener('click', function () {
+        const value = document.querySelector('#buyNowForm input[name="bid_amount"]').value;
+        console.log('✅ 即決フォーム値:', value);
+
+        if (!value || isNaN(value)) {
+            alert("送信値が不正です。");
+            return;
+        }
+
+            document.getElementById('buyNowForm').submit();
+        });
+
+        noButton.addEventListener('click', function () {
+            modal.style.display = 'none';
+            backdrop.style.display = 'none';
+        });
+
+        // 即決モーダル関連
         window.openBuyNowModal = function () {
+            console.log("▶ openBuyNowModal が呼ばれました");
+
+            const modal = document.getElementById('confirmModal');
+            const backdrop = document.getElementById('modalBackdrop');
+
+            if (!modal || !backdrop) {
+                alert("モーダルのHTMLが存在していません。");
+                console.warn("❌ confirmModalまたはmodalBackdropが見つかりません");
+                return;
+            }
+
+
             document.getElementById('confirmModal').style.display = 'block';
             document.getElementById('modalBackdrop').style.display = 'block';
         };
@@ -278,28 +410,29 @@
         };
 
         window.submitBuyNow = function () {
+            const value = parseInt(document.querySelector('#buyNowForm input[name="bid_amount"]').value, 10);
+            console.log('即決フォーム値:', value);  // ← これも出てない場合、ここが呼ばれていません
             document.getElementById('buyNowForm').submit();
         };
+
+
     });
 </script>
-<script>
-    function openPostAuctionModal() {
-        document.getElementById('postAuctionModal').style.display = 'block';
-        document.getElementById('postAuctionBackdrop').style.display = 'block';
-    }
 
-    function closePostAuctionModal() {
-        document.getElementById('postAuctionModal').style.display = 'none';
-        document.getElementById('postAuctionBackdrop').style.display = 'none';
+<script>
+    function submitBuyNow() {
+        const value = document.querySelector('#buyNowForm input[name="bid_amount"]').value;
+        console.log('✅ 即決フォーム値:', value);
+
+        // 念のため NaN 判定
+        if (!value || isNaN(value)) {
+            alert("送信値が不正です。");
+            return;
+        }
+
+        document.getElementById('buyNowForm').submit();
     }
 </script>
-
-
-
-
-
-
-
 
 
 

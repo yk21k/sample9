@@ -55,9 +55,144 @@
 		    <h3><a class="nav-link link-secondary" href="#support">サポート</a></h3>
 		  </li>
 		</ul>
-        
+ <br><br> 
+       
 <div class="container">
+    <style>
+        #auction-history table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #auction-history th, #auction-history td {
+            border: 1px solid #ccc;
+            padding: 8px 12px;
+            text-align: center;
+        }
+        #auction_order_img{
+        	width: 50px;
+        	height: 50px;
+        }
+    </style>
     <main>
+    	<section id="auction-history" class="section_auction">
+    		<h2>オークション購入履歴</h2>
+    		<br>
+    		<button type="button" class="btn btn-sm btn-info" id="hide_button4">Hide/Display</button>
+		    	<br>
+				<ul id="auction-order-history">
+			    
+			    @if(empty($auction_orders) || $auction_orders->isEmpty())
+			    	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<p><h5>&nbsp;&nbsp;&nbsp;&nbsp;当サイトのオークションでの購入履歴がありません</h5></p><br><br><br>
+			    @else
+			    	<table>
+		    			<head>
+		    				<tr>
+		    					<th></th>
+		    					<th>オークション名</th>
+		    					<th>決済日</th>
+		    					<th>決済額 内)配送料</th>
+		    					<th>配送状況</th>
+		    					<th>配送業者名</th>
+		    					<th>受付番号</th>
+		    					<th>更新日</th>
+		    				<tr>
+		    			</head>
+		    			<tbody>
+		    				@foreach($auction_orders as $auction_order)
+		    				<tr>
+		    					<td><img class="" src="{{ asset( 'storage/'.$auction_order->cover_img1 ) }}" alt=""  width="100" height="80"></td>
+		    					<td>{{$auction_order->name}}</td>
+		    					<td>{{$auction_order->payment_at}}</td>
+		    					<td>¥{{$auction_order->final_price}}&nbsp;<small>(¥{{$auction_order->shipping_fee}})</small></td>
+
+		    					@if($auction_order->delivery_status == 0)
+		    						<td>準備中</td>
+
+		    					@elseif($auction_order->delivery_status == 1)
+		    						<td>配送手配中</td>
+
+		    					@elseif($auction_order->delivery_status == 2)
+
+		    						<td>配送手配済</td>
+
+		    					@else($auction_order->delivery_status == 3)
+
+		    						<td>
+		    							配達完了
+		    							@php
+										    $confirmedAt = $auction_order->arrival_confirmed_at;
+										    $showForm = !$confirmedAt || Carbon\Carbon::parse($confirmedAt)->addWeek()->isFuture();
+
+										    // モーダル表示の追加条件：メール送信から1週間以内
+										    $mailSentAt = $auction_order->mail_sent_at;
+										    $withinMailLimit = !$mailSentAt || Carbon\Carbon::parse($mailSentAt)->addWeek()->isFuture();
+										@endphp
+										@if($auction_order->arrival_status==1)
+											{{ Carbon\Carbon::parse($auction_order->arrival_confirmed_at)->format('Y年m月d日') }} に到着確認済
+
+										@elseif($auction_order->arrival_status==0 && $showForm && $withinMailLimit)
+			    							<!-- モーダルを開くトリガーボタン -->
+										    <button type="button" class="btn btn-success btn-sm mt-1" data-bs-toggle="modal" data-bs-target="#confirmArrivalModal-{{ $auction_order->id }}">
+										        到着を確認する
+										    </button>
+
+										    <!-- モーダル本体 -->
+										    <div class="modal fade" id="confirmArrivalModal-{{ $auction_order->id }}" tabindex="-1" aria-labelledby="confirmArrivalModalLabel-{{ $auction_order->id }}" aria-hidden="true">
+										        <div class="modal-dialog modal-dialog-centered">
+										            <div class="modal-content">
+										                <form method="POST" action="{{ route('auction.delivery.confirm', $auction_order->id) }}">
+										                    @csrf
+										                    <div class="modal-header">
+										                        <h5 class="modal-title" id="confirmArrivalModalLabel-{{ $auction_order->id }}">商品の到着を確認</h5>
+										                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
+										                    </div>
+										                    <div class="modal-body">
+										                        <div class="form-group mb-2">
+										                            <label for="arrival_message">コメント</label>
+										                            <textarea name="arrival_message" class="form-control" rows="3" placeholder="商品の到着についてコメントを入力"></textarea>
+										                        </div>
+										                        <div class="form-group">
+																    <label for="arrival_limit" style="color: tomato;">到着の回答期限は</label><br>
+
+																    @if($auction_order->mail_sent_at)
+																        <small>
+																            {{ \Carbon\Carbon::parse($auction_order->mail_sent_at)->format('Y年m月d日') }} の（+7日後の）
+																        </small>
+																        <h4 style="color: tomato;">
+																            → {{ \Carbon\Carbon::parse($auction_order->mail_sent_at)->addDays(7)->format('Y年m月d日') }} です。
+																        </h4>
+																    @else
+																        <small>メールがまだ送信されていません。</small>
+																    @endif
+																</div>
+										                    </div>
+										                    <div class="modal-footer">
+										                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+										                        <button type="submit" class="btn btn-success">到着を確認する</button>
+										                    </div>
+										                </form>
+										            </div>
+										        </div>
+										    </div>
+								        @endif    
+		    						</td>	
+
+		    					@endif
+		    					<td>{{$auction_order->shipping_company}}</td>
+		    					<td>{{$auction_order->reception_number}}</td>
+		    					<td>{{$auction_order->updated_at}}</td>
+		    					
+		    				</tr>
+		    				@endforeach
+		    			</tbody>
+		    		</table><br><br><br>
+		    		
+			    @endif
+				<ul>
+				<br>	
+    	</section><br>
+
         <section id="order-history" class="section_accocnt">
             <h2>注文履歴　Order history</h2>
             <ul>
@@ -85,8 +220,6 @@
 
 			{{-- Hide/Display ボタン --}}
 			<button type="button" class="btn btn-sm btn-info" id="hide_button">Hide/Display</button>
-
-
 
 				<br><br>
             	<table class="table table-bordered table-striped" id="table_order1">
@@ -211,17 +344,12 @@
 		                            <p>評価: {{ $favoItem->wants }}</p>
 		                            <p>投稿日: {{ ($favoItem->created_at)->format('Y年n月j日')}}</p>
 		                        </div>
-		                        <div class="review-actions111">
-		                            <button class="edit-btn111">編集</button>
-		                            <button class="delete-btn111">削除</button>
-		                        </div>
-	                        	<p class="review-content111">
+		                       	<p class="review-content111">
 	                        		{{ $favoItem->review }}
 	                        	</p>
                     		</div>
             			</li>
 		                @endif
-		                <!-- 他のお気に入り商品 -->
 		            @endforeach    
                 @endforeach
             </ul>
@@ -342,6 +470,12 @@ $(function() {
 $(function() {
     $("#hide_button3").click(function() {
         $("#foavoriteItems").slideToggle("");
+    });
+});
+
+$(function() {
+    $("#hide_button4").click(function() {
+        $("#auction-order-history").slideToggle("");
     });
 });
 </script>

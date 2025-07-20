@@ -191,7 +191,8 @@ class OrdersController extends Controller
                 $query->where('template', 'template1')
                       ->orWhere('template', 'template3');
             })->first();
-
+            
+        // dd($mailDisplay);
         // 履歴が存在する場合のみ、排他チェックを実行
         if ($mailDisplay) {
             if (($mailDisplay->template == 'template1') && ($data['template'] == 'template3')) {

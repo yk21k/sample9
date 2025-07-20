@@ -122,18 +122,25 @@
                                     <label class="form-check-label" for="autoSizingCheck">Favorite
                                     </label>
                                     <select class="form-select" id="autoSizingSelect" name="wants">
-                                        <option selected>選択してください...</option>
-                                        <option value="10">完全に満足しており、友人や同僚に強く薦める。</option>
-                                        <option value="9">商品やサービスに非常に満足しており、積極的に薦めたいと感じる。</option>
-                                        <option value="8">商品やサービスに非常に満足しており、友人や同僚に薦める意欲が強い。</option>
-                                        <option value="7">商品やサービスに満足しており、友人や同僚に薦める可能性がある。</option>
-                                        <option value="6">商品やサービスに対して満足しており、薦める可能性が高いが、改善の余地があると感じている。</option>
-                                        <option value="5">商品やサービスに満足しているわけではないが、非常に不満でもない。</option>
-                                        <option value="4">良くも悪くもないと感じており、特に薦める気にはならない。</option>
-                                        <option value="3">商品やサービスにいくつかの問題があり、薦めることに慎重になる。</option>
-                                        <option value="2">一部の要素に不満があり、友人や同僚には薦めない。</option>
-                                        <option value="1">商品やサービスに対して強い不満があり、友人や同僚に絶対に薦めない。</option>
-                                        <option value="0">この商品やサービスに対して非常に不満で、全く薦めたくない。</option>
+                                        <option value="" selected>選択してください...</option>
+                                        <option value="10">非常に満足：全く不満がなく、誰にでも強く薦めたい</option>
+                                        <option value="9.5">非常に満足：期待以上で、積極的に他人にも薦めたい</option>
+                                        <option value="9">満足：質が高く、友人や同僚にも自信を持って薦められる</option>
+                                        <option value="8.5">満足：良い体験ができ、ぜひ他の人にも使ってほしい</option>
+                                        <option value="8">満足：価格・品質・対応など全体的にバランスが良いと感じた</option>
+                                        <option value="7.5">やや満足：ほとんど問題はなく、友人にも薦めたい気持ちがある</option>
+                                        <option value="7">やや満足：気になる点はあるが、総じて良い印象を受けた</option>
+                                        <option value="6.5">概ね満足：改善点もあるが、購入して良かったと感じている</option>
+                                        <option value="4.5">普通以上：特別良いわけではないが、薦める可能性はある</option>
+                                        <option value="-0.5">商品やサービスに満足しているわけではないが、非常に不満でもない。</option>
+                                        <option value="-1">良くも悪くもないと感じており、特に薦める気にはならない。</option>
+                                        <option value="-1.5">いくつかの問題点があり、薦めることには慎重になる</option>
+                                        <option value="-2.5">重要ではないが気になる点があり、人に薦めづらい</option>
+                                        <option value="-3.8">一部の要素に不満があり、友人や同僚には薦めない</option>
+                                        <option value="-4.0">期待を大きく下回り、他人に薦めることはできない</option>
+                                        <option value="-4.1">商品やサービスに対して強い不満があり、絶対に薦めない</option>
+                                        <option value="-4.3">非常に不快な体験で、否定的な意見しか持てない</option>
+                                        <option value="-4.5">この商品やサービスに対して深刻な不満があり、絶対に薦めたくない</option>      
                                     </select>
                                     
                                 </div>

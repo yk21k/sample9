@@ -23,12 +23,12 @@
   <div class="form-group">
     <label for="exampleFormControlSelect1">お問い合わせの件名の種別</label>
     <select class="form-control" id="exampleFormControlSelect1" name="inq_subject" required>
-      <option value="" disabled selected>Select--</option>
+      <option value="" disabled selected>選択してください--</option>
       <option value="1">1: このお問い合わせの回答や問題解決と購入とは別のものです。</option>
       <option value="2">2: このお問い合わせの回答や問題解決が解決されなくても購入します。</option>
       <option value="3">3: このお問い合わせの回答や問題解決が解決したら購入します。</option>
       <option value="4">4: この問題が解決されれば、購入を積極的に検討します。</option>
-      <option value="5">5: ご購入・お受け取りいただいた商品についてです。</option>
+      <option value="5">5: 購入・お受け取りした商品についてです。(配達時の商品の取扱が原因ではないかと推測される場合も選択ください)</option>
       <option value="6">6: キャンセルしたい</option>
     </select>
   </div>
@@ -46,10 +46,10 @@
       <option value="7">7: 強引な勧誘により本商品を購入したため困っています。こちらを選択する際は、消費者センター等へのご相談も検討ください。</option>
     </select>
   </div>
-
+  <br>
   <div class="form-group">
-    <label for="inquiry_details">Inquiry Detail</label>
-    <textarea class="form-control" name="inquiry_details" id="inquiry_details" rows="3" placeholder="Detail" required></textarea>
+    <label for="inquiry_details">お問い合わせ内容の詳細</label>
+    <textarea class="form-control" name="inquiry_details" id="inquiry_details" rows="3" placeholder="(詳細)Detail" required></textarea>
   </div>
 
   <div class="form-group">

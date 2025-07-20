@@ -35,6 +35,16 @@ class ShopCouponsController extends Controller
             'expiry_date' => 'required|date|after:today'
         ]);
 
+        $product_shop_coupons_price = Product::where('id', $products_id)->first();
+        // dd($product_shop_coupons_price->price);
+
+        // dd($values*-1<$product_shop_coupons_price->price*0.2);
+        // dd(abs($values)<$product_shop_coupons_price->price*0.2);
+
+        if(abs($values)<$product_shop_coupons_price->price*0.2){
+            return redirect()->route('order.make_coupon')->withMessage('クーポンは２割引以下で作成してください');    
+        }
+
         $coupons = [];
 
         for($i = 0; $i < $sheets; $i++){

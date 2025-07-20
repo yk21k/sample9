@@ -96,17 +96,29 @@
                                     @else
                                         {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!}
                                     @endif
-
+                                    
                                     @foreach (app('voyager')->afterFormFields($row, $dataType, $dataTypeContent) as $after)
                                         {!! $after->handle($row, $dataType, $dataTypeContent) !!}
                                     @endforeach
+
                                     @if ($errors->has($row->field))
                                         @foreach ($errors->get($row->field) as $error)
                                             <span class="help-block">{{ $error }}</span>
                                         @endforeach
                                     @endif
-                                </div>
 
+                                    {{-- 20250715hidden input で JS に渡す --}}
+                                    @php
+                                        $auction = \App\Models\Auction::with('bids')->find($dataTypeContent->id);
+
+                                        $hasBids = $auction && $auction->bids->isNotEmpty();
+                                    @endphp
+
+                                    <input type="hidden" id="has-bids-flag" value="{{ $hasBids ? 1 : 0 }}">
+
+
+                                </div>
+                                
                             @endforeach
                             
 
@@ -120,7 +132,7 @@
                             @if( $attributeOptions->isEmpty() )
                                 <p>No attribute</p>
                             @endif
-                            
+
 
                         </div><!-- panel-body -->
 
@@ -163,6 +175,10 @@
         </div>
     </div>
     <!-- End Delete File Modal -->
+
+
+
+
 @stop
 
 @section('javascript')
@@ -238,4 +254,156 @@
             $('[data-toggle="tooltip"]').tooltip();
         });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const suggestedInput = document.querySelector('input[name="suggested_price"]');
+            const spotInput = document.querySelector('input[name="spot_price"]');
+
+            function validatePriceDifference() {
+                const suggested = parseFloat(suggestedInput.value);
+                const spot = parseFloat(spotInput.value);
+
+                if (!isNaN(suggested) && !isNaN(spot)) {
+                    const diff = Math.abs(spot - suggested);
+                    if (diff >= 2000) {
+                        spotInput.setCustomValidity("初期価格と即決価格の差額は2000円未満にしてください。");
+                    } else {
+                        spotInput.setCustomValidity("");
+                    }
+                }
+            }
+
+            suggestedInput.addEventListener('input', validatePriceDifference);
+            spotInput.addEventListener('input', validatePriceDifference);
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const radios = document.querySelectorAll('input[name="delivery_status"]');
+            const selected = document.querySelector('input[name="delivery_status"]:checked');
+
+            if (selected && selected.value === "3") {
+                radios.forEach(radio => {
+                    radio.disabled = true;
+                });
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 配送ステータスのラジオボタン群
+            const radios = document.querySelectorAll('input[name="delivery_status"]');
+
+            // shipping_companyとreception_numberのinput要素
+            const shippingCompanyInput = document.querySelector('input[name="shipping_company"]');
+            const receptionNumberInput = document.querySelector('input[name="reception_number"]');
+
+            // これらのinput要素の親フォームグループを取得
+            const shippingCompanyGroup = shippingCompanyInput.closest('.form-group');
+            const receptionNumberGroup = receptionNumberInput.closest('.form-group');
+
+            function toggleShippingFields() {
+                const checked = document.querySelector('input[name="delivery_status"]:checked');
+                if (checked && checked.value === '2') {
+                    shippingCompanyGroup.style.display = 'block';
+                    receptionNumberGroup.style.display = 'block';
+                } else {
+                    shippingCompanyGroup.style.display = 'none';
+                    receptionNumberGroup.style.display = 'none';
+                }
+            }
+
+            toggleShippingFields();
+
+            radios.forEach(radio => {
+                radio.addEventListener('change', toggleShippingFields);
+            });
+        });
+
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const radios = document.querySelectorAll('input[name="delivery_status"]');
+            const shippingInput = document.querySelector('input[name="shipping_company"]');
+            const receptionInput = document.querySelector('input[name="reception_number"]');
+
+            function toggleRequired() {
+                const checked = document.querySelector('input[name="delivery_status"]:checked');
+                if (checked && checked.value === '2') {
+                    shippingInput.required = true;
+                    receptionInput.required = true;
+                } else {
+                    shippingInput.required = false;
+                    receptionInput.required = false;
+                }
+            }
+
+            toggleRequired();  // 初期判定
+
+            radios.forEach(radio => radio.addEventListener('change', toggleRequired));
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const steps = ['0', '1', '2', '3'];
+            const radios = document.querySelectorAll('input[name="delivery_status"]');
+
+            // 初期選択状態を取得
+            const selectedRadio = document.querySelector('input[name="delivery_status"]:checked');
+            const currentIndex = steps.indexOf(selectedRadio?.value);
+
+            radios.forEach(radio => {
+                const index = steps.indexOf(radio.value);
+
+                // 現在より前のステップを無効化
+                if (index < currentIndex) {
+                    radio.disabled = true;
+                }
+            });
+
+            // 選択変更時に前へ戻れないよう再チェック（※必要なら有効化）
+            radios.forEach(radio => {
+                radio.addEventListener('change', function () {
+                    const newIndex = steps.indexOf(this.value);
+                    radios.forEach(r => {
+                        const idx = steps.indexOf(r.value);
+                        r.disabled = idx < newIndex;
+                    });
+                });
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const hasBids = document.getElementById('has-bids-flag');
+
+            if (hasBids && hasBids.value === '1') {
+                // name属性で要素を取得してdisabledを付ける
+                const startInput = document.querySelector('input[name="start"]');
+                const endInput = document.querySelector('input[name="end"]');
+
+                if (startInput) startInput.disabled = true;
+                if (endInput) endInput.disabled = true;
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const hasBids = document.getElementById('has-bids-flag').value === '1';
+
+            if (hasBids) {
+                // 入札がある場合は、すべての <input data-field> を無効にする
+                document.querySelectorAll('input[data-field]').forEach(function (input) {
+                    input.disabled = true;
+                });
+            }
+        });
+    </script>
+
+
+
+
 @stop

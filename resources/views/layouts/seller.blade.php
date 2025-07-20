@@ -193,6 +193,9 @@
                                     @endif
                                 </div>
                             </div>
+
+                            <a href=" {{ url('/seller/shop_auction_orders') }} " class="list-group-item list-group-item-action">オークション　オーダー</a>
+
                         </div>
                     </div>
                 </div>

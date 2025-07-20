@@ -60,4 +60,10 @@ class Shop extends Model
         return $this->hasMany(Commition::class, 'shop_id');
     }
 
+    public function auction_order()
+    {
+        return $this->hasMany(AuctionOrder::class, 'shop_id');
+
+    }
+
 }

@@ -5,11 +5,13 @@
 	   <meta name="csrf-token" content="{{ csrf_token() }}">
     </head>   
 	<div class="container mt-5">
-		<h2 class="text-center mb-4">Checkout</h2>
+        <h2 class="text-center mb-4">Checkout</h2>
+		
 		@if(!empty($deliveryAddresses))
-			<p class="text-center">If your shipping address is not displayed, please register from the account page.</p>
+			<p class="text-center mb-4">
+                <strong>ご安心ください。まだ決済されていません。</strong><br>配送先住所が表示されていない場合は、アカウントページから登録してください。
+            </p>
 		@endif
-
 		@foreach($setDeliPlaces as $setDeliPlace)
 		<form id="payment-form" action="{{ route('orders.store') }}" method="post" class="h-adr shadow-lg p-4 rounded-lg ">
 		    @csrf

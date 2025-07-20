@@ -84,20 +84,28 @@ class CartController extends Controller
         return redirect()->route('cart.index');
     }
 
+    // public function addAuction(Auction $auction)
+    // {
+    //     // add the auction to cart
+    //     \Cart::session(auth()->id())->add(array(
+    //         'id' => $auction->id,
+    //         'name' => $auction->name,
+    //         'price' => $auction->spot_price,
+    //         'quantity' => 1,
+    //         'attributes' => array(),
+    //         'associatedModel' => $auction
+
+    //     ));
+    //     return redirect()->route('cart.index');
+    // }
+
     public function addAuction(Auction $auction)
     {
-        // add the auction to cart
-        \Cart::session(auth()->id())->add(array(
-            'id' => $auction->id,
-            'name' => $auction->name,
-            'price' => $auction->spot_price,
-            'quantity' => 1,
-            'attributes' => array(),
-            'associatedModel' => $auction
-
-        ));
-        return redirect()->route('cart.index');
+        return view('auction.auction_check');
     }
+
+
+
 
     public function index()
     {   
@@ -644,7 +652,7 @@ class CartController extends Controller
             return $item;
         });
 
-        return redirect()->route('cart.index')->withMessage('クーポンを適用しました。対象商品の金額が割引されているかご確認ください。クーポン適用後に該当商品がカートにない場合は、金額に満たないため削除されてます。');
+        return redirect()->route('cart.index')->withMessage('クーポンを適用しました。対象商品の金額が割引されているかご確認ください。クーポン適用後に該当商品がカートにない場合は、決済金額に満たないため削除されてます。');
     }
     
 }

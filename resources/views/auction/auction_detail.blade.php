@@ -33,9 +33,9 @@
                 
     <form method="POST" action="{{ route('auction.bid.store', $auction_bid_items->id) }}" id="buyNowForm">
         @csrf
-        <input type="hidden" name="bid_amount" value="{{ $auction_bid_items->spot_price }}">
+        <input type="hidden" name="bid_amount" value="{{ $auction_bid_items->spot_price+$auction_bid_items->shipping_fee }}">
         <button type="button" class="btn btn-danger" onclick="openBuyNowModal()">
-            即決価格で入札（¥{{ number_format($auction_bid_items->spot_price) }}）
+            即決価格で入札（¥{{ number_format($auction_bid_items->spot_price+$auction_bid_items->shipping_fee) }}）
         </button>
     </form>
 
@@ -48,10 +48,19 @@
 	@endif
 </div>
 @endsection
+
+@php
+    $spotAmount = $auction_bid_items->spot_price + $auction_bid_items->shipping_fee;
+    $formattedSpotAmount = number_format($spotAmount); // PHPで整形
+@endphp
+
 <script>
+    const spotAmount = "{{ $formattedSpotAmount }}";
+
     function openBuyNowModal() {
-        if (confirm('本当にこの価格で即決購入しますか？')) {
+        if (confirm(`￥ ${spotAmount} 円で即決購入しますか？`)) {
             document.getElementById('buyNowForm').submit();
         }
     }
 </script>
+
