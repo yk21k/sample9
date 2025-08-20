@@ -75,7 +75,7 @@
                                     <input type="hidden" name="shop_id" value="{{ $seller_id_shop->id }}">
                                 @elseif($row->display_name == 'users' )
                                     @php
-                                        $seller_id_user = App\Models\User::where('id', $dataTypeContent->seller_id)->first();
+                                        $seller_id_user = App\Models\User::where('id', $dataTypeContent->user_id)->first();
                                     @endphp    
                                         {{ $seller_id_user->name }}
                                     <input type="hidden" name="shop_id" value="{{ $seller_id_user->id }}">    

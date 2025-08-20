@@ -136,6 +136,29 @@ class AccountController extends Controller
         return redirect()->route('account.account', ['id', $id])->withMessage('registered a new address');
 
     }
+
+    public function update(Request $request, $id)
+    {   
+        // dd($id);
+        $validated = $request->validate([
+            'shipping_fullname' => 'required|string|max:255',
+            'shipping_zipcode' => 'required|digits:7',
+            'shipping_state' => 'required|string',
+            'shipping_city' => 'required|string',
+            'shipping_address' => 'required|string',
+            'shipping_phone' => 'required|string',
+        ]);
+
+        $deliUser = DeliveryAddress::where('user_id', Auth::user()->id)->latest()->first();
+        // dd($deliUser);
+        if ($deliUser) {
+            $deliUser->update($validated);
+        }    
+        
+        return redirect()->route('account.account', ['id', Auth::user()->id])->withMessage('配送先を更新しました。');
+
+    }
+
     
     public function arrival(Request $request, $id)
     {
@@ -153,11 +176,15 @@ class AccountController extends Controller
 
             $this->validate($request, $rules, $customMessages);
 
+                // 押した日時をサーバー時間でセット
+            $data['confirmed_at'] = now();
+            
             SubOrdersArrivalReport::updateOrCreate(
                 ['sub_order_id' => $data['sub_order_id']], // 検索条件
                 [
                     'arrival_reported' => $data['arrival_reported'],
                     'comments' => $data['comments'],
+                    'confirmed_at' => $data['confirmed_at'],
                 ] // 更新または新規作成する値
             );
         }

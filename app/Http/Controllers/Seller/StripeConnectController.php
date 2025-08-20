@@ -13,28 +13,49 @@ use App\Http\Controllers\Controller;
 
 class StripeConnectController extends Controller
 {
+    // public function redirectToStripe()
+    // {
+    //     $clientId = config('services.stripe.client_id');
+    //     $redirectUri = config('services.stripe.redirect_uri');
+
+    //     $state = encrypt(Auth::id()); // 安全な暗号化された user_id
+
+    //     $url = 'https://connect.stripe.com/oauth/authorize?' . http_build_query([
+    //         'response_type' => 'code',
+    //         'client_id' => $clientId,
+    //         'scope' => 'read_write',
+    //         'redirect_uri' => $redirectUri,
+    //         'state' => $state,
+    //         'always_prompt' => 'true',
+    //     ]);
+
+    //     return redirect($url);
+    // }
+
     public function redirectToStripe()
     {
         $clientId = config('services.stripe.client_id');
         $redirectUri = config('services.stripe.redirect_uri');
+        $state = encrypt(Auth::id());
 
-        $state = encrypt(Auth::id()); // 安全な暗号化された user_id
-
-        $url = 'https://connect.stripe.com/oauth/authorize?' . http_build_query([
+        $query = http_build_query([
             'response_type' => 'code',
-            'client_id' => $clientId,
-            'scope' => 'read_write',
-            'redirect_uri' => $redirectUri,
-            'state' => $state,
-            'always_prompt' => 'true',
+            'client_id'     => $clientId,
+            'scope'         => 'read_write',
+            'redirect_uri'  => $redirectUri,
+            'state'         => $state,
+            'always_prompt' => 'true', // ← 必要なければ削除
         ]);
 
-        return redirect($url);
+        return redirect('https://connect.stripe.com/oauth/authorize?' . $query);
     }
+
 
 
     public function handleCallback(Request $request)
     {
+        Log::info('Call your hanndle');
+
         if ($request->has('error')) {
             return redirect()->route('dashboard')->with([
                 'message' => 'Stripe接続がキャンセルされました。',
@@ -58,6 +79,7 @@ class StripeConnectController extends Controller
         }
 
         $stripeAccountId = $response->json('stripe_user_id');
+        // dd($response->json());
 
         // state から復元
         if (!$request->has('state')) {

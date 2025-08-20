@@ -253,16 +253,19 @@
     <script src="{{ url('front/js/custom6.js') }}" defer></script>
 
     <script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
+
+    
     @if(!empty(Auth::user()->id))
     <script>
       var botmanWidget = {
-          aboutText: 'Start the conversation with Hi',
-          introMessage: "WELCOME TO CODE SHOTCUT"
+          aboutText: 'よくある質問はこちらから',
+          introMessage: "✋ ログインありがとうございます。ご不明点があれば聞いてください！",
+          chatServer: '{{ url('/botman') }}', // Laravelのルーティングに合わせる
+          title: 'FAQチャット'
       };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/js/widget.js"></script>
     @endif
-    <script>
 
 
 

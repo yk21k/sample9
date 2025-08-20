@@ -24,7 +24,7 @@ class ShopSettingController extends Controller
     public function shopUpdate(UpdateShopRequest $request)
     {
         // dd('入った'); // ← これが出るか確認
-        // $data = $request->all();
+        $data = $request->all();
 
         // dd($data);
 
@@ -150,6 +150,7 @@ class ShopSettingController extends Controller
             'name' => $request->input('name'),
             'is_active' => 0, // 修正後は一旦非アクティブに戻す
             'description' => $request->input('description'),
+            'invoice_number' => $request->input('invoice_number'),
             'location_1' => $request->input('location_1'),
             'location_2' => $request->input('location_2'),
             'telephone' => $request->input('telephone'),

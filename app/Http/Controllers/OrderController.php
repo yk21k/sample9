@@ -41,12 +41,29 @@ class OrderController extends Controller
 
     public function store(StoreOrderRequest $request, Product $product)
     {   
+        // 👇ここに追記
+        \Log::info('注文受信', [
+            'request' => $request->all()
+        ]);
+        \Log::info('受信データ', $request->all()); // ← 確認用
+
         Log::info('store メソッドが呼ばれました');
         // Stripe APIのシークレットキーを設定
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
         // フォームから送信された payment_method を取得
-        $paymentMethod = $request->input('payment_method');
+        $data = $request->json()->all();
+        Log::info('受信したデータ', $data);
+
+
+        $paymentMethod = $data['payment_method'] ?? null;
+
+        // JSONのみで来た場合に備えて強制マージ
+        if ($paymentMethod) {
+            $request->merge(['payment_method' => $paymentMethod]);
+        }
+
+
         // カートの合計金額をセッションから取得
         $cartTotal = session('total_and_shipping');
 
@@ -56,27 +73,10 @@ class OrderController extends Controller
 
         try {
 
-            // 顧客情報を作成
-            $customer = Customer::create([
-                'email' => auth()->user()->email,  // 顧客のメールアドレス（ログイン者から取得）
-                'payment_method' => $paymentMethod,  // クライアントから送信された payment_method
-                'invoice_settings' => [
-                    'default_payment_method' => $paymentMethod, // 顧客にデフォルトの支払い方法を設定
-                ],
-            ]);
-
-            // PaymentIntentを作成して支払いを処理
-            $paymentIntent = PaymentIntent::create([
-                'amount' => $cartTotal,  // Stripeは最小通貨単位で金額を受け取るので、100倍します（例: 1000円なら1000）
-                'currency' => 'jpy',           // 通貨（日本円）
-                'customer' => $customer->id,   // 顧客ID
-                'payment_method' => $paymentMethod,
-                'confirmation_method' => 'manual', // 手動確認
-                'confirm' => true,              // 即時確認
-                'return_url' => route('payment.success') // 支払い後のリダイレクト先URL
-            ]);
             // 支払いが成功した場合
-            if ($paymentIntent->status === 'succeeded') {
+            
+                Log::info('決済成功。注文作成処理開始');
+
                 // 支払いが成功したので、オーダーを作成
                 $request->validate([
                     'shipping_fullname' => 'required',
@@ -87,6 +87,8 @@ class OrderController extends Controller
                     'shipping_zipcode' => 'required',
                     'payment_method' => 'required',
                 ]);
+                $paymentMethod = $data['payment_method'] ?? null;
+
                 Log::info('バリデーション成功、オーダー作成処理開始');
                 $order = new Order();
                 $order->order_number = uniqid('OrderNumber-');
@@ -132,8 +134,6 @@ class OrderController extends Controller
                 ]);
                 $order->coupon_code = implode(',', $appliedCoupons);
 
-
-
                 $order->grand_total = $cartTotal;
                 $order->item_count = \Cart::session(auth()->id())->getTotalQuantity();
                 $order->user_id = auth()->id();
@@ -148,7 +148,6 @@ class OrderController extends Controller
                 // カートアイテムを保存
                 $cartItems = \Cart::session(auth()->id())->getContent();
                 
-
                 foreach ($cartItems as $item) {
                     $product = Product::find($item->id);
                     if (is_null($product->shop_id)) {
@@ -186,13 +185,7 @@ class OrderController extends Controller
                     'message' => '決済が成功しました！',
                     'order_id' => $order->id,  // 注文IDなど
                 ], 200);  // 200は成功のHTTPステータスコード
-            } else {
-            // 支払い失敗時
-            return response()->json([
-                'status' => 'error',
-                'message' => '決済に失敗しました。',
-            ], 400);
-            }
+            
         }catch (ApiErrorException $e) {
         // Stripeのエラーハンドリング
         Log::error('Stripeエラー: ' . $e->getMessage());

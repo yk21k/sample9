@@ -5,7 +5,7 @@
             {{$subOrder->order->order_number}}
         </td>
         <td>
-            {{$subOrder->order->id}}  
+            {{$subOrder->id}}  
         </td>
         <td>
             {{$subOrder->status}}<br>
@@ -24,9 +24,9 @@
                 <div class="form_bill">
                 <form action=" {{route('seller.order.delivered_company', $subOrder)}} " method="get">@csrf
                     <label for="shipping_company">Shipping Company</label>
-                    <input type="text" class="form-control" name="shipping_company" id="">
+                    <input type="text" class="form-control" name="shipping_company" id="" required>
                     <label for="invoice_number">Invoice Number</label>
-                    <input type="text" class="form-control" name="invoice_number" id="">
+                    <input type="text" class="form-control" name="invoice_number" id="" required>
                     <button type="submit" class="btn btn-primary mb-2 mr-2">Submit</button>
 
                 </form>    
@@ -65,7 +65,7 @@
         <td>
 
             <!-- 1. メール送信ボタン（ファザード） -->
-            <button class="btn btn-primary" data-toggle="modal" data-target="#templateModal">Mail</button>
+            <button class="btn btn-primary open-template-modal" data-toggle="modal" data-target="#templateModal" data-order-number="{{ $subOrder->order->order_number }}" data-order-id="{{ $subOrder->id }}" data-user-id="{{ $subOrder->user_id }}">Mail</button>
 
             <!-- 2. テンプレート選択モーダル -->
             <div class="modal" id="templateModal" tabindex="-1" role="dialog" aria-labelledby="templateModalLabel" aria-hidden="true">
@@ -78,7 +78,7 @@
                     </button>
                   </div>
                   <div class="modal-body">
-                    <!-- 2種類のテンプレート選択 -->
+                    <!-- 4種類のテンプレート選択 -->
                     <form id="templateForm">@csrf
                       <div class="form-group">
                         <label for="templateSelect">テンプレートを選択</label>
@@ -95,8 +95,10 @@
                             <option value="template2" >テンプレート2 (キャンペーン開催)</option>
                           @endif
                           <option value="template3">テンプレート3 (商品レビュー依頼)</option>
+                          <option value="template4">テンプレート4 (その他の依頼)</option>
                         </select>
                       </div>
+                      <div id="template4Wrapper" class="d-none mt-2"></div>
                       <button type="button" class="btn btn-info" id="confirmBtn">確認</button>
                     </form>
                     <!-- 3. 確認ページ -->
@@ -105,7 +107,12 @@
                           <h3>確認ページ</h3>
                           <p id="selectedTemplate"></p>
                           <input type="hidden" name="user_id" value="{{ $subOrder->user_id }}">
+                          <input type="hidden" name="order_id" value="{{$subOrder->id}}">
                           <input type="hidden" name="shop_id" value="{{ $subOrder->seller_id }}">
+                          <input type="hidden" name="order_number" value="{{ $subOrder->order->order_number}}">
+                          
+                        　<input type="hidden" name="order_coupon" id="orderCouponInput" value="">
+                          
                           <input type="hidden" name="template" id="templateValue">
                           <button class="btn btn-success" id="sendBtn">送信</button>
                         </div>

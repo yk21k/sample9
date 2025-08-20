@@ -390,13 +390,14 @@
         });
     </script>
 
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const hasBids = document.getElementById('has-bids-flag').value === '1';
 
             if (hasBids) {
-                // 入札がある場合は、すべての <input data-field> を無効にする
-                document.querySelectorAll('input[data-field]').forEach(function (input) {
+                // 入札がある場合は、すべての <input> を無効にする
+                document.querySelectorAll('input').forEach(function (input) {
                     input.disabled = true;
                 });
             }

@@ -94,7 +94,7 @@
 		    					<th>決済額 内)配送料</th>
 		    					<th>配送状況</th>
 		    					<th>配送業者名</th>
-		    					<th>受付番号</th>
+		    					<th>追跡番号</th>
 		    					<th>更新日</th>
 		    				<tr>
 		    			</head>
@@ -228,8 +228,8 @@
 
 		        	    	<td>発送状況</td>
 		        	    	<td>配達業者</td>
-		        	    	<td>Invoice Number　会社によって異なる</td>
-					        <td>Order Number</td>
+		        	    	<td>追跡番号</td>
+					        <td>注文ID</td>
 					        <td>購入日</td>
 					        <td>名前</td>
 					        <td>郵便番号</td>
@@ -280,6 +280,7 @@
 										        <p>この商品の到着を確認したら、下のボタンを押してください。</p>
 										        <input type="hidden" name="sub_order_id" value="{{ $order_history->id }}">
 										        <input type="hidden" name="arrival_reported" value="1">
+										        <input type="hidden" name="confirmed_at" >
 										        <div>
 										            <label for="comments">コメント（任意）:</label><br>
 										            <textarea name="comments" id="comments" rows="4" cols="50">{{ old('comments') }}</textarea>
@@ -358,62 +359,109 @@
         <section id="addresses" class="section">
             <h2>Shipping address</h2>
             @if($firstDelis)
-            <p>Latest Address: 〒{{ $firstDelis->shipping_zipcode }}
-            {{ $firstDelis->shipping_state }}
-            {{ $firstDelis->shipping_city }}
-            {{ $firstDelis->shipping_address }}</p>
-            @foreach($savedDelis as $savedDeli)
-            	<p>Other Addresses: 〒{{ $savedDeli->shipping_zipcode }} {{ $savedDeli->shipping_state }} {{ $savedDeli->shipping_city }} {{ $savedDeli->shipping_address }}</p>
-            @endforeach
-            @else
-            <button type="button" class="btn btn-info" id="hide_button2">Hide/Display Register new address</button><br><br>
-			<form class="h-adr" id="address1" action="{{route('account.addresses', Auth::user()->id)}}" method="post">@csrf
+			    <p>
+			        直近の配送先: 宛名：{{ $firstDelis->shipping_fullname }}<br>
+			        宛先：〒{{ $firstDelis->shipping_zipcode }}
+			        {{ $firstDelis->shipping_state }}
+			        {{ $firstDelis->shipping_city }}
+			        {{ $firstDelis->shipping_address }}
+			    </p>
 
-            	<h4>The Other Address</h4>
-	            <div class="form-group">
-			        <label for="">Full Name</label>
-			        <input type="text" name="shipping_fullname" id="" class="form-control" required>
-			    </div>
+			    @foreach($savedDelis as $savedDeli)
+			        <p>
+			            その他の配送先: 宛名:{{ $savedDeli->shipping_fullname }}<br>
+			            宛先:〒{{ $savedDeli->shipping_zipcode }}
+			            {{ $savedDeli->shipping_state }}
+			            {{ $savedDeli->shipping_city }}
+			            {{ $savedDeli->shipping_address }}
+			        </p>
+			    @endforeach
 
-			    <div class="form-group">
-			        <label for="location_1"> <h3>Location * </h3><small>⭐️Please enter the address after entering the postal code.</small></label><br>
-			        <span class="p-country-name" style="display:none;">Japan</span>
-			        <label for="post-code">Postal Code:</label>
-			        <input type="text" class="form-control p-postal-code" name="shipping_zipcode" size="8" maxlength="8" required><br>
-			        
-		    	</div>
+			    <hr>
+			    <h4>配送先の変更</h4>
+			    <form class="h-adr" id="update-address" action="{{ route('account.addresses.update', Auth::user()->id) }}" method="POST">
+			        @csrf
+			        @method('POST') {{-- 更新処理用 --}}
 
-			    <div class="form-group">
-			        <label for="">State</label>
-			        <input type="text" name="shipping_state" id="" class="form-control p-region" readonly>
-			    </div>
+			        <div class="form-group">
+			            <label for="">Full Name</label>
+			            <input type="text" name="shipping_fullname" class="form-control" value="{{ old('shipping_fullname', $firstDelis->shipping_fullname) }}" required>
+			        </div>
 
-			    <div class="form-group">
-			        <label for="">City</label>
-			        <input type="text" name="shipping_city" id="" class="form-control p-locality" readonly>
-			    </div>
+			        <div class="form-group">
+			            <label for="location_1"><h3>Location * </h3><small>⭐️Please enter the address after entering the postal code.</small></label><br>
+			            <span class="p-country-name" style="display:none;">Japan</span>
+			            <label for="post-code">Postal Code:</label>
+			            <input type="text" class="form-control p-postal-code" name="shipping_zipcode" size="8" maxlength="8" value="{{ old('shipping_zipcode', $firstDelis->shipping_zipcode) }}" required><br>
+			        </div>
 
-			    <div class="form-group">
-			        <label for="">Full Address</label>
-			        <input type="text" name="shipping_address" id="" class="form-control p-street-address p-extended-address" required>
-			    </div>
+			        <div class="form-group">
+			            <label for="">State</label>
+			            <input type="text" name="shipping_state" class="form-control p-region" value="{{ old('shipping_state', $firstDelis->shipping_state) }}" readonly>
+			        </div>
 
-			    <div class="form-group">
-			        <label for="">Mobile</label>
-			        <input type="text" name="shipping_phone" id="" class="form-control" required>
-			    </div>
-		    	<button type="submit" class="btn btn-primary mt-3">save address</button>
+			        <div class="form-group">
+			            <label for="">City</label>
+			            <input type="text" name="shipping_city" class="form-control p-locality" value="{{ old('shipping_city', $firstDelis->shipping_city) }}" readonly>
+			        </div>
 
-            </form>
-            @endif
-        </section>
+			        <div class="form-group">
+			            <label for="">Full Address</label>
+			            <input type="text" name="shipping_address" class="form-control p-street-address p-extended-address" value="{{ old('shipping_address', $firstDelis->shipping_address) }}" required>
+			        </div>
 
-        <section id="payment-methods" class="section">
-            <h2>支払い方法</h2>
-            <p>クレジットカード: xxxx-xxxx-xxxx-1234</p>
-            <p>PayPalアカウント: example@email.com</p>
-            <button>支払い方法を追加</button>
-        </section>
+			        <div class="form-group">
+			            <label for="">Mobile</label>
+			            <input type="text" name="shipping_phone" class="form-control" value="{{ old('shipping_phone', $firstDelis->shipping_phone) }}" required>
+			        </div>
+
+			        <button type="submit" class="btn btn-primary mt-3">配送先を変更して保存</button>
+			    </form>
+
+			@else
+	            <button type="button" class="btn btn-info" id="hide_button2">Hide/Display Register new address</button><br><br>
+				<form class="h-adr" id="address1" action="{{route('account.addresses', Auth::user()->id)}}" method="post">@csrf
+
+	            	<h4>The Other Address</h4>
+		            <div class="form-group">
+				        <label for="">Full Name</label>
+				        <input type="text" name="shipping_fullname" id="" class="form-control" required>
+				    </div>
+
+				    <div class="form-group">
+				        <label for="location_1"> <h3>Location * </h3><small>⭐️Please enter the address after entering the postal code.</small></label><br>
+				        <span class="p-country-name" style="display:none;">Japan</span>
+				        <label for="post-code">Postal Code:</label>
+				        <input type="text" class="form-control p-postal-code" name="shipping_zipcode" size="8" maxlength="8" required><br>
+				        
+			    	</div>
+
+				    <div class="form-group">
+				        <label for="">State</label>
+				        <input type="text" name="shipping_state" id="" class="form-control p-region" readonly>
+				    </div>
+
+				    <div class="form-group">
+				        <label for="">City</label>
+				        <input type="text" name="shipping_city" id="" class="form-control p-locality" readonly>
+				    </div>
+
+				    <div class="form-group">
+				        <label for="">Full Address</label>
+				        <input type="text" name="shipping_address" id="" class="form-control p-street-address p-extended-address" required>
+				    </div>
+
+				    <div class="form-group">
+				        <label for="">Mobile</label>
+				        <input type="text" name="shipping_phone" id="" class="form-control" required>
+				    </div>
+			    	<button type="submit" class="btn btn-primary mt-3">save address</button>
+
+	            </form>    
+			@endif
+
+        </section><br><br><br>
+
 
         <section id="account-settings" class="section">
             <h2>Account Settings</h2>

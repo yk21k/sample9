@@ -171,6 +171,7 @@ class ShopController extends Controller
             'is_draft' => $isDraft,
             'name' => $request->input('name'),
             'description' => $request->input('description'),
+            'invoice_number' => $request->input('invoice_number'),
             'location_1' => $request->input('location_1'),
             'location_2' => $request->input('location_2'),
             'telephone' => $request->input('telephone'),

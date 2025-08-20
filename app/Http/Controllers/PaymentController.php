@@ -28,7 +28,9 @@ class PaymentController extends Controller
 
         $cartTotal = session('total_and_shipping', 0);
         $amount = intval($cartTotal);
+        $paymentMethod = $request->json('payment_method'); 
 
+        \Log::info("Stripe決済金額　税抜: " . $cartTotal);
         \Log::info("Stripe決済金額（受信）: " . $amount);
 
         $user = Auth::user();

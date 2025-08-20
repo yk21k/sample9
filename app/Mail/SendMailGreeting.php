@@ -46,7 +46,10 @@ class SendMailGreeting extends Mailable
 
         return new Content(
             markdown: 'mail.order.shop-greeting',
-            with: ['formail_shops' => $formail_shops, ],
+            with: [
+                'formail_shops' => $formail_shops,
+                'mail_orders' => $this->mails
+                 ],
 
         );
     }

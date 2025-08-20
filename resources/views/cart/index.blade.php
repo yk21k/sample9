@@ -66,12 +66,14 @@
 	    </thead>
 	    <tbody>
 	        @foreach ($cartItems as $item)
-
+	        	
 	            @php
-	                $shippingFee = (float) ($item->associatedModel->shipping_fee ?? 0);
-	                $originalPrice = (float) $item->price + $shippingFee;
-	                $finalPrice = isset($item->final_price) ? (float) $item->final_price + $shippingFee : $originalPrice;
-	                $discountedPrice = isset($item->discounted_price) ? (float) $item->discounted_price + $shippingFee : $originalPrice;
+	                $shippingFee = (float) ($item->associatedModel->shipping_fee*1.1 ?? 0);
+	                $originalPrice = (float) $item->price + $shippingFee + $item->price*0.1;
+
+	                $finalPrice = isset($item->final_price) ? floor($item->final_price*1.1 + $shippingFee): $originalPrice;
+
+	                $discountedPrice = isset($item->discounted_price) ? floor($item->discounted_price*1.1 + $shippingFee): $originalPrice;
 	                $lowestPrice = min($finalPrice, $discountedPrice);
 
 	                $isDiscounted = $lowestPrice < $originalPrice;
@@ -86,7 +88,6 @@
 
 	                $totalAll += $totalPrice;
 	            @endphp
-
 	            <tr>
 	                <td>
 	                    <img style="width: 96px; height: 65px;" class="card-img-top"
@@ -94,7 +95,9 @@
 	                </td>
 	                <td>{{ $item->name }}</td>
 	                <td>
-	                    ¥{{ number_format($isDiscounted ? $lowestPrice : $originalPrice) }}
+	                    ¥{{ number_format($isDiscounted ? $lowestPrice : $originalPrice) }}<br>
+	                    ¥{{ number_format($finalPrice) }}<br>
+	                    ¥{{ number_format($originalPrice) }}
 	                    @if ($isDiscounted && $quantity > 1)
 	                        <br><small class="text-danger">※割引価格は1点のみ</small>
 	                    @endif
@@ -182,15 +185,15 @@
 	    
 
 	    $shippingTotal = $cartItems->sum(function ($item) {
-		    $shippingFee = (float) ($item->associatedModel->shipping_fee ?? 0);
+		    $shippingFee = (float) ($item->associatedModel->shipping_fee*1.1 ?? 0);
 		    return $shippingFee * $item->quantity;
 		});
 
-	    $originalTotalWithShipping = $originalTotal + $shippingTotal;
+	    $originalTotalWithShipping = $originalTotal + $shippingTotal + $originalTotal*0.1;
 
 	    
 
-	    $discountAmount = floor($totalAll) - floor($originalTotalWithShipping);
+	    $discountAmount = floor($originalTotalWithShipping) - floor($totalAll);
 	    $discountPercent = $originalTotal > 0 ? round(($discountAmount / $originalTotal) * 100) : 0;
 
 	    $cartCampaigns = $cartItems->pluck('campaign')->filter()->unique('id');
@@ -200,6 +203,7 @@
 	    session(['total_and_shipping' => $totalAll]); 
 	    Log::info('total_and_shipping: ' . session('total_and_shipping')); 
 	@endphp
+
 
 	<h3 style="color: #b0c4de;">ご注文金額
 
@@ -249,7 +253,8 @@
 
 	<button class="btn btn-primary" id="submitButton" onclick="location.href='{{ route('cart.checkout') }}' " role="button">Proceed to Checkout</button>
 		
-	<script>
+
+		<script>
 	    const totalAmount = {{ session('total_and_shipping', 0) }};  // または $totalAll
 	</script>
 	<script>
@@ -265,5 +270,6 @@
 
 
 	</script>
+
 	
 @endsection

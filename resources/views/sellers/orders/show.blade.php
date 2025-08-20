@@ -38,7 +38,7 @@
                 $quantity = $item->pivot->quantity;
                 $basePrice = (float) $item->price;
                 $shippingFee = (float) $item->shipping_fee;
-                $originalPriceWithShipping = $basePrice + $shippingFee;
+                $originalPriceWithShipping = floor(($basePrice + $shippingFee)*1.1);
                 $rate_and_fixed = App\Models\Commition::first();
                 $feeRate = $rate_and_fixed->rate;
                 $feeFixed = $rate_and_fixed->fixed;
@@ -50,7 +50,10 @@
                 $shopId = $preShopId->id;
 
                 $preThisOrderCoupon = $shopSubOrder->coupon_code;
+
                 $thisOrderCoupon = App\Models\ShopCoupon::where('code', $shopSubOrder->coupon_code)->first();
+
+                $preThisOrderProductCoupon = App\Models\ShopCoupon::where('code', $shopSubOrder->coupon_code)->first();
 
                 // --- キャンペーン価格 ---
                 $campaign = Campaign::where('shop_id', $shopId)
@@ -62,17 +65,21 @@
 
                 $discountedPrice = $basePrice;
                 if ($campaign) {
-                    $discountedPrice = ceil($basePrice - ($basePrice * $campaign->dicount_rate1));
+                    $discountedPrice = floor(($basePrice - ($basePrice * $campaign->dicount_rate1))*1.1);
                 }
-                $campaignPrice = $discountedPrice + $shippingFee;
+                $campaignPrice = floor($discountedPrice + $shippingFee*1.1);
 
                 // --- クーポン価格 ---
                 $couponPrice = $basePrice;
-                if ($thisOrderCoupon) {
-                    $couponPrice = $basePrice + $thisOrderCoupon->value;
+                if ($thisOrderCoupon && $thisOrderCoupon->product_id == $item->pivot->product_id) {
+                    $couponPrice = floor(($basePrice + $thisOrderCoupon->value)*1.1);
                     $couponPrice = max($couponPrice, 0); // 負にならないように
+                    
+                    $couponPriceWithShipping = $couponPrice + $shippingFee*1.1;
+                }else{
+                    $couponPriceWithShipping = ($basePrice + $shippingFee)*1.1;
                 }
-                $couponPriceWithShipping = $couponPrice + $shippingFee;
+                
 
                 // --- 最終価格（1点だけ割引） ---
                 $lowestUnitPrice = min($originalPriceWithShipping, $campaignPrice, $couponPriceWithShipping);
@@ -96,6 +103,7 @@
                     $appliedLabel = 'クーポン適用';
                 }
             @endphp
+
             <tr>
                 @if($item->shop_id == $shopMane)
                     <td scope="row">

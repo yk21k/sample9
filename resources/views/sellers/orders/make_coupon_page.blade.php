@@ -85,10 +85,17 @@
                     <option value="{{ $pscoupon->id }}">{{ $pscoupon->name }}</option>
                 @endforeach    
             </select> 
-            
-            <label for="value">割引額（※半角ハイフン付き数字のみ）:</label>
-            <input type="text" id="value" name="value" placeholder="例　-100 半角に変更してから入力ください" required>
 
+            <label for="value">割引額（※半角マイナス数字のみ）:</label>
+            <input
+                type="text"
+                id="value"
+                name="value"
+                placeholder="例　-100 半角に変更してから入力ください"
+                required
+                pattern="^-\d+$"
+                title="マイナスの整数のみ入力してください（例: -100）"
+            >
 
             <label for="description">説明:</label>
             <input type="text" id="description" name="description">

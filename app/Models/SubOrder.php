@@ -21,6 +21,10 @@ class SubOrder extends Model
                     ->withPivot('quantity', 'price', 'user_id');
     }
 
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id', 'id');
+    }
 
     public function order()
     {
@@ -43,6 +47,11 @@ class SubOrder extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function invoiceUser()//SubOrderObserverで利用
+    {
+        return $this->belongsTo(User::class, 'seller_id');
+    }
+
     public function arrivalReport()
     {
         return $this->hasOne(SubOrdersArrivalReport::class);
@@ -57,6 +66,26 @@ class SubOrder extends Model
     {
         return $this->belongsToMany(ShopCoupon::class, 'shop_coupon_sub_order', 'sub_order_id', 'shop_coupon_id');
     }
+
+    public function shopMail(){
+        return $this->belongsTo(Shop::class);  
+    }
+
+    public function invoiceSubOrder_item()
+    {
+       return $this->hasMany(SubOrderItem::class);
+    }
+
+    public function invoiceArrivalReport()
+    {
+        return $this->belongsTo(SubOrdersArrivalReport::class, 'sub_order_id');
+    }
+
+
+
+
+
+
 
     
 }

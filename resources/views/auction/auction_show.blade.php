@@ -205,32 +205,45 @@
                     $spotPrice = $auction_bid_items->spot_price;
                     $minimumBidUnit = $suggestedPrice >= 10000 ? 1000 : 100;
                 @endphp
-
                 <form method="POST" action="{{ route('auction.bid.store', $auction_bid_items->id) }}" id="regularBidForm" class="mt-4">
                     @csrf
                     即決金額を超える入札額は、即決金額で決済画面に進みます
+
                     <div class="form-group">
                         <label for="bid_amount">入札金額</label>
                         <input type="number"
-                               name="bid_amount"
-                               id="bid_amount"
-                               class="form-control"
-                               required
-                               min="{{ $suggestedPrice+$auction_bid_items->shipping_fee+$minimumBidUnit }}"
-                               step="{{ $minimumBidUnit }}"
-                               placeholder="¥金額を入力">
+                           name="bid_amount"
+                           id="bid_amount"
+                           class="form-control @error('bid_amount') is-invalid @enderror"
+                           required
+                           min="{{ (int) optional($topBids->first())->amount + $minimumBidUnit }}"
+                           max="{{ (int) optional($topBids->first())->amount + $minimumBidUnit }}"
+                           step="{{ $minimumBidUnit }}"
+                           placeholder="¥金額を入力">
+
+
+                        {{-- エラーメッセージ表示 --}}
+                        @error('bid_amount')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror           
                     </div>
+                    
 
                     <div class="form-group">
                         <label for="bid_amount_confirm">確認のためもう一度入力</label>
                         <input type="number"
                                name="bid_amount_confirm"
                                id="bid_amount_confirm"
-                               class="form-control"
+                               class="form-control @error('bid_amount_confirm') is-invalid @enderror"
                                required
                                placeholder="もう一度同じ金額を入力">
+                        {{-- エラーメッセージ表示 --}}
+                        @error('bid_amount_confirm')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror           
                     </div>
 
+                    
 
                     <p id="confirm-error" style="color: red; display: none;">確認金額が一致しません。</p>
                     @if($delivery_addresses)

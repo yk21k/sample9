@@ -10,6 +10,7 @@ class Auction extends Model
     use HasFactory;
 
     protected $fillable = [
+        'id',
         'name',
         'spot_price',
         'suggested_price',

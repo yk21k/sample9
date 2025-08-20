@@ -147,13 +147,20 @@
                             
                             <a href=" {{url('/seller/orders')}} " class="list-group-item list-group-item-action">Orders</a>
 
+                            <a href=" {{route('seller.order.sales_order_invoice')}} " class="list-group-item list-group-item-action">Invoice</a>
+
+                            <a href=" {{route('seller.order.sales_order_invoice2')}} " class="list-group-item list-group-item-action">Invoice2</a>
+                            
+
+                            <a href="" class="list-group-item list-group-item-action">Invoice（オークション）未実装</a>
+
                             <a href=" {{url('/admin/shops')}} " class="list-group-item list-group-item-action">Go to Shop</a>
 
                             @php
                                 $orders = App\Models\SubOrder::where('seller_id', auth()->id())->first();
                             @endphp
                             @if($orders)
-                                <a href=" {{ route('order.make_coupon') }} " class="list-group-item list-group-item-action">Create Shop Coupon</a>
+                                <a href=" {{ route('order.make_coupon_page') }} " class="list-group-item list-group-item-action">Create Shop Coupon</a>
                             @else
                                 <a href="" class="list-group-item list-group-item-action">Create Shop Coupon<br>（初決済後にご利用いただけます。）</a>    
                             @endif
@@ -238,6 +245,18 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js" integrity="sha384-fbbOQedDUMZZ5KreZpsbe1LCZPVmfTnH7ois6mU1QK+m14rQ1l2bGBq41eYeM/fS" crossorigin="anonymous"></script>
 <script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
+
+@if(!empty(Auth::user()->id))
+<script>
+  var botmanWidget = {
+      aboutText: 'よくある質問はこちらから',
+      introMessage: "✋ ログインありがとうございます。ご不明点があれば聞いてください！",
+      chatServer: '{{ url('/botman') }}', // Laravelのルーティングに合わせる
+      title: 'FAQチャット'
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/js/widget.js"></script>
+@endif
 
 </html>
 

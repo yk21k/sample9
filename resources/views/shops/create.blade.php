@@ -56,7 +56,16 @@
         <label for="name"><h3>店名 * 上記の登録区分を必ず選択して下さい</h3></label>
         <input type="text" class="form-control" name="name" id="name" aria-describedby="helpId" value="{{ old('name', $shop_sets->name ?? '') }}" required>
     </div>
-    &nbsp;
+    &nbsp;<br><br>
+
+    <a style="color:tomato;" href="https://www.invoice-kohyo.nta.go.jp/">国税庁インボイス制度適格請求書発行事業者公表サイト</a><small>必要時は検索し確認してください</small><br><br>
+
+    <div class="form-group">
+        <label for="invoice_number"><h3>インボイス番号：</h3></label>
+        <input type="text" id="invoiceFormField" name="invoice_number" placeholder="T1234567890123"
+       pattern="^[A-Za-z]\d{13}$"
+       title="先頭は英字1文字、その後に数字13桁で入力してください。">
+    </div><br><br>
 
     <div class="form-group">
         <label for="description"><h3>店舗概要 *</h3></label>
@@ -398,6 +407,12 @@ document.getElementById('saveDraftBtn').addEventListener('click', function () {
     document.getElementById('shopForm').submit();
 });
 </script>
+
+
+<!-- インボイスPOST -->
+
+
+
 
 
 @endsection

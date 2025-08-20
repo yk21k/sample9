@@ -44,6 +44,7 @@ class SendMail extends Mailable
     public function content(): Content
     {
         $formail_coupons = ShopCoupon::where('id', $this->mails->coupon_id)->first();
+        
         $formail_shops = Shop::where('user_id', $this->mails->shop_id)->first();
 
         return new Content(

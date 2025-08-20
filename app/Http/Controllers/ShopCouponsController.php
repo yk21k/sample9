@@ -41,7 +41,7 @@ class ShopCouponsController extends Controller
         // dd($values*-1<$product_shop_coupons_price->price*0.2);
         // dd(abs($values)<$product_shop_coupons_price->price*0.2);
 
-        if(abs($values)<$product_shop_coupons_price->price*0.2){
+        if($product_shop_coupons_price->price*0.2<abs($values)){
             return redirect()->route('order.make_coupon')->withMessage('クーポンは２割引以下で作成してください');    
         }
 

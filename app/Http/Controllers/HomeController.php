@@ -93,10 +93,12 @@ class HomeController extends Controller
 
             if ($matchingCampaign) {
                 $discountRate = $matchingCampaign->dicount_rate1;
-                $product->discounted_price = $product->price - ($product->price*$discountRate);
+                $shipping = floor($product->shipping_fee);
+                $product->discounted_price = floor(($product->price - ($product->price*$discountRate))+$shipping);
                 $product->campaign = $matchingCampaign;
             } else {
-                $product->discounted_price = $product->price;
+                $shipping = floor($product->shipping_fee);
+                $product->discounted_price = floor(($product->price + $shipping));
                 $product->campaign = null;
             }
 

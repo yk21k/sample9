@@ -75,18 +75,27 @@
 
                     @endif
                     	<td>{{ $history->created_at }}</td>
-                    @if(!empty($history->forMailCoupon ))
-	                    <td>{{ $history->forMailCoupon->name }}</td>
-	                @elseif($history->template == 'template3')
-	                    <td>設定できません</td>	
-	                @else
-	                    <td>未設定</td>	
-	                @endif
-	                @if(!empty($history->forMailCampaign ))
-	                    <td>{{ $history->forMailCampaign->name  }}</td>
-	                @else
-	                    <td>未設定</td>	
-	                @endif
+
+	                @php
+                        $mail_history_coupon = App\Models\ShopCoupon::find($history->order_coupon);
+                    @endphp
+
+                    @if($mail_history_coupon)
+                        <td>
+                            (コード: {{ $mail_history_coupon->code }})
+                            （期限: {{ \Carbon\Carbon::parse($mail_history_coupon->expiry_date)->format('Y年m月d日') }}）
+                        </td>
+                    @elseif($history->template === 'template3')
+                        <td>設定できません</td>
+                    @else
+                        <td>未設定</td>
+                    @endif
+
+                    @if(!empty($history->forMailCampaign ))
+                        <td>{{ $history->forMailCampaign->name  }}</td>
+                    @else
+                        <td>未設定</td>    
+                    @endif
 
 
                 </tr>

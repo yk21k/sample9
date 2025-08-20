@@ -9,6 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
+use Carbon\Carbon;
 use App\Models\Mails;
 use App\Models\Campaign;
 use App\Models\Shop;
@@ -48,7 +49,11 @@ class SendMailCampaign extends Mailable
         
         // dd($formail_shops);
 
-        $formail_campaigns = Campaign::where('shop_id', $formail_shops->id)->first();
+        $formail_campaigns = Campaign::where('shop_id', $formail_shops->id)
+        ->whereDate('start_date', '<=', Carbon::today())
+        ->whereDate('end_date', '>=', Carbon::today())
+        ->get();
+
         
         // dd($formail_campaigns);
         

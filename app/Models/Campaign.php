@@ -17,4 +17,10 @@ class Campaign extends Model
     {
         return $this->hasMany(Mails::class, 'campaign_id');
     }
+
+    public function shop()
+    {
+        return $this->belongsTo(Shop::class);
+    }
+    
 }

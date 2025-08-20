@@ -300,17 +300,17 @@
 
                 // 値が有効な数値か確認
                 if (!isNaN(price) && !isNaN(shipping)) {
-                    const maxShipping = price * 0.7;
+                    const maxShipping = Math.floor(price * 0.25);
 
                     // 配送料が70%を超えていたらモーダルを表示しない
                     if (shipping > maxShipping) {
-                        alert(`配送料は価格の70%（最大 ${maxShipping.toFixed(2)} 円）を超えることはできません。`);
+                        alert(`配送料は価格の25%（最大 ${maxShipping} 円）を超えることはできません。`);
                         return;
                     }
 
                     // 合計金額を表示するモーダル
                     const total = price + shipping;
-                    const message = `商品ページの表示価格は、入力の価格 (${price.toFixed(2)} 円) と配送料 (${shipping.toFixed(2)} 円) の合計で <strong>${total.toFixed(2)} 円</strong> になります。`;
+                    const message = `商品ページの表示価格は、入力の価格 (${price} 円) と配送料 (${shipping.toFixed(2)} 円) の合計で <strong>${total} 円</strong> になります。`;
 
                     document.getElementById('modalMessage').innerHTML = message;
 
@@ -332,12 +332,12 @@
                 const price = parseFloat(priceInput?.value || '');
                 const shipping = parseFloat(shippingInput?.value || '');
 
-                const maxShipping = price * 0.7;
+                const maxShipping = Math.floor(price * 0.7);
 
                 if (!isNaN(price) && !isNaN(shipping)) {
                     if (shipping > maxShipping) {
                         // 超過している場合：エラー表示して値をリセット
-                        alert(`配送料は価格の70%（最大 ${maxShipping.toFixed(2)} 円）を超えることはできません。`);
+                        alert(`配送料は価格の70%（最大 ${maxShipping} 円）を超えることはできません。`);
                         shippingInput.value = '';
                         shippingInput.focus();
                         return false;
@@ -351,8 +351,13 @@
                 const shipping = parseFloat(shippingInput?.value || '');
 
                 if (!isNaN(price) && !isNaN(shipping)) {
+                    const shippingTax = Math.floor(shipping * 0.1);
+                    const productTax = Math.floor(price * 0.1);
+                    const shippngTaxPlus = Math.floor(shipping + shipping*0.1);
                     const total = price + shipping;
-                    const message = `商品ページの表示価格は、入力の価格 (${price.toFixed(2)} 円) と配送料 (${shipping.toFixed(2)} 円) の合計で <strong>${total.toFixed(2)} 円</strong> になります。`;
+                    const total2 = Math.floor(price + shippngTaxPlus + price*0.1);
+
+                    const message = `商品ページの表示価格は、消費税込みの金額が表示されます。<br>消費税抜きの金額を入力ください。<br>商品ページの表示価格は、<br><div style="color:green;">【免税事業者】は、入力の価格 (${price} 円) と配送料 (${shipping} 円) の合計で${total} 円になります。</div><br><div style="color:tomato;">【課税事業者】は、入力の価格 (${price} 円) と配送料 (${shipping} 円) と消費税（商品分：${productTax} 円）と消費税（配送料分：${shippingTax} 円）の合計で${total2} 円になります。</div>`;
 
                     document.getElementById('modalMessage').innerHTML = message;
                     $('#priceModal').modal('show');

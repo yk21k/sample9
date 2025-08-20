@@ -39,8 +39,8 @@ class CartController extends Controller
         \Cart::session(auth()->id())->add(array(
             'id' => (string)$product->id,
             'name' => $product->name,
-            'price' => $product->price,
-            'shippnng_fee' => $product->shippnng_fee,
+            'price' => $product->price*1.1,
+            'shippnng_fee' => $product->shippnng_fee*1.1,
             'quantity' => 1,
             'attributes' => array(),
             // 'attributes' => [
@@ -104,9 +104,6 @@ class CartController extends Controller
         return view('auction.auction_check');
     }
 
-
-
-
     public function index()
     {   
         $cartItems = \Cart::session(auth()->id())->getContent();
@@ -152,10 +149,10 @@ class CartController extends Controller
                 $discountRate = $matchingCampaign->dicount_rate1;
                 $item->discounted_price = ceil($item->price - ceil($item->price*$discountRate));
                 $item->campaign = $matchingCampaign;
-                $item->shipping_fee = $item->associatedModel->shipping_fee;
+                $item->shipping_fee = $item->associatedModel->shipping_fee*1.1;
             } else {
                 $item->discounted_price = $item->price;
-                $item->shipping_fee = $item->associatedModel->shipping_fee;
+                $item->shipping_fee = $item->associatedModel->shipping_fee*1.1;
 
                 $item->campaign = null;
             }
@@ -170,7 +167,7 @@ class CartController extends Controller
                 ]);
             }
             // dd($item->associatedModel->shipping_fee);
-            $item->final_price = $item->price + $couponDiscount;            
+            $item->final_price = $item->price + $couponDiscount; 
 
             // --- 最終的な表示価格を選ぶ ---
             $item->lowest_price = min([
@@ -243,9 +240,6 @@ class CartController extends Controller
 
        return view('cart.index', compact('cartItems', 'items', 'discountedCarts', 'total'));
     }
-
-
-
 
     public function destroy(Product $product, $itemId)
     {   
@@ -333,16 +327,16 @@ class CartController extends Controller
 
         $discountedCarts = $cartItems->map(function ($item) use ($campaigns) {
             $shopId = $item->associatedModel?->getOriginal('shop_id');
-            $shipping = (float) ($item->associatedModel->shipping_fee ?? 0);
+            $shipping = (float) ($item->associatedModel->shipping_fee*1.1 ?? 0);
             $productPrice = (float) $item->price;
             $quantity = $item->quantity;
 
             // --- キャンペーン価格（最初の1点用） ---
             $matchingCampaign = $campaigns->where('shop_id', $shopId)->sortByDesc('dicount_rate1')->first();
-            $campaignPrice = $productPrice;
+            $campaignPrice = $productPrice*1.1;
             if ($matchingCampaign) {
                 $rate = $matchingCampaign->dicount_rate1;
-                $campaignPrice = ceil($productPrice - ceil($productPrice * $rate));
+                $campaignPrice = (ceil($productPrice - ceil($productPrice * $rate)))*1.1;
             }
 
             // --- クーポン価格（最初の1点用） ---
@@ -358,14 +352,30 @@ class CartController extends Controller
                     }
                 }
             }
-            $couponPrice = $productPrice - $couponDiscount;
+            $couponPrice = ($productPrice - $couponDiscount)*1.1;
+
+
+            // $couponDiscount = 0;
+            // foreach ((array) $item->getConditions() as $condition) {
+            //     $value = $condition->getValue();
+
+            //     // 金額割引だけを想定（マイナス符号や通貨記号を考慮）
+            //     if (is_string($value)) {
+            //         $couponDiscount += abs(floatval($value));
+            //     }
+            // }
+
+            // 割引後の価格に消費税を加算
+            $couponPrice = ($productPrice - $couponDiscount) * 1.1;
+
+            $newProductPrice = $productPrice*1.1;
 
             // --- 最小価格を選択（0円未満を防ぐ） ---
-            $lowestPrice = max(min($productPrice, $campaignPrice, $couponPrice), 0);
+            $lowestPrice = max(min($newProductPrice, $campaignPrice, $couponPrice), 0);
 
             // --- 商品小計 ---
             $productSubtotal = ($quantity > 1)
-                ? $lowestPrice + $productPrice * ($quantity - 1)
+                ? $lowestPrice + ($productPrice * ($quantity - 1)*1.1)
                 : $lowestPrice;
 
             // --- 配送料小計 ---
@@ -381,7 +391,7 @@ class CartController extends Controller
             // --- デバッグログ ---
             \Log::debug('カート商品の割引内訳', [
                 '商品名' => $item->name,
-                '商品価格' => $productPrice,
+                '商品価格' => $newProductPrice,
                 'キャンペーン適用後' => $campaignPrice,
                 'クーポン適用後' => $couponPrice,
                 '最終適用価格（lowest_price）' => $lowestPrice,
@@ -398,6 +408,7 @@ class CartController extends Controller
         $cartTotal = $discountedCarts->sum('total_price');
         // dd($cartTotal);
         session()->put('total_and_shipping', $cartTotal);
+        Log::debug('カートのアイテム税抜:', ['税抜' => $cartTotal]);
 
         // 配送先情報など他の処理（省略）
 
@@ -448,7 +459,9 @@ class CartController extends Controller
             }        
         }    
         
-        $deliveryAddresses = DeliveryAddress::where('user_id', Auth::user()->id)->get();
+        $firstDelis = Order::where('user_id', Auth::user()->id)->latest()->first();
+
+        $deliveryAddresses = DeliveryAddress::where('user_id', Auth::user()->id)->first();
         // dd($deliveryAddresses);
         
         $setDeliPlaces = DeliveryAddress::setDeliPlaces();
@@ -460,7 +473,7 @@ class CartController extends Controller
         if($setCart){
             return back()->withMessage('You cannot proceed to checkout. Please continue shopping');
         }else{
-            return view('cart.checkout', compact('deliveryAddresses', 'setDeliPlaces', 'setCart', 'discountedCarts', 'cartTotal'));
+            return view('cart.checkout', compact('deliveryAddresses', 'setDeliPlaces', 'setCart', 'discountedCarts', 'cartTotal', 'firstDelis'));
         }
 
     }
@@ -606,10 +619,10 @@ class CartController extends Controller
 
                  // デバッグ出力
             }
-            $shippingFee = (float) ($item->associatedModel->shipping_fee ?? 0);
-            $originalPrice = (float) $item->price + $shippingFee;
-            $finalPrice = isset($item->final_price) ? (float) $item->final_price + $shippingFee : $originalPrice;
-            $discountedPrice = isset($item->discounted_price) ? (float) $item->discounted_price + $shippingFee : $originalPrice;
+            $shippingFee = (float) ($item->associatedModel->shipping_fee*1.1?? 0);
+            $originalPrice = (float) $item->price + $shippingFee + $item->price*0.1;
+            $finalPrice = isset($item->final_price) ? (float) $item->final_price + $shippingFee + $item->final_price*0.1: $originalPrice;
+            $discountedPrice = isset($item->discounted_price) ? (float) $item->discounted_price + $shippingFee + $item->discounted_price*0.1: $originalPrice;
             $lowestPrice = min($finalPrice, $discountedPrice);
 
             $quantity = $item->quantity;
@@ -647,7 +660,7 @@ class CartController extends Controller
             }
 
             // アイテムを clone してプロパティを追加（元のオブジェクトを壊さず）
-            $item->final_price = $item->price + $discount;
+            $item->final_price = $item->price + $discount + $item->price*0.1;
 
             return $item;
         });

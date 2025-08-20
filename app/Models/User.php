@@ -24,7 +24,8 @@ class User extends \TCG\Voyager\Models\User
         'password',
         'email_verified',
         'email_verify_token',
-        'stripe_account_id'
+        'stripe_account_id',
+        'stripe_account_name'
     ];
 
     /**

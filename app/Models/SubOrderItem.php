@@ -21,4 +21,9 @@ class SubOrderItem extends Model
     {
         return $this->belongsTo(Order::class);
     }
+
+    public function invoiceSubOrder()
+    {
+        return $this->belongsTo(SubOrder::class);
+    }
 }
