@@ -16,10 +16,10 @@
 <h2> アカウント　Your Account </h2>
 		<ul class="nav">
 		  <li class="nav-item">
-		    <h3><a class="nav-link link-secondary" href="#">Order History</a></h3>
+		    <h3><a class="nav-link link-secondary" href="#">オーダー履歴</a></h3>
 		  </li>
 		  <li class="nav-item">
-		    <h3><a class="nav-link link-secondary" href="#">Shipping Address</a></h3>
+		    <h3><a class="nav-link link-secondary" href="#">配送先</a></h3>
 		  </li>
 			@php
 			    $open_shops = App\Models\Shop::where('user_id', auth()->user()->id)->first();
@@ -31,11 +31,11 @@
 			    </li>
 			@elseif($open_shops)
 			    <li class="nav-item">
-			        <h3><a class="nav-link link-secondary">あなたの店舗は開設済みです。</a></h3>
+			        <h3><a class="nav-link link-secondary">あなたの店舗は開設申請済みです。</a></h3>
 			    </li>
 			@else
 			    <li class="nav-item">
-			        <h3><a class="nav-link link-secondary" href="{{ route('shops.create') }}">店舗を登録してください</a></h3>
+			        <h3><a class="nav-link link-secondary" href="{{ route('shops.create') }}">店舗登録する</a></h3>
 			    </li>
 			@endif
 

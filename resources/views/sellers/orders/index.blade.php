@@ -74,6 +74,7 @@
     <script>
         const template4Wrapper = document.getElementById('template4Wrapper');
 
+
         const template4SelectHTML = `
             <label for="template4Purpose">送信目的を選択してください</label>
             <select id="template4Purpose" class="form-control">
@@ -85,6 +86,7 @@
             </select>
         `;
 
+
         // テンプレート選択変更時に制御
         document.getElementById('templateSelect').addEventListener('change', function () {
             const selectedTemplate = this.value;
@@ -93,14 +95,26 @@
                 template4Wrapper.innerHTML = template4SelectHTML;
                 template4Wrapper.classList.remove('d-none');
 
+                // select が生成された後にイベントを登録
+                 
                 // イベントリスナーを再登録（selectが再生成されるので毎回必要）
-                document.getElementById('template4Purpose').addEventListener('change', updateEmailPreview);
+                const template4Select =　document.getElementById('template4Purpose');
+                template4Select.addEventListener('change', function () {
+                    // 選択値を hidden input にセット
+                    document.getElementById('purposeInput').value = this.value;
+                    updateEmailPreview();
+                });
+
+                // 初期値が空の場合は hidden も空に
+                document.getElementById('purposeInput').value = template4Select.value;
+                
             } else {
                 template4Wrapper.innerHTML = '';
                 template4Wrapper.classList.add('d-none');
+                document.getElementById('purposeInput').value = ''; // 他テンプレートの場合は空
             }
-
             updateEmailPreview();
+            
         });
 
 
@@ -322,79 +336,79 @@
             }
 
 
-                        // ✅ ボタンの有効／無効化
-                        sendBtn.disabled = !isSendable;
-                        document.getElementById('selectedTemplate').innerHTML = emailContent;
-                    }
+            // ✅ ボタンの有効／無効化
+            sendBtn.disabled = !isSendable;
+            document.getElementById('selectedTemplate').innerHTML = emailContent;
+        }
 
-                    // 初期選択状態でのプレビュー表示（必要に応じて）
-                    window.addEventListener('DOMContentLoaded', updateEmailPreview);
-                </script>
+        // 初期選択状態でのプレビュー表示（必要に応じて）
+        window.addEventListener('DOMContentLoaded', updateEmailPreview);
+    </script>
 
-                <script>
-                    let sortField = 'id';
-                    let sortDirection = 'desc';
-                    let currentPage = 1;
+    <script>
+        let sortField = 'id';
+        let sortDirection = 'desc';
+        let currentPage = 1;
 
-                    function fetchOrders() {
-                        $.ajax({
-                            url: "{{ route('seller.orders.index') }}",
-                            type: 'GET',
-                            data: {
-                                search: $('#orderSearch').val(),
-                                sort: sortField,
-                                direction: sortDirection,
-                                page: currentPage
-                            },
-                            success: function (html) {
-                                // デバッグ用ログ（必要に応じて）
-                                console.log("✅ 成功:", html);
+        function fetchOrders() {
+            $.ajax({
+                url: "{{ route('seller.orders.index') }}",
+                type: 'GET',
+                data: {
+                    search: $('#orderSearch').val(),
+                    sort: sortField,
+                    direction: sortDirection,
+                    page: currentPage
+                },
+                success: function (html) {
+                    // デバッグ用ログ（必要に応じて）
+                    console.log("✅ 成功:", html);
 
-                                // tbody 部分の差し替え
-                                $('#orders-table-body').html($(html).find('tbody').html());
-                                $('#pagination-links').html($(html).find('#pagination-links').html());
-                            },
-                            error: function (xhr, status, error) {
-                                console.error("❌ エラーが発生しました:");
-                                console.error("ステータスコード:", xhr.status);
-                                console.error("ステータス:", status);
-                                console.error("エラー内容:", error);
-                                console.error("レスポンス本文:", xhr.responseText);
-                                alert('データの取得中にエラーが発生しました。開発者ツールを確認してください。');
-                            }
-                        });
-                    }
+                    // tbody 部分の差し替え
+                    $('#orders-table-body').html($(html).find('tbody').html());
+                    $('#pagination-links').html($(html).find('#pagination-links').html());
+                },
+                error: function (xhr, status, error) {
+                    console.error("❌ エラーが発生しました:");
+                    console.error("ステータスコード:", xhr.status);
+                    console.error("ステータス:", status);
+                    console.error("エラー内容:", error);
+                    console.error("レスポンス本文:", xhr.responseText);
+                    alert('データの取得中にエラーが発生しました。開発者ツールを確認してください。');
+                }
+            });
+        }
 
 
-                    $(document).ready(function () {
-                        // 🔍 入力検索
-                        $('#orderSearch').on('input', function () {
-                            currentPage = 1;
-                            fetchOrders();
-                        });
+        $(document).ready(function () {
+            // 🔍 入力検索
+            $('#orderSearch').on('input', function () {
+                currentPage = 1;
+                fetchOrders();
+            });
 
-                        // 🔃 ソートクリック
-                        $(document).on('click', '.sortable', function (e) {
-                            e.preventDefault();
-                            const clickedField = $(this).data('sort');
+            // 🔃 ソートクリック
+            $(document).on('click', '.sortable', function (e) {
+                e.preventDefault();
+                const clickedField = $(this).data('sort');
 
-                            if (sortField === clickedField) {
-                                sortDirection = (sortDirection === 'asc') ? 'desc' : 'asc';
-                            } else {
-                                sortField = clickedField;
-                                sortDirection = 'asc';
-                            }
+                if (sortField === clickedField) {
+                    sortDirection = (sortDirection === 'asc') ? 'desc' : 'asc';
+                } else {
+                    sortField = clickedField;
+                    sortDirection = 'asc';
+                }
 
-                            fetchOrders();
-                        });
+                fetchOrders();
+            });
 
-                        // ⏭️ ページネーション
-                        $(document).on('click', '.pagination a', function (e) {
-                            e.preventDefault();
-                            currentPage = $(this).attr('href').split('page=')[1];
-                            fetchOrders();
-                        });
-                    });
+            // ⏭️ ページネーション
+            $(document).on('click', '.pagination a', function (e) {
+                e.preventDefault();
+                currentPage = $(this).attr('href').split('page=')[1];
+                fetchOrders();
+            });
+        });
     </script>
     
 @endsection

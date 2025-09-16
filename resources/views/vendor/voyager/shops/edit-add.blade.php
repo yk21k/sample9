@@ -23,12 +23,9 @@
     <div class="page-content edit-add container-fluid">
         <div class="row">
 
-
             <div>
                 <a href="{{url('/seller/orders')}}" class="">Order Management</a>
             </div>
-
-
 
             <div class="col-md-12">
 

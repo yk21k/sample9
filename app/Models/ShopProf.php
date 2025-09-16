@@ -9,6 +9,10 @@ class ShopProf extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'shop_id',
+    ];
+
     public function shop()
     {
         return $this->belongsTo(Shop::class, 'shop_id');

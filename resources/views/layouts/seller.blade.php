@@ -147,8 +147,6 @@
                             
                             <a href=" {{url('/seller/orders')}} " class="list-group-item list-group-item-action">Orders</a>
 
-                            <a href=" {{route('seller.order.sales_order_invoice')}} " class="list-group-item list-group-item-action">Invoice</a>
-
                             <a href=" {{route('seller.order.sales_order_invoice2')}} " class="list-group-item list-group-item-action">Invoice2</a>
                             
 
@@ -251,10 +249,11 @@
   var botmanWidget = {
       aboutText: 'よくある質問はこちらから',
       introMessage: "✋ ログインありがとうございます。ご不明点があれば聞いてください！",
-      chatServer: '{{ url('/botman') }}', // Laravelのルーティングに合わせる
+      chatServer: '{{ request()->is("seller/*") ? url("/botman-seller") : url("/botman") }}',
       title: 'FAQチャット'
   };
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/js/widget.js"></script>
 @endif
 

@@ -97,15 +97,6 @@
                                         @endif
                                         <!--  end 20240728 add -->    
 
-                                    @elseif($row->display_name == 'Campaigns Rate1' && auth()->user()->hasRole('seller'))
-                                        @php
-                                            $product_camp = App\Models\Product::where('shop_id', auth()->user()->shop->id)
-                                        @endphp
-                                        @if(empty($product_camp))
-                                            {{ $product_camp->campaigns_rate1 }}
-                                        @else
-                                            :　0 if it is a newly registered product, or the setting value after creating a campaign
-                                        @endif
                                         
                                     @else
                                         {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!}

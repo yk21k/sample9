@@ -19,6 +19,9 @@ use App\Models\Inquiries;
 use App\Models\PriceHistory;
 use App\Models\InventoryLog;
 use App\Models\SubOrderItem;
+use App\Models\TaxRate;
+use App\Models\Commition;
+use App\Models\FinalOrder;
 use DB;
 use Carbon\Carbon;
 
@@ -90,26 +93,97 @@ class OrdersController extends Controller
         return view('sellers.orders.index', compact('mail_part', 'orders', 'coupons', 'campaigns'));
     }
 
+    // public function show(SubOrder $order)
+    // {   
+    //     if(auth()->user()->id == 1){
+    //         $items = $order->items;
+    //         // dd($items);
+
+    //         return view('sellers.orders.show', compact('items'));
+
+    //     }else{
+    //         $items = $order->items;
+
+    //         $shopMane = auth()->user()->shop->id;
+    //         // dd($shopMane);
+
+    //         // dd($items);
+    //         return view('sellers.orders.show', compact('items', 'shopMane'));
+    //     }
+        
+        
+    // }
+
     public function show(SubOrder $order)
-    {   
-        if(auth()->user()->id == 1){
-            $items = $order->items;
-            // dd($items);
+    {
+        $items = $order->items;
 
-            return view('sellers.orders.show', compact('items'));
+        $suborder = $order; 
 
-        }else{
-            $items = $order->items;
+        foreach ($items as $item) {
+            // dd($item);
+            $quantity   = $item->pivot->quantity;
+            $unitPrice  = $item->pivot->price;
+            $shipping   = $item->pivot->shipping_fee ?? 0;
 
-            $shopMane = auth()->user()->shop->id;
-            // dd($shopMane);
+            // 税抜価格（商品 + 送料）
+            $originalPriceWithShipping = $unitPrice + $shipping;
 
-            // dd($items);
-            return view('sellers.orders.show', compact('items', 'shopMane'));
+            // 割引後価格（キャンペーン/クーポン適用）
+            $discountedUnitPrice = $item->pivot->discounted_price ?? $unitPrice;
+            $lowestUnitPrice = $discountedUnitPrice + $shipping;
+            // dd($discountedUnitPrice);
+            // 適用ラベル
+            if (isset($item->pivot->campaign_id) && $item->pivot->campaign_id) {
+                $appliedLabel = 'キャンペーン適用';
+            } elseif (isset($item->pivot->coupon_id) && $item->pivot->coupon_id) {
+                $appliedLabel = 'クーポン適用';
+            } else {
+                $appliedLabel = 'なし';
+            }
+
+            // 小計（1個だけ割引、それ以外は通常価格）
+            if ($quantity > 1 && $lowestUnitPrice < $originalPriceWithShipping) {
+                $finalLineTotal = $lowestUnitPrice + ($originalPriceWithShipping * ($quantity - 1));
+            } else {
+                $finalLineTotal = $lowestUnitPrice * $quantity;
+            }
+
+            // 課税判定（インボイス番号があれば課税）
+            $isTaxable = !empty($item->pivot->invoice_number ?? null);
+
+            $taxRate = TaxRate::current()?->rate; // 消費税率10%
+
+            $tax = $isTaxable ? (int)($finalLineTotal * $taxRate) : 0;
+
+            // 手数料計算（例）
+            // $feeRate  = 0.05; // 5% 手数料
+            $feeRate = Commition::current()?->rate ?? 0; // 10% 手数料
+            $feeFixed = 0;
+            $fee = (int)($originalPriceWithShipping * $quantity * $feeRate + $feeFixed);
+
+            // 出品者受取額
+            $sellerReceive = $finalLineTotal - $fee - $tax;
+
+            $item->calc = [
+                'originalPriceWithShipping' => $originalPriceWithShipping,
+                'lowestUnitPrice'           => $lowestUnitPrice,
+                'appliedLabel'              => $appliedLabel,
+                'finalLineTotal'            => $finalLineTotal,
+                'tax'                       => $tax,
+                'fee'                       => $fee,
+                'sellerReceive'             => $sellerReceive,
+            ];
         }
-        
-        
+
+        if(auth()->user()->id == 1){
+            return view('sellers.orders.show', compact('items'));
+        } else {
+            $shopMane = auth()->user()->shop->id;
+            return view('sellers.orders.show', compact('items', 'shopMane', 'suborder'));
+        }
     }
+
 
     // PostAjaxController.php
     public function fetch(Request $request)
@@ -199,6 +273,37 @@ class OrdersController extends Controller
         $data = $request->all();
         // dd($data);
 
+        $subOrder = SubOrder::where('id', $data['order_id'])->first();
+        // dd($subOrder->created_at);
+
+        $product_pre = SubOrder::with('invoiceSubOrder_item')->where('id', $data['order_id'])->first();
+        // dd($product_pre);
+
+
+
+        $shops = Shop::where('user_id', $data['shop_id'])->first();
+
+        $campaigns = Campaign::where('shop_id', $shops->id)->where('start_date', '<=', $subOrder->created_at)->where('end_date', '>=', $subOrder->created_at)->orderByDesc('dicount_rate1')->first();
+
+
+        // dd($campaigns->id);
+
+        // coupon_code が存在する場合
+        $coupons = [];
+        if (!empty($subOrder->coupon_code)) {
+            // カンマで分割
+            $codes = explode(',', $subOrder->coupon_code);
+
+            // それぞれのコードで ShopCoupon を検索
+            foreach ($codes as $code) {
+                $coupon = ShopCoupon::where('code', trim($code))->first();
+                if ($coupon) {
+                    $coupons[] = $coupon->id;
+                }
+            }
+        }
+        // dd($coupons);
+
         $user = User::where('id', $data['user_id'])->first();
 
         $mailDisplay = Mails::where('shop_id', auth()->id())
@@ -221,16 +326,40 @@ class OrdersController extends Controller
             }
         }
 
+        // invoiceSubOrder_item から product_id だけ抜き出す
+        $productIds = $product_pre->invoiceSubOrder_item->pluck('product_id')->toArray();
+
+        // 単一キャンペーンIDを配列に
+        $campaignIds = [];
+        if (!empty($campaigns) && !empty($campaigns->id)) {
+            $campaignIds[] = $campaigns->id;
+        }
+
+        $subOrderItems = SubOrder::with(['invoiceSubOrder_item.product'])->where('id', $data['order_id'])->first();
+
+        // dd($subOrderItems);
+
         // 初回でも送信されるようにここで保存処理
         $mail = new Mails;
         $mail->user_id = $data['user_id'];
         $mail->shop_id = $data['shop_id'];
         $mail->mail = $user->email;
         $mail->template = $data['template'];
-        $mail->coupon_id = $data['coupon_id'] ?? " ";
-        $mail->campaign_id = $data['campaign_id'] ?? " ";
+        $mail->purpose = $data['purpose'];
+        
+        // カンマ区切り文字列に変換
+        $mail->product_id = implode(',', $productIds);  
+
+        // 複数クーポンIDをカンマ区切り文字列に変換
+        $mail->coupon_id = !empty($coupons) ? implode(',', $coupons) : null;
+
+        // カンマ区切りにして保存
+        $mail->campaign_id = implode(',', $campaignIds) ?: " ";
         $mail->order_number = $data['order_number'] ?? " ";
-        $mail->order_coupon = $data['order_coupon'] ?? " ";
+        $mail->sub_order_id = $data['order_id'] ?? " ";
+
+        // dd($mail);
+
         $mail->save();
 
         return redirect('/seller/orders')->withMessage('Mail sent!!');
@@ -456,179 +585,6 @@ class OrdersController extends Controller
 
     }
 
-    public function invoice(Request $request)
-    {
-
-        // 必要なリレーションをまとめて取得
-        $subOrders = SubOrder::where('seller_id', auth()->id())->
-        with([
-            'invoiceUser',
-            'invoiceSubOrder_item',
-            'invoiceArrivalReport'
-        ])->orderByDesc('id')->get();
-
-        // dd($subOrders->first()->coupon_code);
-
-        // $subOrders の先頭1件の全体構造確認
-        // dd($subOrders->first()->invoiceSubOrder_item);
-
-        $sales = $subOrders->map(function ($order) {
-
-        $purchase_date = Carbon::parse($order->created_at);
-
-        $confirmedDate = $order->invoiceArrivalReport ? Carbon::parse($order->invoiceArrivalReport->confirmed_at) : null;
-
-        $payoutDate = $order->transferred_at ? Carbon::parse($order->transferred_at) : null;
-
-                        // 各商品の情報を取得
-        $shop_parts = Shop::where('user_id', $order->invoiceUser->id)->first();
-        // dd($order);
-        // dd($product_parts);
-
-
-        // $sub_order_item_parts = SubOrderItem::where('sub_order_id', $order->id)->first();
-
-        // $product_parts = Product::where('id', $sub_order_item_parts->product_id)->first();
-
-            // 注文の各商品ごとに1行ずつ作る
-            return $order->invoiceSubOrder_item->map(function ($item) use ($order, $purchase_date, $confirmedDate, $payoutDate, $shop_parts) {
-
-                // 商品情報をリレーションなしで取得
-                $product = Product::where('id', $item->product_id)->first();
-                $shippingFee = $product->shipping_fee ?? 0;
-
-                return (object)[
-                    'seller_id' => $order->seller_id,
-                    'purchase_date' => $purchase_date,
-                    'confirmed_at' => $confirmedDate,
-                    'pay_transfer' => $payoutDate,
-                    'order_number' => $order->id,
-                    'seller_name' => $shop_parts->name ?? '',
-                    'seller_registration_number' => $shop_parts->invoice_number ?? 'なし',
-                    'product_name' => $item->product->name ?? '不明な商品',
-                    'coupon_code' => $order->coupon_code ?? '不明なクーポン',
-                    'quantity' => $item->quantity,
-                    'shipping_fee' => $shippingFee,
-                    'unit_price' => $item->price,
-                    'tax_rate' => '10',
-                    'tax_amount' => floor(($item->price*$item->quantity)*0.1),
-                    'shippinng_fee_tax_amount' => floor(($shippingFee*$item->quantity)*0.1),
-                    'total_amount' => floor(($item->price+$shippingFee)*1.1),
-                    'tax_category' => '課税',
-                ];
-            });
-        })->flatten(1);
-
-            // CSV出力
-        if ($request->format === 'csv') {
-
-            $headers = [
-                '購入日', '取引日(到着確認日)', '入金日(手数料以外)', '注文番号', '出品者名称', '出品者登録番号',
-                '商品名', '数量', '単価(税抜)', '税率(%)', '消費税額(商品)', '税込金額', '単価(税抜)割引対象', '税率(%)', '消費税額', '税込金額', '配送料(税抜)', '税率(%)', '消費税額(配送料)', '税込金額', '税込金額合計', '消費税合計', '税区分'
-            ];
-
-            $callback = function () use ($sales, $headers) {
-                $file = fopen('php://output', 'w');
-                mb_convert_variables('SJIS-win', 'UTF-8', $headers);
-                fputcsv($file, $headers);
-
-                foreach ($sales as $row) {
-
-                    $original_price = $row->unit_price;
-                    $shipFee = $row->shipping_fee;
-                    $shipping_fee_tax = $shipFee *0.1;
-
-                    $shop_coupon = ShopCoupon::where('code', $row->coupon_code)->first();
-
-                    $shop_campaign_pre = Shop::where('user_id', $row->seller_id)->first();
-
-                    //$row->purchase_date 購入日で期間を確認する
-
-                    $campaign_set = Campaign::where('shop_id', $shop_campaign_pre->id)->where('start_date', '<=', $row->purchase_date)
-                        ->where('end_date', '>=', $row->purchase_date)
-                        ->orderByDesc('dicount_rate1')
-                        ->first();
-
-                    $campaign_set_price = null; // 初期化しておくと安全
-                    if($campaign_set){
-                        if($row->quantity >= 2){
-                            $campaign_set_price = $row->unit_price - ($row->unit_price * $campaign_set->dicount_rate1);
-                            $campaign_set_price_tax = $campaign_set_price * 0.1;
-                            $campaign_set_price_remove_total = $row->unit_price * ($row->quantity - 1);
-                            $campaign_total = $campaign_set_price+($row->unit_price*($row->quantity-1));
-                        }                        
-                    }
-
-                    $coupon_set = null; // 初期化しておくと安全
-                    if(isset($shop_coupon)){
-                        if($row->quantity >= 2){
-                            $coupon_set = $row->unit_price + $shop_coupon->value;
-                            $coupon_set_tax = $coupon_set * 0.1;
-                            $coupon_set_remove_total = $row->unit_price * ($row->quantity - 1);
-                        }                        
-                    }
-
-                    $prices = array_filter([
-                        $original_price,
-                        $campaign_set_price,
-                        $coupon_set
-                    ], fn($v) => $v !== null);
-
-                    $lowest_price = !empty($prices) ? min($prices) : null;
-
-                    $campaign_total = floor((
-                        $campaign_set_price +
-                        $row->unit_price * ($row->quantity - 1) +
-                        ($shipFee * $row->quantity)
-                    ) * 1.1);
-
-                    $couponTotal = floor((
-                        $coupon_set +
-                        $row->unit_price * ($row->quantity - 1) +
-                        ($shipFee * $row->quantity)
-                    ) * 1.1);
-
-                    $data = [
-                        optional($row->purchase_date)->format('Y-m-d'),
-                        optional($row->confirmed_at)->format('Y-m-d'),
-                        optional($row->pay_transfer)->format('Y-m-d'),
-                        $row->order_number,
-                        $row->seller_name,
-                        $row->seller_registration_number,
-                        $row->product_name,
-                        $row->quantity,
-                        $row->unit_price,
-                        $row->tax_rate,
-                        ($row->unit_price*($row->quantity -1))*0.1,
-                        ($row->unit_price*($row->quantity -1))*1.1,
-                        $lowest_price,
-                        $row->tax_rate,
-                        $lowest_price*0.1,
-                        $lowest_price*1.1,
-                        $shipFee,
-                        $row->tax_rate,
-                        $shipFee*0.1,
-                        $shipFee*1.1,
-                        ($lowest_price + $shipFee*$row->quantity + $row->unit_price*($row->quantity -1))*1.1,
-                        ($lowest_price + $shipFee*$row->quantity + $row->unit_price*($row->quantity -1))*0.1,
-                        $row->tax_category,
-                    ];
-                    mb_convert_variables('SJIS-win', 'UTF-8', $data);
-                    fputcsv($file, $data);
-                }
-                fclose($file);
-            };
-
-            return Response::stream($callback, 200, [
-                "Content-Type" => "text/csv",
-                "Content-Disposition" => "attachment; filename=sales.csv",
-            ]);
-        }
-
-        return view('sellers.sales.sales_index', compact('subOrders', 'sales', 'headers'));
-    }
-
-
     public function invoice2(Request $request)
     {
 
@@ -645,7 +601,11 @@ class OrdersController extends Controller
             'invoiceArrivalReport'
         ])->orderByDesc('id')->get();
 
+        // 必要なリレーションをまとめて取得
+        $finalOrders = FinalOrder::where('shop_id', auth()->user()->shop->id)->orderByDesc('id')->get();
+
         // dd($subOrders->first()->coupon_code);
+        // dd($finalOrders);
 
         // $subOrders の先頭1件の全体構造確認
         // dd($subOrders->first()->invoiceSubOrder_item);
@@ -661,125 +621,186 @@ class OrdersController extends Controller
                         // 各商品の情報を取得
         $shop_parts = Shop::where('user_id', $order->invoiceUser->id)->first();
         // dd($order);
-        // dd($product_parts);
+        // dd($shop_parts->invoice_number);
 
+        $tax_rate = TaxRate::current()?->rate;
+        // dd($tax_rate);
 
         // $sub_order_item_parts = SubOrderItem::where('sub_order_id', $order->id)->first();
 
         // $product_parts = Product::where('id', $sub_order_item_parts->product_id)->first();
 
             // 注文の各商品ごとに1行ずつ作る
-            return $order->invoiceSubOrder_item->map(function ($item) use ($order, $purchase_date, $confirmedDate, $payoutDate, $shop_parts) {
+            return $order->invoiceSubOrder_item->map(function ($item) use ($order, $purchase_date, $confirmedDate, $payoutDate, $shop_parts, $tax_rate) {
 
                 // 商品情報をリレーションなしで取得
                 $product = Product::where('id', $item->product_id)->first();
                 $shippingFee = $product->shipping_fee ?? 0;
+                $tax_category = '免税業者';
+                if($shop_parts->invoice_number)
+                {
+                    $tax_category = '課税業者';
 
-                return (object)[
-                    'seller_id' => $order->seller_id,
-                    'purchase_date' => $purchase_date,
-                    'confirmed_at' => $confirmedDate,
-                    'pay_transfer' => $payoutDate,
-                    'order_number' => $order->id,
-                    'seller_name' => $shop_parts->name ?? '',
-                    'seller_registration_number' => $shop_parts->invoice_number ?? 'なし',
-                    'product_name' => $item->product->name ?? '不明な商品',
-                    'coupon_code' => $order->coupon_code ?? '不明なクーポン',
-                    'quantity' => $item->quantity,
-                    'shipping_fee' => $shippingFee,
-                    'unit_price' => $item->price,
-                    'tax_rate' => '10',
-                    'tax_amount' => floor(($item->price*$item->quantity)*0.1),
-                    'shippinng_fee_tax_amount' => floor(($shippingFee*$item->quantity)*0.1),
-                    'total_amount' => floor(($item->price+$shippingFee)*1.1),
-                    'tax_category' => '課税',
-                ];
+                    return (object)[
+                        'seller_id' => $order->seller_id,
+                        'purchase_date' => $purchase_date,
+                        'confirmed_at' => $confirmedDate,
+                        'pay_transfer' => $payoutDate,
+                        'order_number' => $order->id,
+                        'seller_name' => $shop_parts->name ?? '',
+                        'seller_registration_number' => $shop_parts->invoice_number ?? 'なし',
+                        'product_id' => $item->product->id ?? '不明な商品ID',
+                        'product_name' => $item->product->name ?? '不明な商品',
+                        'coupon_code' => $order->coupon_code ?? '不明なクーポン',
+                        'quantity' => $item->quantity,
+                        'shipping_fee' => $shippingFee,
+                        'unit_price' => $item->price,
+                        'tax_rate' => '10',//表示上
+                        'tax_amount' => floor(($item->price*$item->quantity)*$tax_rate),
+                        'shippinng_fee_tax_amount' => floor(($shippingFee*$item->quantity)*$tax_rate),
+                        'total_amount' => floor(($item->price+$shippingFee)*($tax_rate+1)),
+                        'tax_category' => $tax_category,
+                    ];
+                }else
+                    {
+                        return (object)[
+                            'seller_id' => $order->seller_id,
+                            'purchase_date' => $purchase_date,
+                            'confirmed_at' => $confirmedDate,
+                            'pay_transfer' => $payoutDate,
+                            'order_number' => $order->id,
+                            'seller_name' => $shop_parts->name ?? '',
+                            'seller_registration_number' => $shop_parts->invoice_number ?? 'なし',
+                            'product_id' => $item->product->id ?? '不明な商品ID',
+                            'product_name' => $item->product->name ?? '不明な商品',
+                            'coupon_code' => $order->coupon_code ?? '不明なクーポン',
+                            'quantity' => $item->quantity,
+                            'shipping_fee' => $shippingFee,
+                            'unit_price' => $item->price,
+                            'tax_rate' => 'なし',//表示上
+                            'tax_amount' => floor(($item->price*$item->quantity)),
+                            'shippinng_fee_tax_amount' => floor($shippingFee*$item->quantity),
+                            'total_amount' => floor($item->price+$shippingFee),
+                            'tax_category' => $tax_category,
+                        ];    
+                    }
+
+                
             });
         })->flatten(1);
+        // dd($subOrders);
+        // dd($sales);
 
         // CSV出力
         if ($request->format === 'csv') {
 
-            $filenameCsv = 'sales.csv';
+            $filenameCsv  = 'sales.csv';
             $filenameHtml = 'readme.html';
-            $zipFilename = 'export_files.zip';
+            $zipFilename  = 'export_files.zip';
 
-            // --- CSVをストレージに保存 ---
+            // 一時ディレクトリ
             $tmpDir = storage_path('app/tmp');
-            // ディレクトリがなければ作成
-            if (!file_exists($tmpDir)) {
-                mkdir($tmpDir, 0777, true);
-            }
+            if (!file_exists($tmpDir)) mkdir($tmpDir, 0777, true);
 
             $csvPath = $tmpDir . '/sales.csv';
-
             $file = fopen($csvPath, 'w');
 
-            $headers = [
-                '購入日', '取引日(到着確認日)', '入金日(手数料以外)', '注文番号', '出品者名称', '出品者登録番号',
-                '商品名', '数量', '単価(税抜)', '税率(%)', '消費税額(商品)', '税込金額', 
-                '単価(税抜)割引対象', '税率(%)', '消費税額', '税込金額', '配送料(税抜)', 
-                '税率(%)', '消費税額(配送料)', '税込金額', '税込金額合計', '消費税合計', '税区分'
-            ];
+            // 税区分判定（免税/課税）
+            $taxCategory = $sales->first()->tax_category ?? '免税業者';
+            $tax_rate = TaxRate::current()?->rate ?? 0;
+
+            // CSVヘッダー切替
+            if($taxCategory === '免税業者'){
+                $headers = [
+                    '購入日','取引日','入金日','注文番号','出品者名称','出品者登録番号',
+                    '商品名','数量','単価','割引後単価','適用ラベル',
+                    '2個目以降単価','配送料','税込金額合計','税区分'
+                ];
+            } else {
+                $headers = [
+                    '購入日','取引日','入金日','注文番号','出品者名称','出品者登録番号',
+                    '商品名','数量','単価(税抜)','税率(%)','割引後単価', '消費税額(1個目)','税込金額(1個目)',
+                    '適用ラベル','2個目以降税抜合計','2個目以降消費税','2個目以降税込合計',
+                    '配送料(税抜)','配送料消費税','配送料税込','税込金額合計','消費税合計','税区分'
+                ];
+            }
 
             mb_convert_variables('SJIS-win','UTF-8',$headers);
             fputcsv($file, $headers);
 
-            foreach ($sales as $row) {
+            foreach($sales as $row){
+                $quantity = $row->quantity;
+                $unit_price = $row->unit_price;
+                $shipFee = $row->shipping_fee;
 
-                    $original_price = $row->unit_price;
-                    $shipFee = $row->shipping_fee;
-                    $shipping_fee_tax = $shipFee *0.1;
+                // --- キャンペーン適用 ---
+                $campaign_set_price = null;
+                $shop_campaign = Campaign::where('shop_id', auth()->user()->shop->id)
+                    ->where('start_date','<=',$row->purchase_date)
+                    ->where('end_date','>=',$row->purchase_date)
+                    ->orderByDesc('dicount_rate1')->first();
+                if($shop_campaign && $quantity >= 2){
+                    $campaign_set_price = floor($unit_price * (1 - $shop_campaign->dicount_rate1));
+                }
 
-                    $shop_coupon = ShopCoupon::where('code', $row->coupon_code)->first();
+                // --- クーポン適用 ---
+                $coupon_set_price = null;
 
-                    $shop_campaign_pre = Shop::where('user_id', $row->seller_id)->first();
+                if (!empty($row->coupon_code)) {
+                    // 複数のクーポンコードを配列化
+                    $couponCodes = explode(',', $row->coupon_code);
 
-                    //$row->purchase_date 購入日で期間を確認する
+                    // クーポンをまとめて取得
+                    $shop_coupons = ShopCoupon::whereIn('code', $couponCodes)->get();
 
-                    $campaign_set = Campaign::where('shop_id', $shop_campaign_pre->id)->where('start_date', '<=', $row->purchase_date)
-                        ->where('end_date', '>=', $row->purchase_date)
-                        ->orderByDesc('dicount_rate1')
-                        ->first();
-
-                    $campaign_set_price = null; // 初期化しておくと安全
-                    if($campaign_set){
-                        if($row->quantity >= 2){
-                            $campaign_set_price = $row->unit_price - ($row->unit_price * $campaign_set->dicount_rate1);
-                            $campaign_set_price_tax = $campaign_set_price * 0.1;
-                            $campaign_set_price_remove_total = $row->unit_price * ($row->quantity - 1);
-                            $campaign_total = $campaign_set_price+($row->unit_price*($row->quantity-1));
-                        }                        
+                    foreach ($shop_coupons as $shop_coupon) {
+                        // 対象商品か確認
+                        if ($row->product_id == $shop_coupon->product_id) {
+                            // クーポンは最初の1個だけ適用
+                            // ※値引きなら -、値上げクーポンなら + にしてください
+                            $coupon_set_price = max(0, $unit_price + $shop_coupon->value);
+                            break; // 最初に見つかった対象クーポンを適用
+                        }
                     }
+                }
 
-                    $coupon_set = null; // 初期化しておくと安全
-                    if(isset($shop_coupon)){
-                        if($row->quantity >= 2){
-                            $coupon_set = $row->unit_price + $shop_coupon->value;
-                            $coupon_set_tax = $coupon_set * 0.1;
-                            $coupon_set_remove_total = $row->unit_price * ($row->quantity - 1);
-                        }                        
-                    }
 
-                    $prices = array_filter([
-                        $original_price,
-                        $campaign_set_price,
-                        $coupon_set
-                    ], fn($v) => $v !== null);
+                // --- 最安値適用 ---
+                $prices = array_filter([$unit_price,$campaign_set_price,$coupon_set_price], fn($v)=>$v!==null);
+                $applied_unit_price = !empty($prices) ? min($prices) : $unit_price;
 
-                    $lowest_price = !empty($prices) ? min($prices) : null;
+                // dd($row->seller_id, $unit_price,$campaign_set_price,$coupon_set_price);
 
-                    $campaign_total = floor((
-                        $campaign_set_price +
-                        $row->unit_price * ($row->quantity - 1) +
-                        ($shipFee * $row->quantity)
-                    ) * 1.1);
+                // 適用ラベル
+                if($applied_unit_price === $campaign_set_price) $applied_label='キャンペーン適用';
+                elseif($applied_unit_price === $coupon_set_price) $applied_label='クーポン適用';
+                else $applied_label='通常価格';
 
-                    $couponTotal = floor((
-                        $coupon_set +
-                        $row->unit_price * ($row->quantity - 1) +
-                        ($shipFee * $row->quantity)
-                    ) * 1.1);
+                if($taxCategory === '免税業者'){
+                    $total_with_tax = ($applied_unit_price + $unit_price*($quantity-1)) + $shipFee*$quantity;
+                    $data = [
+                        optional($row->purchase_date)->format('Y-m-d'),
+                        optional($row->confirmed_at)->format('Y-m-d'),
+                        optional($row->pay_transfer)->format('Y-m-d'),
+                        $row->order_number,
+                        $row->seller_name,
+                        $row->seller_registration_number,
+                        $row->product_name,
+                        $quantity,
+                        $unit_price,
+                        $applied_unit_price,
+                        $applied_label,
+                        $quantity>1 ? $unit_price*($quantity-1) : 0,
+                        $shipFee,
+                        $total_with_tax,
+                        $row->tax_category
+                    ];
+                } else {
+                    $tax_first = floor($applied_unit_price * $tax_rate);
+                    $taxable_others = $unit_price * ($quantity-1);
+                    $tax_others = floor($taxable_others * $tax_rate);
+                    $shipping_tax = floor($shipFee * $quantity * $tax_rate);
+                    $total_with_tax = $applied_unit_price + $tax_first + $taxable_others + $tax_others + $shipFee*$quantity + $shipping_tax;
 
                     $data = [
                         optional($row->purchase_date)->format('Y-m-d'),
@@ -789,202 +810,223 @@ class OrdersController extends Controller
                         $row->seller_name,
                         $row->seller_registration_number,
                         $row->product_name,
-                        $row->quantity,
-                        $row->unit_price,
-                        $row->tax_rate,
-                        ($row->unit_price*($row->quantity -1))*0.1,
-                        ($row->unit_price*($row->quantity -1))*1.1,
-                        $lowest_price,
-                        $row->tax_rate,
-                        $lowest_price*0.1,
-                        $lowest_price*1.1,
+                        $quantity,
+                        $unit_price,
+                        $tax_rate*100,
+                        $applied_unit_price,
+                        $tax_first,
+                        $applied_unit_price + $tax_first,
+                        $applied_label,
+                        $taxable_others,
+                        $tax_others,
+                        $taxable_others + $tax_others,
                         $shipFee,
-                        $row->tax_rate,
-                        $shipFee*0.1,
-                        $shipFee*1.1,
-                        ($lowest_price + $shipFee*$row->quantity + $row->unit_price*($row->quantity -1))*1.1,
-                        ($lowest_price + $shipFee*$row->quantity + $row->unit_price*($row->quantity -1))*0.1,
-                        $row->tax_category,
+                        $shipping_tax,
+                        $shipFee*$quantity + $shipping_tax,
+                        $total_with_tax,
+                        $tax_first + $tax_others + $shipping_tax,
+                        $row->tax_category
                     ];
+                }
+
                 mb_convert_variables('SJIS-win','UTF-8',$data);
-                fputcsv($file, $data);
+                fputcsv($file,$data);
             }
+
             fclose($file);
 
-            // --- HTML解説を生成 ---
-            $htmlContent = view('sellers.sales.csv_guide', compact('headers'))->render();
+            // --- HTMLガイド（ダミーデータ） ---
+            $htmlContent = view('sellers.sales.csv_guide', [
+                'headers' => $headers,
+                'dummyData' => true, // ダミーデータ用フラグ
+            ])->render();
             $htmlPath = storage_path("app/tmp/{$filenameHtml}");
             file_put_contents($htmlPath, $htmlContent);
 
             // --- ZIPにまとめる ---
             $zipPath = storage_path("app/tmp/{$zipFilename}");
             $zip = new ZipArchive;
-            if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
-                $zip->addFile($csvPath, $filenameCsv);
-                $zip->addFile($htmlPath, $filenameHtml);
+            if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE){
+                $zip->addFile($csvPath,$filenameCsv);
+                $zip->addFile($htmlPath,$filenameHtml);
                 $zip->close();
             }
 
-            // --- ダウンロード ---
+            // ダウンロード
             return response()->download($zipPath)->deleteFileAfterSend(true);
         }
 
-        return view('sellers.sales.sales_index', compact('subOrders', 'sales' , 'headers'));
+        return view('sellers.sales.sales_index', compact('subOrders', 'sales' , 'headers', 'finalOrders'));
     }
 
-    public function slip()
-    {
-        $headers = [
-            '購入日', '取引日(到着確認日)', '入金日', '注文番号', '出品者名称', '出品者登録番号',
-            '商品名', '数量', '単価(税抜)', '税率(%)', '消費税額', '税込金額', '配送料', '配送料消費税', '税込金額合計', '税区分'
-        ];
 
-        $subOrders = SubOrder::where('seller_id', auth()->id())
-            ->with([
-                'invoiceUser',
-                'invoiceSubOrder_item',
-                'invoiceArrivalReport'
-            ])->orderByDesc('id')->get();
+    // public function slip2()
+    // {
+    //     $headers = [
+    //         '購入日', '取引日(到着確認日)', '入金日(手数料以外)', '注文番号', '出品者名称', '出品者登録番号',
+    //         '商品名', '数量', '単価(税抜)', '税率(%)', '消費税額(商品)', '税込金額',
+    //         '配送料(税抜)', '消費税額(配送料)', '税込金額(配送料)', 
+    //         '税込金額合計', '消費税合計', '税区分'
+    //     ];
 
-        $sales = $subOrders->map(function ($order) {
-            $purchase_date = \Carbon\Carbon::parse($order->created_at);
-            $confirmedDate = $order->invoiceArrivalReport ? \Carbon\Carbon::parse($order->invoiceArrivalReport->confirmed_at) : null;
-            $payoutDate = $order->transferred_at ? \Carbon\Carbon::parse($order->transferred_at) : null;
-            $shop_parts = Shop::where('user_id', $order->invoiceUser->id)->first();
+    //     $subOrders = SubOrder::where('seller_id', auth()->id())
+    //         ->with(['invoiceUser', 'invoiceSubOrder_item', 'invoiceArrivalReport'])
+    //         ->orderByDesc('id')
+    //         ->get();
 
-            // 商品リスト + 合計計算
-            $items = $order->invoiceSubOrder_item->map(function ($item) {
+            
 
-                $product = Product::find($item->product_id);
-                $shippingFee = $product->shipping_fee ?? 0;
-                $shippingFeeTotal = $shippingFee * $item->quantity;
+    //     $sales = $subOrders->map(function ($order) {
+    //         $purchase_date = Carbon::parse($order->created_at);
+    //         $confirmedDate = $order->invoiceArrivalReport ? Carbon::parse($order->invoiceArrivalReport->confirmed_at) : null;
+    //         $payoutDate = $order->transferred_at ? Carbon::parse($order->transferred_at) : null;
+    //         $shop_parts = Shop::where('user_id', $order->invoiceUser->id)->first();
+    //         $tax_rates = TaxRate::current()?->rate;
 
-                $subtotal = $item->price * $item->quantity;
-                $tax_amount = floor($subtotal * 0.1);
-                $shipping_tax = floor($shippingFee * 0.1);
-                $total_amount = $subtotal + $tax_amount + $shippingFee + $shipping_tax;
+    //         $items = $order->invoiceSubOrder_item->map(function ($item) use ($tax_rates) {
+    //             $product = Product::find($item->product_id);
+    //             $shippingFee = $product->shipping_fee ?? 0;
 
-                return (object)[
-                    'product_name' => $product->name ?? '不明な商品',
-                    'quantity' => $item->quantity,
-                    'unit_price' => $item->price,
-                    'tax_rate' => 10,
-                    'tax_amount' => $tax_amount,
-                    'shipping_fee' => $shippingFee,
-                    'shipping_fee_tax_amount' => $shipping_tax * $item->quantity,
-                    'total_amount' => $total_amount,
-                    'tax_category' => '課税',
-                ];
-            });
+    //             return [
+    //                 'product_name' => $product->name ?? '不明な商品',
+    //                 'quantity' => $item->quantity,
+    //                 'unit_price' => $item->price,
+    //                 'tax_rate' => 10,
+    //                 'tax_amount' => floor($item->price * $item->quantity * $tax_rates),
+    //                 'total_amount' => floor($item->price * $item->quantity * ($tax_rates+1)),
+    //                 'shipping_fee' => $shippingFee,
+    //                 'shipping_fee_tax_amount' => floor($shippingFee * $item->quantity * $tax_rates),
+    //                 'shipping_fee_total' => floor($shippingFee * $item->quantity * ($tax_rates+1)),
+    //                 'tax_category' => '課税',
+    //             ];
+    //         })->toArray(); // ← Collectionではなく配列に変換
 
-            // 合計値を計算
-            $order_totals = (object)[
-                'quantity_total' => $items->sum('quantity'),
-                'unit_price_total' => $items->sum(function ($i) {
-                    return $i->unit_price * $i->quantity;
-                }),
-                'shipping_fee_total' => $items->sum(function ($i) {
-                    return $i->shipping_fee * $i->quantity;
-                }),
-                'tax_total' => $items->sum('tax_amount'),
-                'shipping_fee_tax_total' => $items->sum('shipping_fee_tax_amount'),
-                'grand_total' => $items->sum('total_amount'),
-            ];
+    //         // 合計計算
+    //         $total_quantity = collect($items)->sum('quantity');
+    //         $total_price = collect($items)->sum(fn($i) => $i['unit_price'] * $i['quantity']);
+    //         $total_tax = collect($items)->sum('tax_amount');
 
-            return (object)[
-                'shop_location' => $shop_parts->location_1,
-                'order_id' => $order->id,
-                'purchase_date' => $purchase_date,
-                'confirmed_at' => $confirmedDate,
-                'payout_date' => $payoutDate,
-                'seller_name' => $shop_parts->name ?? '',
-                'seller_registration_number' => $shop_parts->invoice_number ?? 'なし',
-                'items' => $items,
-                'order_totals' => $order_totals,
-            ];
-        });
+    //         $total_shipping = collect($items)->sum(fn($i) => $i['shipping_fee'] * $i['quantity']);
 
-        return view('sellers.sales.sales_slip', compact('sales', 'headers'));
-    }
+    //         $total_shipping_tax = collect($items)->sum('shipping_fee_tax_amount');
+
+    //         return (object)[
+    //             'order_id' => $order->id,
+    //             'purchase_date' => $purchase_date,
+    //             'confirmed_at' => $confirmedDate,
+    //             'payout_date' => $payoutDate,
+    //             'seller_name' => $shop_parts->name ?? '',
+    //             'seller_registration_number' => $shop_parts->invoice_number ?? 'なし',
+    //             'items' => $items,
+    //             'totals' => [
+    //                 'total_quantity' => $total_quantity,
+    //                 'total_price' => $total_price,
+    //                 'total_tax' => $total_tax + $total_shipping_tax,
+    //                 'total_shipping' => $total_shipping,
+    //                 'grand_total1' => $total_price,
+    //                 'grand_total2' => $total_shipping,
+    //                 'grand_total3' => $total_tax,
+    //                 'grand_total4' => $total_shipping_tax,
+    //                 'grand_total' => $total_price + $total_shipping + $total_tax + $total_shipping_tax,
+    //             ],
+    //         ];
+    //     });
+    //     // dd($sales);
+
+    //     return view('sellers.sales.sales_slip2', compact('sales', 'headers'));
+    // }
 
     public function slip2()
     {
         $headers = [
             '購入日', '取引日(到着確認日)', '入金日(手数料以外)', '注文番号', '出品者名称', '出品者登録番号',
-            '商品名', '数量', '単価(税抜)', '税率(%)', '消費税額(商品)', '税込金額',
+            '商品名', '数量', '単価(税抜)', '税率(%)', '消費税額(商品)', '合計金額',
             '配送料(税抜)', '消費税額(配送料)', '税込金額(配送料)', 
             '税込金額合計', '消費税合計', '税区分'
         ];
 
         $subOrders = SubOrder::where('seller_id', auth()->id())
-            ->with(['invoiceUser', 'invoiceSubOrder_item', 'invoiceArrivalReport'])
+            ->with(['invoiceUser', 'invoiceSubOrder_item', 'invoiceArrivalReport', 'arrivalReport'])
             ->orderByDesc('id')
             ->get();
 
         $sales = $subOrders->map(function ($order) {
             $purchase_date = Carbon::parse($order->created_at);
-            $confirmedDate = $order->invoiceArrivalReport ? Carbon::parse($order->invoiceArrivalReport->confirmed_at) : null;
+            $confirmedDate = $order->arrivalReport ? Carbon::parse($order->arrivalReport->confirmed_at) : null;
             $payoutDate = $order->transferred_at ? Carbon::parse($order->transferred_at) : null;
-            $shop_parts = Shop::where('user_id', $order->invoiceUser->id)->first();
+            $shop = $order->invoiceUser->shop ?? null;
+            $tax_rate = TaxRate::current()?->rate ?? 0;
 
-            $items = $order->invoiceSubOrder_item->map(function ($item) {
+            $items = $order->invoiceSubOrder_item->map(function ($item) use ($order, $shop, $tax_rate) {
                 $product = Product::find($item->product_id);
                 $shippingFee = $product->shipping_fee ?? 0;
+
+                // --- キャンペーン ---
+                $campaign = Campaign::where('shop_id', $shop->id ?? 0)
+                    ->where('start_date', '<=', $order->created_at)
+                    ->where('end_date', '>=', $order->created_at)
+                    ->orderByDesc('dicount_rate1')
+                    ->first();
+
+                // dd($campaign);
+                $campaign_price = null;
+                if($campaign && $item->quantity >= 2){
+                    $campaign_price = floor($item->price * (1 - $campaign->dicount_rate1));
+                }
+
+                // --- クーポン ---
+                $coupon_price = null;
+                if(!empty($item->coupon_id)){
+                    $couponCodes = explode(',', $item->coupon_id);
+                    $coupons = ShopCoupon::whereIn('id', $couponCodes)->get();
+                    $coupon_candidates = [];
+                    foreach($coupons as $coupon){
+                        if($coupon->product_id == $item->product_id && $item->quantity >= 2){
+                            $coupon_candidates[] = max(0, $item->price + $coupon->value);
+                        }
+                    }
+                    if(!empty($coupon_candidates)){
+                        $coupon_price = min($coupon_candidates);
+                    }
+                }
+                // dd($item);
+
+                // --- 最安値1個目 ---
+                $prices = array_filter([$item->price, $campaign_price, $coupon_price], fn($v) => $v !== null);
+                $lowest_price = !empty($prices) ? min($prices) : $item->price;
+                // dd($shop);
+                // dd($item->price, $campaign_price, $coupon_price);
+                // 適用ラベル
+                $applied_label = '通常価格';
+                if($lowest_price === $campaign_price) $applied_label = 'キャンペーン適用';
+                if($lowest_price === $coupon_price) $applied_label = 'クーポン適用';
 
                 return [
                     'product_name' => $product->name ?? '不明な商品',
                     'quantity' => $item->quantity,
                     'unit_price' => $item->price,
-                    'tax_rate' => 10,
-                    'tax_amount' => floor($item->price * $item->quantity * 0.1),
-                    'total_amount' => floor($item->price * $item->quantity * 1.1),
+                    'lowest_price' => $lowest_price,
+                    'applied_label' => $applied_label,
+                    'remaining_price' => $item->quantity > 1 ? $item->price : 0,
                     'shipping_fee' => $shippingFee,
-                    'shipping_fee_tax_amount' => floor($shippingFee * $item->quantity * 0.1),
-                    'shipping_fee_total' => floor($shippingFee * $item->quantity * 1.1),
-                    'tax_category' => '課税',
+                    'tax_category' => $shop->invoice_number ?? '非課税',
                 ];
-            })->toArray(); // ← Collectionではなく配列に変換
-
-            // 合計計算
-            $total_quantity = collect($items)->sum('quantity');
-            $total_price = collect($items)->sum(fn($i) => $i['unit_price'] * $i['quantity']);
-            $total_tax = collect($items)->sum('tax_amount');
-
-            $total_shipping = collect($items)->sum(fn($i) => $i['shipping_fee'] * $i['quantity']);
-
-            $total_shipping_tax = collect($items)->sum('shipping_fee_tax_amount');
+            })->toArray();
 
             return (object)[
-                'order_id' => $order->id,
                 'purchase_date' => $purchase_date,
                 'confirmed_at' => $confirmedDate,
                 'payout_date' => $payoutDate,
-                'seller_name' => $shop_parts->name ?? '',
-                'seller_registration_number' => $shop_parts->invoice_number ?? 'なし',
+                'order_id' => $order->id,
+                'shop_name' => $shop->name ?? '',
+                'invoice_number' => $shop->invoice_number ?? '0',
                 'items' => $items,
-                'totals' => [
-                    'total_quantity' => $total_quantity,
-                    'total_price' => $total_price,
-                    'total_tax' => $total_tax + $total_shipping_tax,
-                    'total_shipping' => $total_shipping,
-                    'grand_total1' => $total_price,
-                    'grand_total2' => $total_shipping,
-                    'grand_total3' => $total_tax,
-                    'grand_total4' => $total_shipping_tax,
-                    'grand_total' => $total_price + $total_shipping + $total_tax + $total_shipping_tax,
-                ],
             ];
         });
-        // dd($sales);
 
         return view('sellers.sales.sales_slip2', compact('sales', 'headers'));
     }
 
-
-
-
-
-    
 
 
 

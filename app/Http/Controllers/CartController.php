@@ -11,6 +11,7 @@ use App\Models\ShopCoupon;
 use App\Models\Order;
 use App\Models\SubOrder;
 use App\Models\Campaign;
+use App\Models\TaxRate;
 
 use App\Models\DeliveryAddress;
 use App\Models\Auction;
@@ -34,13 +35,16 @@ class CartController extends Controller
     public function add(Product $product)
     {
         // dd($product);
+        
+        $tax_rate = TaxRate::current()?->rate;
+
 
         // add the product to cart
         \Cart::session(auth()->id())->add(array(
             'id' => (string)$product->id,
             'name' => $product->name,
-            'price' => $product->price*1.1,
-            'shippnng_fee' => $product->shippnng_fee*1.1,
+            'price' => $product->price + $product->price * $tax_rate,
+            'shippnng_fee' => $product->shippnng_fee + $product->shippnng_fee * $tax_rate,
             'quantity' => 1,
             'attributes' => array(),
             // 'attributes' => [
@@ -146,13 +150,15 @@ class CartController extends Controller
             $matchingCampaign = $campaigns->where('shop_id', $shopId)->sortByDesc('dicount_rate1')->first();
 
             if ($matchingCampaign) {
+                $tax_rate = TaxRate::current()?->rate;
                 $discountRate = $matchingCampaign->dicount_rate1;
                 $item->discounted_price = ceil($item->price - ceil($item->price*$discountRate));
                 $item->campaign = $matchingCampaign;
-                $item->shipping_fee = $item->associatedModel->shipping_fee*1.1;
+                $item->shipping_fee = $item->associatedModel->shipping_fee + $item->associatedModel->shipping_fee * $tax_rate;
             } else {
+                $tax_rate = TaxRate::current()?->rate;
                 $item->discounted_price = $item->price;
-                $item->shipping_fee = $item->associatedModel->shipping_fee*1.1;
+                $item->shipping_fee = $item->associatedModel->shipping_fee + $item->associatedModel->shipping_fee * $tax_rate;
 
                 $item->campaign = null;
             }
@@ -407,7 +413,7 @@ class CartController extends Controller
         // dd($discountedCarts);
         $cartTotal = $discountedCarts->sum('total_price');
         // dd($cartTotal);
-        session()->put('total_and_shipping', $cartTotal);
+        // session()->put('total_and_shipping', $cartTotal);
         Log::debug('カートのアイテム税抜:', ['税抜' => $cartTotal]);
 
         // 配送先情報など他の処理（省略）

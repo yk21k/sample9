@@ -175,6 +175,11 @@ class OrderController extends Controller
                 Log::info('generateSubOrders 呼び出し確認');
                 $order->generateFavoritesSalesRate();
                 $order->generateFavoritesDisplay();
+                // staticメソッド呼び出し
+                $order->generateFinalOrderFromCart($cartItems);
+                // $order->generateFinalOrderFromCart(CartCollection $cartItems, Order $order);
+                Log::info('generateFinalOrderFromCart 呼び出し確認');
+                
 
                 // カートを空にする
                 \Cart::session(auth()->id())->clear();

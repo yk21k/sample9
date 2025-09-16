@@ -15,10 +15,27 @@ class SubOrder extends Model
         'transferred_at' => 'datetime',
     ];
 
+    // public function items()
+    // {
+    //     return $this->belongsToMany(Product::class, 'sub_order_items', 'sub_order_id', 'product_id')
+    //                 ->withPivot('quantity', 'price', 'user_id');
+    // }
+
     public function items()
     {
-        return $this->belongsToMany(Product::class, 'sub_order_items', 'sub_order_id', 'product_id')
-                    ->withPivot('quantity', 'price', 'user_id');
+        return $this->belongsToMany(Product::class, 'sub_order_items')
+                    ->withPivot([
+                        'user_id',
+                        'price',
+                        'quantity',
+                        'discounted_price',
+                        'subtotal',
+                        'tax_amount',
+                        'shipping_fee',
+                        'campaign_id',
+                        'coupon_id',
+                        'sub_order_id' // ← 追加
+                    ]);
     }
 
     public function product()
@@ -81,7 +98,10 @@ class SubOrder extends Model
         return $this->belongsTo(SubOrdersArrivalReport::class, 'sub_order_id');
     }
 
-
+    public function subOrders()
+    {
+        return $this->hasMany(SubOrderItem::class);
+    }
 
 
 

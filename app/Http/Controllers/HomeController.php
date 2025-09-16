@@ -83,7 +83,7 @@ class HomeController extends Controller
         $product_attributes = Attribute::with('values')->get();
 
         // 商品を20件だけ取得（ここが大事）
-        $products = Product::take(20)->get();
+        $products = Product::take(40)->get();
 
         // 各商品に対応するキャンペーンを見つけて、割引価格を追加
         $discountedProducts = $products->map(function ($product) use ($campaigns) {

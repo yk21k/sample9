@@ -112,6 +112,7 @@
                           <input type="hidden" name="order_number" value="{{ $subOrder->order->order_number}}">
                           
                         　<input type="hidden" name="order_coupon" id="orderCouponInput" value="">
+                          <input type="hidden" name="purpose" id="purposeInput" value="">
                           
                           <input type="hidden" name="template" id="templateValue">
                           <button class="btn btn-success" id="sendBtn">送信</button>
@@ -133,3 +134,5 @@
 <div id="pagination-links">
     {{ $orders->links() }}
 </div>
+
+

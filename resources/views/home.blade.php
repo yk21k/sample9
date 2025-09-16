@@ -57,9 +57,6 @@
       margin-left: 8px;
     }
 
-
-
-
 </style>
 
 <div class="sidenav shadow-sm">
@@ -152,6 +149,7 @@
             }
         }
         $sorted = $products->sortByDesc('score')->values();
+        $tax_rate = App\Models\TaxRate::current()?->rate;
         @endphp
 
         @foreach($sorted as $index => $item)
@@ -166,7 +164,7 @@
             <div class="guaranteed-product" style="border: 2px solid gold; padding: 20px; margin-bottom: 30px; background: darkslategray;">
                 <h2>🏆 保証品（1位）</h2>
                 <p style="font-size: 1.2em;">Name: {{ $attr->name }}</p>
-                <p style="font-size: 1.2em;">Price: {{ floor(($attr->price+$attr->shipping_fee)*1.1) }}</p>
+                <p style="font-size: 1.2em;">Price: {{ floor(($attr->price+$attr->shipping_fee)*($tax_rate+1)) }}</p>
                 <p style="font-size: 1.2em;">Score: {{ $score }}</p>
 
                 @foreach ($movies as $movie)
@@ -201,7 +199,7 @@
                 @endif
                 <div class="product" style="flex: 1; border: 1px solid #ccc; padding: 10px;">
                     <p>Name: {{ $attr->name }}</p>
-                    <p>Price: {{ floor(($attr->price+$attr->shipping_fee)*1.1) }}</p>
+                    <p>Price: {{ floor(($attr->price+$attr->shipping_fee)*($tax_rate+1)) }}</p>
                     <p>Score: {{ $score }}</p>
 
                     @foreach ($movies as $movie)
@@ -238,100 +236,40 @@
 
         <br><br><br>        
 
-        @foreach ($discountedProducts as $product)
 
-
-            <div class="col-4">
-                @if($product->status==0)
-                    
-                    <div class="card card-skin change-border01 container10">
-                        <div class="card-body change-border01__inner">
-                            @if(isset($product->cover_img) && !empty($product->cover_img))
-                                <img class="card-img-top" src="{{ asset( 'storage/'.$product->cover_img ) }}" alt="Card image cap">               
-                            @else
-                                <img class="card-img-top" src="{{ asset('images/no_image.jpg') }}" alt="Card image cap">
-                            @endif
-                            <h4 class="card-title overlay10">Inactive</h4>
-                            <span class="change-border01__inner"><h4 class="card-title">Coming Soon !!</h4></span>
-                            
-                            
-                            <h4 class="card-title">Coming Soon !!</h4>
-                            <h4 class="card-title">Coming Soon !!</h4>
-                            <h4 class="card-title">Coming Soon !!</h4>
-                            <h4 class="card-title">Coming Soon !!</h4>
-                        </div>
-                    </div>
-                    <br>   
-                @else
-                <div class="card card-skin change-border01">
-                    <div class="card-body change-border01__inner">
-                        <a class="" href="{{ route('products.detail', ['id'=>$product->id]) }}">
-
-                            @if(isset($product->cover_img) && !empty($product->cover_img))
-                                <img class="card-img-top" src="{{ asset( 'storage/'.$product->cover_img ) }}" alt="Card image cap">               
-                            @else
-                                <img class="card-img-top" src="{{ asset('images/no_image.jpg') }}" alt="Card image cap">
-                            @endif
-                        </a>
-
-                        <div class="card-body change-border01__inner">
-
-                            <h4 class="card-title">{{ $product->name }}</h4>
-
-                            {{ $product->description }}
-
-                            <h4 class="card-title">
-                                @if ($product->campaign)
-                                    <div class="price-box">
-                                        <span class="original-price"> 
-                                            ¥{{ number_format(floor(($product->price+$product->shipping_fee)*1.1)) }}
-                                             </span>
-                                        <span class="discount-price" style="display: none;">キャンペーン価格: ¥{{ number_format(floor(($product->discounted_price)*1.1)) }} 
-                                            </span>
-                                        <div class="ribbon1"> Campaign !! </div>
-                                        <div class="ribbon2">
-                                             <small>Up to: {{Carbon\Carbon::parse($product->campaign->end_date)->format('Y/m/d')}}</small>
-                                        </div>
-                                    </div>
-                                @else
-                                    ¥{{ floor(($product->price+$product->shipping_fee)*1.1) }}   
-
-                                @endif
-
-                            </h4>    
-                            <h4 class="card-title" id="stockQty">
-                             @if($product->stock<=0) 
-                                <div class="ribbon">Sold out!!</div>
-                             @else  
-                                Stock : {{ $product->stock }}
-                             @endif   
-                            </h4>
-                            @foreach($product_attributes as $attr)
-                                @foreach ($attr->values as $val)
-                                    @if((!empty(json_decode($product->product_attributes,true)[$attr->name]) && json_decode($product->product_attributes,true)[$attr->name] == $val->value))
-                                
-                                    <h4>{{$attr->name}} : {{$val->value}}</h4>
-                                    @endif
-                                @endforeach
-                            @endforeach
-                            <h4 class="card-title">{{ $product->shop->name }}</h4>
-
-                            <a class="" href="{{ route('customer.inquiry', ['shopId'=>$product->shop->id]) }}"><h5>Contact Shop Manager</h5></a>
-                            <div class="card-body change-border01__inner" id="addCart1">
-                                <a href="{{ route('cart.add', $product->id) }}" class="card-link">Add to Cart</a>
-                            </div>
-                            
-                               
-                        </div>                      
-                        
-                    </div>
-                </div>     
-                @endif
-            </div>
-            <br>
-        @endforeach
         
     </div><br>
+
+    {{-- 課税事業者の商品 --}}
+    <h3>課税事業者の商品一覧</h3>
+    <div class="row">
+        @foreach ($discountedProducts->whereNotNull('shop.invoice_number') as $product)
+            <div class="col-4">
+                @include('partials.product_card', [
+                    'product' => $product, 
+                    'tax_rate' => $tax_rate,
+                    'product_attributes' => $product_attributes
+                ])
+            </div>
+        @endforeach
+    </div>
+
+    <br><br><br> 
+
+    {{-- 免税事業者の商品 --}}
+    <h3>免税事業者の商品一覧</h3>
+    <div class="row">
+        @foreach ($discountedProducts->whereNull('shop.invoice_number') as $product)
+            <div class="col-4">
+                @include('partials.product_card', [
+                    'product' => $product, 
+                    'tax_rate' => 0,
+                    'product_attributes' => $product_attributes
+                ])
+            </div>
+        @endforeach
+    </div>
+
     
 
 </div><br>

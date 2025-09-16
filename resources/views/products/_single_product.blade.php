@@ -19,6 +19,9 @@
 
 <div class="row" style="margin-right: 20%;"> 
 
+@php
+    $tax_rate = App\Models\TaxRate::current()?->rate;
+@endphp
 
 @forelse($products as $product) 
 
@@ -34,12 +37,16 @@
             <img class="card-img-top" src="{{ asset('images/no_image.jpg') }}" alt="Card image cap">
 
         @endif
-        
         <div class="card-body">
             <h4 class="card-title">{{$product->name}}</h4>
             <p class="card-text">{{$product->description}}</p>
-            <h3>$ {{ floor(($product->price+$product->shipping_fee)*1.1) }}</h3>
-            <h3> {{ $product->shop->name ?? 'Sample9' }}</h3> 
+            <h3>$ {{ floor(($product->price+$product->shipping_fee)*($tax_rate+1)) }}</h3>
+            <h3> {{ $product->shop->name ?? 'Sample9' }}</h3>
+            @if($product->shop->invoice_number)
+                <span class="badge bg-danger ms-2">課税事業者</span>
+            @else
+                <span class="badge bg-success ms-2">免税事業者</span>
+            @endif 
         </div>
         
         <div class="card-body">

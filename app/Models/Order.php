@@ -42,158 +42,278 @@ class Order extends Model
         return $this->hasMany(SubOrder::class);
     }
 
-
-public function generateSubOrders()
-{
-
-    Log::debug('generateSubOrders開始時点のクーポンコード:', [
-        'coupon_code' => $this->coupon_code
-    ]);
-    Log::debug('全OrderItems:', $this->items->toArray());
-
-    $orderItems = $this->items;
-
-    // クーポンコードがカンマ区切りで保存されている場合の対応
-    // $couponCodeList = explode(',', $this->coupon_code ?? '');
-
-    // 修正案
-    $couponCodeList = Session::get('applied_coupon_codes', []);
-    if (!is_array($couponCodeList)) {
-        $couponCodeList = explode(',', $couponCodeList);
+    public function finalOrders()
+    {
+        return $this->hasMany(FinalOrder::class);
     }
 
-    $couponCodeList = array_map('trim', array_filter($couponCodeList)); // 空白・空文字除去
 
-    foreach ($orderItems->groupBy('shop_id') as $shopId => $products) {
+    public function generateSubOrders()
+    {
+        $orderItems = $this->items;
 
-        Log::debug("処理中のshop_id: {$shopId}", ['商品数' => $products->count()]);
-        
-
-
-        if (is_null($shopId)) {
-            Log::warning("shop_id が null の商品をスキップしました。");
-            continue;
+        // セッションまたはDBに保存されたクーポンコードを取得
+        $couponCodeList = Session::get('applied_coupon_codes', []);
+        if (!is_array($couponCodeList)) {
+            $couponCodeList = explode(',', $couponCodeList);
         }
+        $couponCodeList = array_map('trim', array_filter($couponCodeList));
 
-        $shop = Shop::find($shopId);
-        if (!$shop) {
-            Log::warning("Shop ID {$shopId} が見つかりません。");
-            continue;
-        }
+        foreach ($orderItems->groupBy('shop_id') as $shopId => $products) {
 
-        DB::beginTransaction();
-
-        try {
-            $couponIds = [];
-
-            foreach ($products as $product) {
-                Log::debug("商品ID: {$product->id} に対してクーポン検索を実行");
-
-                // クーポンを複数コードで検索
-                $shopCoupon = ShopCoupon::whereIn('code', $couponCodeList)
-                                        ->where('product_id', $product->id)
-                                        ->first();
-
-                if ($shopCoupon) {
-                    Log::debug("クーポン適用対象: coupon_id={$shopCoupon->id}, product_id={$product->id}");
-                    $couponIds[] = $shopCoupon->id;
-                } else {
-                    Log::warning("該当するクーポンが見つかりませんでした: code=" . implode(', ', $couponCodeList) . ", product_id={$product->id}");
-                }
+            if (is_null($shopId)) {
+                Log::warning("shop_id が null の商品をスキップしました。");
+                continue;
             }
 
-            $couponIds = array_unique($couponIds);
-
-            // 表示用に1件だけコード取得（なければ null）
-            // $couponCodeToApply = !empty($couponIds)
-            //     ? optional(ShopCoupon::find($couponIds[0]))->code
-            //     : null;
-
-            $couponCodesToApply = [];
-
-            foreach ($couponIds as $cid) {
-                $coupon = ShopCoupon::find($cid);
-                if ($coupon) {
-                    $couponCodesToApply[] = $coupon->code;
-                }
+            $shop = Shop::find($shopId);
+            if (!$shop) {
+                Log::warning("Shop ID {$shopId} が見つかりません。");
+                continue;
             }
 
-            // カンマ区切りの文字列へ変換
-            $couponCodeString = implode(',', array_unique($couponCodesToApply));
+            // 課税判定およびインボイス番号格納
+            $invoiceNumber = $shop->invoice_number;
+            $isTaxable = !empty($invoiceNumber);
 
+            // ショップ単位のキャンペーン（重複時は割引率最大）
+            $campaign = Campaign::where('shop_id', $shopId)
+                                ->where('start_date', '<=', now())
+                                ->where('end_date', '>=', now())
+                                ->orderByDesc('dicount_rate1')
+                                ->first();
 
-            $productAll = 0; // 合計金額を初期化
+            DB::beginTransaction();
+            try {
+                // サブオーダー作成（grand_totalは割引なし初期値0）
+                $suborder = $this->subOrders()->create([
+                    'order_id'       => $this->id,
+                    'seller_id'      => $shop->user_id ?? 1,
+                    'user_id'        => auth()->id(),
+                    'grand_total'    => 0,
+                    'tax_amount'     => 0,
+                    'item_count'     => $products->count(),
+                    'coupon_code'    => implode(',', $couponCodeList),
+                    'is_taxable'     => $isTaxable,
+                    'invoice_number' => $invoiceNumber,
+                ]);
 
-            foreach ($products as $product) {
-                Log::debug("商品ID: {$product->id} | 数量: {$product->pivot->quantity}");
+                $suborderTotal = 0;
+                $suborderTax   = 0;
 
-                $itemTotal = $product->pivot->price * $product->pivot->quantity;
-                $productAll += $itemTotal;
-            }
+                foreach ($products as $product) {
+                    $unitPrice = $product->pivot->price;   // 割引前
+                    $quantity  = $product->pivot->quantity;
 
-            Log::debug('サブオーダー作成前のデータ', [
-                'order_id'     => $this->id,
-                'seller_id'    => $shop->user_id ?? 1,
-                'user_id'      => auth()->id(),
-                'grand_total'  => $productAll,
-                'item_count'   => $products->count(),
-                // 'coupon_code'  => $couponCodeToApply,
-                'coupon_code'  => $couponCodeString,
-            ]);
+                    // 商品ごとのクーポン適用（1つだけ）
+                    $shopCoupon = ShopCoupon::whereIn('code', $couponCodeList)
+                                            ->where('product_id', $product->id)
+                                            ->where('expiry_date', '>=', now())
+                                            ->first();
+                    $couponPrice = $shopCoupon ? max(0, $unitPrice + $shopCoupon->value) : null;
 
-            $suborder = $this->subOrders()->create([
-                'order_id'     => $this->id,
-                'seller_id'    => $shop->user_id ?? 1,
-                'user_id'      => auth()->id(),
-                'grand_total'  => $productAll,
-                'item_count'   => $products->count(),
-                // 'coupon_code'  => $couponCodeToApply,
-                'coupon_code'  => $couponCodeString,
-            ]);
+                    // キャンペーン適用（1つだけ）
+                    $campaignPrice = $campaign ? floor($unitPrice * (1 - $campaign->dicount_rate1)) : null;
 
-            if (!$suborder || !$suborder->id) {
-                throw new \Exception('サブオーダーの作成に失敗しました。');
-            }
+                    // 通常価格・キャンペーン価格・クーポン価格の最小を採用
+                    $priceCandidates = [$unitPrice];
+                    if ($couponPrice !== null) $priceCandidates[] = $couponPrice;
+                    if ($campaignPrice !== null) $priceCandidates[] = $campaignPrice;
+                    $discountedUnitPrice = min($priceCandidates);
 
-            // クーポンを中間テーブルに紐付け
-            if (!empty($couponIds)) {
-                $suborder->shopCoupons()->syncWithoutDetaching($couponIds);
-            }
+                    // 割引は1点のみ、残りは通常価格
+                    $subtotal = ($quantity > 1 && $discountedUnitPrice < $unitPrice)
+                        ? $discountedUnitPrice + $unitPrice * ($quantity - 1)
+                        : $discountedUnitPrice * $quantity;
 
-            Log::debug("Created SubOrder ID: {$suborder->id}");
+                    // 税額（送料は含まない）
+                    $taxRate = TaxRate::current()?->rate ?? 0;
+                    if ($isTaxable) {
+                        if ($quantity > 1 && $discountedUnitPrice < $unitPrice) {
+                            $discountedTax = floor($discountedUnitPrice * $taxRate);
+                            $normalTax     = floor($unitPrice * $taxRate) * ($quantity - 1);
+                            $tax = $discountedTax + $normalTax;
+                        } else {
+                            $tax = floor($discountedUnitPrice * $taxRate * $quantity);
+                        }
+                    } else {
+                        $tax = 0;
+                    }
 
-            foreach ($products as $product) {
-                try {
+                    // 送料（表示用、課税考慮）
+                    $shippingFee = (float) $product->shipping_fee;
+                    $shippingTotal = $isTaxable
+                        ? floor($shippingFee * (1 + $taxRate) * $quantity)
+                        : $shippingFee * $quantity;
+
+                    // SubOrderItem 登録
                     $suborder->items()->attach($product->id, [
-                        'user_id'   => $suborder->user_id,
-                        'price'     => $product->pivot->price,
-                        'quantity'  => $product->pivot->quantity,
+                        'user_id'         => $suborder->user_id,
+                        'price'           => $unitPrice,
+                        'quantity'        => $quantity,
+                        'discounted_price'=> $discountedUnitPrice,
+                        'subtotal'        => $subtotal,
+                        'tax_amount'      => $tax,
+                        'shipping_fee'    => $shippingTotal,
+                        'campaign_id'     => $campaign?->id,
+                        'coupon_id'       => $shopCoupon?->id,
                     ]);
-                    Log::debug("商品ID: {$product->id} を sub_order_id: {$suborder->id} に追加");
-                } catch (\Exception $e) {
-                    Log::error('アイテムの添付に失敗', [
-                        'suborder_id' => $suborder->id,
-                        'product_id'  => $product->id,
-                        'message'     => $e->getMessage(),
-                    ]);
-                }
-            }
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('サブオーダー作成失敗', [
-                'message' => $e->getMessage(),
-                'trace'   => $e->getTraceAsString(),
-            ]);
+                    // SubOrder 合計値計算
+                    $suborderTotal += $unitPrice * $quantity; // 割引なし通常価格
+                    $suborderTax   += $tax;
+                }
+
+                // サブオーダー総額・税額更新（grand_total は割引なし）
+                $suborder->update([
+                    'grand_total' => $suborderTotal,
+                    'tax_amount'  => $suborderTax,
+                ]);
+
+                // クーポン紐付け
+                if ($shopCoupon) {
+                    $suborder->shopCoupons()->syncWithoutDetaching([$shopCoupon->id]);
+                }
+
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('SubOrder作成失敗', [
+                    'message' => $e->getMessage(),
+                    'trace'   => $e->getTraceAsString(),
+                ]);
+            }
         }
+
+        Log::info('generateSubOrders 呼び出し確認');
     }
 
-    Log::info('generateSubOrders 呼び出し確認');
-}
 
 
+    public function generateFinalOrderFromCart($cartItems)
+    {
+        $taxRate = TaxRate::current()?->rate ?? 0;
 
+        Log::info("generateFinalOrderFromCart 呼び出し確認");
+
+        // ショップごとにグループ化
+        foreach ($cartItems->groupBy(fn($item) => $item->associatedModel->shop_id) as $shopId => $shopItems) {
+            $shop = Shop::find($shopId);
+            $isTaxable = !empty($shop->invoice_number);
+
+            // --- キャンペーン取得（重複している場合は最も割引率の高いものを適用）
+            $campaign = Campaign::where('shop_id', $shopId)
+                ->where('start_date', '<=', now())
+                ->where('end_date', '>=', now())
+                ->orderByDesc('dicount_rate1')
+                ->first();
+
+            $shopSubtotal = 0;
+            $shopTax = 0;
+            $shopShipping = 0;
+
+            foreach ($shopItems as $item) {
+                $product = $item->associatedModel;
+                $quantity = $item->quantity;
+                $normalPrice = (float) $item->price;
+                $shippingFee = (float) $product->shipping_fee;
+
+                // --- クーポン取得（商品ごと、1個だけ適用）
+                $coupon = ShopCoupon::where('shop_id', $shopId)
+                    ->where('product_id', $product->id)
+                    ->where('expiry_date', '>=', now())
+                    ->orderByDesc('value') // 割引額が大きいものを優先
+                    ->first();
+
+                $couponPrice = $normalPrice;
+                $couponApplied = false;
+                if ($coupon) {
+                    $couponPrice = max(0, $normalPrice + $coupon->value); // valueは負
+                    $couponApplied = true;
+                }
+
+                // --- キャンペーン価格
+                $campaignPrice = $normalPrice;
+                if ($campaign) {
+                    $campaignPrice = floor($normalPrice * (1 - $campaign->dicount_rate1));
+                }
+
+                // --- 割引後の最安値（キャンペーン or クーポン or 通常価格）
+                $discountedUnitPrice = min($normalPrice, $couponPrice, $campaignPrice);
+
+
+                // --- 小計（割引は1個だけ、残りは通常価格）
+                if ($quantity > 1 && $discountedUnitPrice < $normalPrice) {
+                    $subtotal = $discountedUnitPrice + ($normalPrice * ($quantity - 1));
+                } else {
+                    $subtotal = $discountedUnitPrice * $quantity;
+                }
+
+                Log::info("Test {$coupon->value} | {$normalPrice} | {$couponPrice} | {$campaignPrice} | {$couponApplied}");
+
+                // --- 税額
+                if ($isTaxable) {
+                    if ($quantity > 1 && $discountedUnitPrice < $normalPrice) {
+                        $discountedTax = floor($discountedUnitPrice * $taxRate);
+                        $normalTax = floor($normalPrice * $taxRate) * ($quantity - 1);
+                        $itemTax = $discountedTax + $normalTax;
+                    } else {
+                        $itemTax = floor($discountedUnitPrice * $taxRate * $quantity);
+                    }
+                } else {
+                    $itemTax = 0;
+                }
+
+                // --- 配送料（数量分 * 税込/税抜）
+                $shippingTotal = $isTaxable
+                    ? floor($shippingFee * (1 + $taxRate) * $quantity)
+                    : $shippingFee * $quantity;
+
+                // --- Shopごとの合計に加算
+                $shopSubtotal += $subtotal;
+                $shopTax += $itemTax;
+                $shopShipping += $shippingTotal;
+
+                // --- FinalOrderItem 保存
+                $finalOrder = FinalOrder::firstOrCreate(
+                    [
+                        'order_id' => $this->id,
+                        'shop_id' => $shopId,
+                    ],
+                    [
+                        'is_taxable' => $isTaxable,
+                        'subtotal' => 0,
+                        'tax_amount' => 0,
+                        'shipping_fee' => 0,
+                        'total' => 0,
+                    ]
+                );
+
+                FinalOrderItem::create([
+                    'final_order_id' => $finalOrder->id,
+                    'product_id' => $product->id,
+                    'product_name' => $product->name,
+                    'quantity' => $quantity,
+                    'unit_price' => $normalPrice,
+                    'subtotal' => $subtotal,
+                    'tax_amount' => $itemTax,
+                    'shipping_fee' => $shippingTotal,
+                ]);
+
+                Log::info("Order {$this->id} | Shop {$shopId} | Product {$product->id} | Qty {$quantity} | Price {$normalPrice} | Discounted {$discountedUnitPrice} | Taxable {$isTaxable} | Tax {$itemTax} | Shipping {$shippingTotal} | Subtotal {$subtotal}");
+            }
+
+            // --- FinalOrder 更新
+            $finalOrder->update([
+                'subtotal' => $shopSubtotal,
+                'tax_amount' => $shopTax,
+                'shipping_fee' => $shopShipping,
+                'total' => $shopSubtotal + $shopTax + $shopShipping,
+            ]);
+
+            Log::info("FinalOrder {$finalOrder->id} | Shop {$shopId} | Subtotal {$shopSubtotal} | Tax {$shopTax} | Shipping {$shopShipping} | Total " . ($shopSubtotal + $shopTax + $shopShipping));
+        }
+    }
 
     public function favoriteSales()
     {

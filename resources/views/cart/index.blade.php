@@ -64,44 +64,80 @@
 	            <th>ショップ</th>
 	        </tr>
 	    </thead>
-	    <tbody>
-	        @foreach ($cartItems as $item)
-	        	
-	            @php
-	                $shippingFee = (float) ($item->associatedModel->shipping_fee*1.1 ?? 0);
-	                $originalPrice = (float) $item->price + $shippingFee + $item->price*0.1;
+	    
+        @foreach ($cartItems as $item)
+			@php
+			    $tax_rate = App\Models\TaxRate::current()?->rate ?? 0;
+			    $isTaxable = !empty($item->associatedModel->shop->invoice_number);
 
-	                $finalPrice = isset($item->final_price) ? floor($item->final_price*1.1 + $shippingFee): $originalPrice;
+			    $shippingFee = (float) ($item->associatedModel->shipping_fee ?? 0);
 
-	                $discountedPrice = isset($item->discounted_price) ? floor($item->discounted_price*1.1 + $shippingFee): $originalPrice;
-	                $lowestPrice = min($finalPrice, $discountedPrice);
+			    if ($isTaxable) {
+			        // 税込
+			        $shippingFeeTaxed = floor($shippingFee * (1 + $tax_rate));
+			        $originalPriceEx = (float) $item->price + $shippingFee; // 税抜
+			        $originalPrice   = (float) $item->price * (1 + $tax_rate) + $shippingFeeTaxed; // 税込
 
-	                $isDiscounted = $lowestPrice < $originalPrice;
-	                $quantity = $item->quantity;
+			        $finalPrice = isset($item->final_price)
+			            ? floor($item->final_price * (1 + $tax_rate) + $shippingFeeTaxed)
+			            : $originalPrice;
 
-	                // 割引価格は1点のみ、それ以外は通常価格で計算
-	                if ($quantity > 1 && $isDiscounted) {
-	                    $totalPrice = $lowestPrice + $originalPrice * ($quantity - 1);
-	                } else {
-	                    $totalPrice = $lowestPrice * $quantity;
-	                }
+			        $discountedPrice = isset($item->discounted_price)
+			            ? floor($item->discounted_price * (1 + $tax_rate) + $shippingFeeTaxed)
+			            : $originalPrice;
 
-	                $totalAll += $totalPrice;
-	            @endphp
+			        // 消費税額（1商品分）
+			        $taxAmount = $originalPrice - $originalPriceEx;
+			    } else {
+			        // 免税
+			        $originalPrice   = (float) $item->price + $shippingFee;
+			        $originalPriceEx = $originalPrice; // 免税なので税込＝税抜
+			        $finalPrice = isset($item->final_price)
+			            ? floor($item->final_price + $shippingFee)
+			            : $originalPrice;
+
+			        $discountedPrice = isset($item->discounted_price)
+			            ? floor($item->discounted_price + $shippingFee)
+			            : $originalPrice;
+
+			        $taxAmount = 0; // 免税事業者は税額なし
+			    }
+
+			    $lowestPrice   = min($finalPrice, $discountedPrice);
+			    $isDiscounted  = $lowestPrice < $originalPrice;
+			    $quantity      = $item->quantity;
+
+			    if ($quantity > 1 && $isDiscounted) {
+			        $totalPrice = $lowestPrice + $originalPrice * ($quantity - 1);
+			    } else {
+			        $totalPrice = $lowestPrice * $quantity;
+			    }
+
+			    $totalAll += $totalPrice;
+			@endphp
+            <tbody>
 	            <tr>
 	                <td>
 	                    <img style="width: 96px; height: 65px;" class="card-img-top"
 	                        src="{{ asset('storage/' . $item->associatedModel->cover_img) }}" alt="商品画像">
 	                </td>
-	                <td>{{ $item->name }}</td>
+                    @if($item->associatedModel->shop->invoice_number)
+	                	<td>{{ $item->name }} <span class="badge bg-danger ms-2">課税事業者</span></td>
+	                @else	
+	                	<td>{{ $item->name }} <span class="badge bg-success ms-2">免税事業者</span></td>
+	                @endif	
 	                <td>
-	                    ¥{{ number_format($isDiscounted ? $lowestPrice : $originalPrice) }}<br>
-	                    ¥{{ number_format($finalPrice) }}<br>
-	                    ¥{{ number_format($originalPrice) }}
-	                    @if ($isDiscounted && $quantity > 1)
-	                        <br><small class="text-danger">※割引価格は1点のみ</small>
-	                    @endif
-	                </td>
+					    ¥{{ number_format($lowestPrice) }}<br>
+					    <small class="text-muted">税抜: ¥{{ number_format($originalPriceEx) }}</small><br>
+					    @if($isTaxable)
+					        <small class="text-warning">消費税: ¥{{ number_format($taxAmount) }}</small><br>
+					    @endif
+					    <small class="text-muted">税込: ¥{{ number_format($originalPrice) }}</small>
+
+					    @if ($isDiscounted && $quantity > 1)
+					        <br><small class="text-danger">※割引価格は1点のみ</small>
+					    @endif
+					</td>
 	                <td>
 	                    <form action="{{ route('cart.update', $item->id) }}" method="GET">
 	                        <input name="quantity" type="number" value="{{ $quantity }}" min="1" style="width: 60px;">
@@ -113,20 +149,27 @@
 	                    <a href="{{ route('cart.destroy', $item->id) }}" class="btn btn-sm btn-danger">削除</a>
 	                </td>
 	                <td>
-	                    <a href="{{ route('shops.overview', $item->associatedModel->shop->id) }}">
-	                        {{ $item->associatedModel->shop->name }}
-	                    </a>
+	                	@if($item->associatedModel->shop->invoice_number)
+		                    <a href="{{ route('shops.overview', $item->associatedModel->shop->id) }}">
+		                        {{ $item->associatedModel->shop->name }} <span class="badge bg-danger ms-2">課税事業者</span>
+		                    </a>
+	                    @else
+		                    <a href="{{ route('shops.overview', $item->associatedModel->shop->id) }}">
+		                        {{ $item->associatedModel->shop->name }} <span class="badge bg-success ms-2">免税事業者</span>
+		                    </a>
+	                    @endif
 	                </td>
 	            </tr>
-		           
-	        @endforeach
-	    </tbody>
-	    <tfoot>
+           	</tbody>
+		    
+                   
+        @endforeach
+        <tfoot>
 	        <tr>
 	            <td colspan="4" class="text-right"><strong>合計金額：</strong></td>
 	            <td colspan="3"><strong>¥{{ number_format($totalAll) }}</strong></td>
 	        </tr>
-	    </tfoot>
+		</tfoot>
 	</table>
 
 <!-- 	20250719休止中<div class="coupon">
@@ -182,14 +225,14 @@
 	<br>
 	@php
 	    $originalTotal = \Cart::session(auth()->id())->getSubTotalWithoutConditions();
-	    
+        $tax_rate = App\Models\TaxRate::current()?->rate;
 
-	    $shippingTotal = $cartItems->sum(function ($item) {
-		    $shippingFee = (float) ($item->associatedModel->shipping_fee*1.1 ?? 0);
+	    $shippingTotal = $cartItems->sum(function ($item) use ($tax_rate){
+		    $shippingFee = (float) ($item->associatedModel->shipping_fee*($tax_rate+1) ?? 0);
 		    return $shippingFee * $item->quantity;
 		});
 
-	    $originalTotalWithShipping = $originalTotal + $shippingTotal + $originalTotal*0.1;
+	    $originalTotalWithShipping = $originalTotal + $shippingTotal + $originalTotal*$tax_rate;
 
 	    
 

@@ -166,7 +166,7 @@ Route::post('/account/addresses/{id}', [App\Http\Controllers\AccountController::
 
 
 
-Route::get('/shop-prof', [App\Http\Controllers\ShopProfController::class, 'index'])->name('shop_prof')->middleware('auth');
+Route::get('/shop-prof', [App\Http\Controllers\ShopProfController::class, 'index'])->name('shop_prof');
 
 
 
@@ -243,8 +243,6 @@ Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', '
 
     Route::get('/orders/shop_mail/{suborder}', 'OrdersController@sendMail')->name('order.shop_mail');
 
-    Route::get('/sales-order-invoice', 'OrdersController@invoice')->name('order.sales_order_invoice');
-    Route::post('/orders/invoice', 'OrdersController@invoice')->name('orders.invoice');
 
     Route::get('/sales-order-invoice2', 'OrdersController@invoice2')->name('order.sales_order_invoice2');
     Route::post('/orders/invoice2', 'OrdersController@invoice2')->name('orders.invoice2');
@@ -332,55 +330,82 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/admin/product/import', [App\Http\Controllers\ProductImportController::class, 'import'])->name('products.import');
 });
 
+use App\Models\FAQ;
 use BotMan\BotMan\BotManFactory;
 use BotMan\BotMan\Drivers\DriverManager;
-use BotMan\BotMan\Messages\Conversations\Conversation;
 
-Route::match(['get', 'post'], '/botman', function () {
+Route::match(['get','post'], '/botman', function () {
+    handleBotman('customer');
+});
+
+Route::match(['get','post'], '/botman-seller', function () {
+    handleBotman('seller');
+});
+
+function handleBotman($target)
+{
     $config = [];
     DriverManager::loadDriver(\BotMan\Drivers\Web\WebDriver::class);
     $botman = BotManFactory::create($config);
 
-    $botman->hears('送料|配送料', function ($bot) {
-        $bot->reply('送料は商品ごとに出品者が設定しています。同一商品の個数✖︎配送料になります：<a href="https://example.com/shipping" target="_blank">送料・配送について</a>');
-    });
+    $botman->hears('{message}', function ($bot, $message) use ($target) {
+        $faqs = FAQ::where('is_approved', true)
+                    ->where('target', $target)
+                    ->get();
 
-    $botman->hears('消費税|消費税の表示', function ($bot) {
-        $bot->reply('消費税は込みの表示になっています。（出品者へ）商品登録の際に消費税抜きの金額を入力ください：<a href="https://example.com/shipping" target="_blank">消費税・消費税の表示について</a>');
-    });
+        foreach ($faqs as $faq) {
+            $keywords = preg_split('/[\s,]+/u', $faq->keywords, -1, PREG_SPLIT_NO_EMPTY);
+            foreach ($keywords as $keyword) {
+                if (mb_strpos($message, $keyword) !== false) {
+                    $bot->reply($faq->answer);
+                    return;
+                }
+            }
+            if (mb_strpos($message, $faq->question) !== false) {
+                $bot->reply($faq->answer);
+                return;
+            }
+        }
 
-    $botman->hears('手数料|手数料の計算', function ($bot) {
-        $bot->reply('（出品者へ）商品登録の際に入力いただいた消費税抜きの金額の１０％です。配送料は含みません。：<a href="https://example.com/shipping" target="_blank">手数料・手数料について</a>');
-    });
-
-    $botman->hears('返品|返金', function ($bot) {
-        $bot->reply('基本的には返品・返金は対応しておりませんが、ご事情がある場合は、商品の各出品者へお問い合わせください。詳しくはこちら：<a href="https://example.com/returns" target="_blank">返品ポリシー</a>');
-    });
-
-    $botman->hears('注文状況', function ($bot) {
-        $bot->reply('注文履歴は以下からご確認いただけます：<a href="https://example.com/my-orders" target="_blank">注文履歴</a>');
-    });
-
-    $botman->hears('インボイス', function ($bot) {
-        $bot->reply('当サイト運営は（仮）インボイスに対応しています：<a href="https://example.com/my-orders" target="_blank">インボイス</a>');
-    });
-
-    $botman->hears('キャンペーン|キャンペーン割引', function ($bot) {
-        $bot->reply('キャンペーンの割引は、カート内の同一商品の一つに対して適用されます。：<a href="https://example.com/my-orders" target="_blank">キャンペーン</a>');
-    });
-
-    $botman->hears('クーポン|クーポン割引', function ($bot) {
-        $bot->reply('クーポンの割引は、カート内の同一商品の一つに対して適用されます。：<a href="https://example.com/my-orders" target="_blank">クーポン</a>');
-    });
-
-    $botman->fallback(function ($bot) {
-        $bot->reply('すみません、よく分かりませんでした。送料、返品、注文状況などについてお答えできます。');
+        $bot->reply('すみません、よく分かりませんでした。FAQページをご覧ください。');
     });
 
     $botman->listen();
-});
+}
 
 
+// Route::match(['get','post'], '/botman', function () {
+//     $config = [];
+//     DriverManager::loadDriver(\BotMan\Drivers\Web\WebDriver::class);
+//     $botman = BotManFactory::create($config);
+
+//     $botman->hears('{message}', function ($bot, $message) {
+//         $faqs = FAQ::where('is_approved', true)->get();
+
+//         foreach ($faqs as $faq) {
+//             // keywords を配列化（カンマ or スペース区切り対応）
+//             $keywords = preg_split('/[\s,]+/u', $faq->keywords, -1, PREG_SPLIT_NO_EMPTY);
+
+//             foreach ($keywords as $keyword) {
+//                 if (mb_strpos($message, $keyword) !== false) {
+//                     $bot->reply($faq->answer);
+//                     return; // 最初に見つかったものを返答
+//                 }
+//             }
+
+//             // 質問文も部分一致チェック
+//             if (mb_strpos($message, $faq->question) !== false) {
+//                 $bot->reply($faq->answer);
+//                 return;
+//             }
+//         }
+
+//         // どれにもマッチしなかった場合
+//         $bot->reply('すみません、よく分かりませんでした。FAQページをご覧ください。もしくは、「購入」などカギ括弧なしで入力ください');
+//     });
+
+//     $botman->listen();
+// });
 
 
 Route::get('/test', function(){
