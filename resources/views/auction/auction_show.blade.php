@@ -157,7 +157,7 @@
             @if(now()->greaterThan($auction_bid_items->end) && Auth::check() && optional($topBids->first())->user_id === Auth::id())
                 <p class="text-info">
                     お客様は、入札順位一位でオークションが終了したので、購入することが可能です。
-                    期限は、{{$oneWeekLater->format('Y年m月d日 H:i')}} です
+                    期限は、{{$oneWeekLater->format('Y年m月d日 H:i')}} です。購入期限を過ぎると「購入手続きへ進む」ことができません。次回のオークションに参加ください。
                 </p>
                 
                 @if ($now->between($endDate, $oneWeekLater))

@@ -412,7 +412,7 @@
             const rows = document.querySelectorAll('#dataTable tbody tr'); 
 
             rows.forEach(row => {
-                const endDateText = row.querySelectorAll('td')[16].textContent.trim();
+                const endDateText = row.querySelectorAll('td')[20].textContent.trim();
                 const endDate = new Date(endDateText);
                 
                 const statusText = row.querySelectorAll('td')[1].textContent.trim(); // 状態（1番目の<td>）

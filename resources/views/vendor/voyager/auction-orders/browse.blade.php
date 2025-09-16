@@ -407,6 +407,7 @@
         });
     </script>
 
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const today = new Date();
@@ -433,39 +434,6 @@
         });
     </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('tr').forEach(row => {
-                const statusCell = row.querySelector('td:nth-child(2)'); // 2列目が「購入者決定」
-                if (statusCell && statusCell.textContent.trim() === '購入者決定') {
-                    const deleteBtn = row.querySelector('.delete');
-                    const editBtn = row.querySelector('.edit');
-                    const viewBtn = row.querySelector('.view');
-
-                    if (deleteBtn) {
-                        deleteBtn.classList.add('disabled');
-                        deleteBtn.setAttribute('title', '削除不可');
-                        deleteBtn.style.pointerEvents = 'none';
-                        deleteBtn.style.opacity = 0.5;
-                    }
-
-                    if (editBtn) {
-                        editBtn.classList.add('disabled');
-                        editBtn.setAttribute('title', '編集不可');
-                        editBtn.style.pointerEvents = 'none';
-                        editBtn.style.opacity = 0.5;
-                    }
-
-                    if (viewBtn) {
-                        viewBtn.classList.add('disabled');
-                        viewBtn.setAttribute('title', '編集不可');
-                        viewBtn.style.pointerEvents = 'none';
-                        viewBtn.style.opacity = 0.5;
-                    }
-                }
-            });
-        });
-    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
