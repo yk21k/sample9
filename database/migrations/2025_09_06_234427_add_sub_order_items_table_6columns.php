@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('sub_order_items', function (Blueprint $table) {
-            $table->decimal('discounted_price', 10, 2)->default(0)->after('price');
             $table->decimal('subtotal', 10, 2)->default(0)->after('discounted_price');
             $table->decimal('tax_amount', 10, 2)->default(0)->after('subtotal');
             $table->decimal('shipping_fee', 10, 2)->default(0)->after('tax_amount');
@@ -34,7 +33,6 @@ return new class extends Migration
             $table->dropForeign(['campaign_id']);
             $table->dropForeign(['coupon_id']);
             $table->dropColumn([
-                'discounted_price',
                 'subtotal',
                 'tax_amount',
                 'shipping_fee',
