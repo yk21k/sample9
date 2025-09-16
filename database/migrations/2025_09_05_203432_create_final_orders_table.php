@@ -12,16 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('final_orders', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('order_id')->constrained()->onDelete('cascade');
-            $table->foreignId('shop_id')->constrained()->onDelete('cascade');
-            $table->boolean('is_taxable')->default(true);
-            $table->decimal('subtotal', 10, 2)->default(0);
-            $table->decimal('tax_amount', 10, 2)->default(0);
-            $table->decimal('shipping_fee', 10, 2)->default(0);
-            $table->decimal('total', 10, 2)->default(0);
-            $table->timestamps();
-        });
+
 
     }
 
