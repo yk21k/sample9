@@ -11,18 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('sub_order_items', function (Blueprint $table) {
-            $table->decimal('discounted_price', 10, 2)->default(0)->after('price');
-            $table->decimal('subtotal', 10, 2)->default(0)->after('discounted_price');
-            $table->decimal('tax_amount', 10, 2)->default(0)->after('subtotal');
-            $table->decimal('shipping_fee', 10, 2)->default(0)->after('tax_amount');
-            $table->unsignedBigInteger('campaign_id')->nullable()->after('shipping_fee');
-            $table->unsignedBigInteger('coupon_id')->nullable()->after('campaign_id');
-
-            // 外部キー制約（任意）
-            $table->foreign('campaign_id')->references('id')->on('campaigns')->onDelete('set null');
-            $table->foreign('coupon_id')->references('id')->on('shop_coupons')->onDelete('set null');
+        Schema::create('final_orders', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('order_id')->constrained()->onDelete('cascade');
+            $table->foreignId('shop_id')->constrained()->onDelete('cascade');
+            $table->boolean('is_taxable')->default(true);
+            $table->decimal('subtotal', 10, 2)->default(0);
+            $table->decimal('tax_amount', 10, 2)->default(0);
+            $table->decimal('shipping_fee', 10, 2)->default(0);
+            $table->decimal('total', 10, 2)->default(0);
+            $table->timestamps();
         });
+
     }
 
     /**
@@ -31,16 +31,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('sub_order_items', function (Blueprint $table) {
-            $table->dropForeign(['campaign_id']);
-            $table->dropForeign(['coupon_id']);
-            $table->dropColumn([
-                'discounted_price',
-                'subtotal',
-                'tax_amount',
-                'shipping_fee',
-                'campaign_id',
-                'coupon_id'
-            ]);
+            Schema::dropIfExists('final_orders');
         });
     }
 };
