@@ -151,7 +151,7 @@
                         </p>
 
                         <p>
-                            当サイトへの支払い(消費税込)：¥{{ number_format($fee) }} 
+                            当サイトへの支払(消費税込)：¥{{ number_format($fee) }} 
                         </p>
                         <p>
                             Shopへの入金：¥{{ number_format(($discountedUnitPrice + $unitPrice) * ($tax_rate + 1) + $shippingFee * $quantity * ($tax_rate + 1) - $fee) }} 
