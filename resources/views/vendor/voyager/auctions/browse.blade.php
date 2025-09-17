@@ -404,30 +404,75 @@
     </script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const today = new Date();
-            const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // 時間を00:00:00に設定
+        document.addEventListener('DOMContentLoaded', () => {
 
-            // テーブルのすべての行を取得
-            const rows = document.querySelectorAll('#dataTable tbody tr'); 
+            // 日付文字列を安全に Date に変換する関数
+            function parseEndDate(raw) {
+                if (!raw) return null;
+                // "YYYY-MM-DD HH:MM:SS" → "YYYY-MM-DDTHH:MM:SS" に変換
+                const iso = raw.trim().replace(' ', 'T');
+                const d = new Date(iso);
+                return isNaN(d) ? null : d;
+            }
 
-            rows.forEach(row => {
-                const endDateText = row.querySelectorAll('td')[20].textContent.trim();
-                const endDate = new Date(endDateText);
-                
-                const statusText = row.querySelectorAll('td')[1].textContent.trim(); // 状態（1番目の<td>）
+            function updateAuctionStatus() {
+                const rows = document.querySelectorAll('#dataTable tbody tr');
 
-                // 終了日が本日以前で、かつ状態が'購入者決定'でない場合
-                if (endDate <= todayDate && statusText !== '購入者決定') {
-                    row.querySelectorAll('td')[1].textContent = '終了';  // 状態を'終了'に変更
-                }
-                row.querySelectorAll('td').forEach((td, index) => {
-                    console.log(`Index ${index}:`, td.textContent.trim());
+                rows.forEach((row, rowIndex) => {
+                    const tds = row.querySelectorAll('td');
+
+                    const END_COL_INDEX = 20;   // 終了日列
+                    const STATUS_COL_INDEX = 1; // 状態列
+
+                    if (tds.length <= Math.max(END_COL_INDEX, STATUS_COL_INDEX)) return;
+
+                    const rawEnd = tds[END_COL_INDEX].textContent;
+                    const endDate = parseEndDate(rawEnd);
+                    const statusText = tds[STATUS_COL_INDEX].textContent.trim();
+
+                    // 今日の日付 00:00:00
+                    const todayDate = new Date();
+                    todayDate.setHours(0,0,0,0);
+
+                    if (endDate) {
+                        // 日付のみ比較
+                        const endDateOnly = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+
+                        if (endDateOnly <= todayDate) {
+                            if (statusText === '購入者決定') {
+                                tds[STATUS_COL_INDEX].textContent = '終了　(購入権放棄)';
+                            } else if (statusText === '開催中') {
+                                tds[STATUS_COL_INDEX].textContent = '終了　(落札者なし)';
+                            }
+                            // それ以外の状態は変更しない
+                        }
+                    } else {
+                        console.warn(`row=${rowIndex} の終了日が無効: "${rawEnd}"`);
+                    }
+
+                    // 🔹 デバッグ出力（絶対に削除しない）
+                    console.log(`row=${rowIndex} status=${tds[STATUS_COL_INDEX].textContent}`);
+                    tds.forEach((td, index) => {
+                        console.log(`Index ${index}:`, td.textContent.trim());
+                    });
                 });
-            });
+            }
+
+            // 最初に1回実行
+            updateAuctionStatus();
+
+            // DataTables などで行が動的に変化する場合にも対応
+            const tableBody = document.querySelector('#dataTable tbody');
+            if (tableBody) {
+                const mo = new MutationObserver(() => {
+                    updateAuctionStatus();
+                });
+                mo.observe(tableBody, { childList: true, subtree: true });
+            }
 
         });
     </script>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {

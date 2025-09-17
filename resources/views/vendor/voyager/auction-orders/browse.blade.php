@@ -408,7 +408,7 @@
     </script>
 
 
-    <script>
+    <script>//auctionsと間違わないように後で確認
         document.addEventListener('DOMContentLoaded', function () {
             const today = new Date();
             const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // 時間を00:00:00に設定

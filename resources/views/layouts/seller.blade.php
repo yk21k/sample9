@@ -147,10 +147,12 @@
                             
                             <a href=" {{url('/seller/orders')}} " class="list-group-item list-group-item-action">Orders</a>
 
-                            <a href=" {{route('seller.order.sales_order_invoice2')}} " class="list-group-item list-group-item-action">Invoice2</a>
+                            <a href=" {{ url('/seller/shop_auction_orders') }} " class="list-group-item list-group-item-action">Auction Orders</a>
+
+                            <a href=" {{route('seller.order.sales_order_invoice2')}} " class="list-group-item list-group-item-action">Invoice</a>
                             
 
-                            <a href="" class="list-group-item list-group-item-action">Invoice（オークション）未実装</a>
+                            <a href=" {{route('seller.order.sales_order_invoice2')}} " class="list-group-item list-group-item-action">Invoice(Auction)</a>
 
                             <a href=" {{url('/admin/shops')}} " class="list-group-item list-group-item-action">Go to Shop</a>
 
@@ -199,7 +201,7 @@
                                 </div>
                             </div>
 
-                            <a href=" {{ url('/seller/shop_auction_orders') }} " class="list-group-item list-group-item-action">オークション　オーダー</a>
+                            
 
                         </div>
                     </div>
