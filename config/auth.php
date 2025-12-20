@@ -40,6 +40,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        'shop_staff' => [ // ← 追加部分
+            'driver' => 'session',
+            'provider' => 'shop_staffs',
+        ],
     ],
 
     /*
@@ -63,6 +68,11 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
+        ],
+        
+        'shop_staffs' => [  // ← 追加部分
+            'driver' => 'eloquent',
+            'model' => App\Models\ShopStaff::class,
         ],
 
         // 'users' => [

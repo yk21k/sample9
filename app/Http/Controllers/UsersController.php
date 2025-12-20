@@ -33,11 +33,9 @@ class UsersController extends Controller
             $data = $request->all();
 
             // dd($data);
-
             $termination = new DeleteShop;
             $termination->user_id = Auth::user()->id;
             $termination->reason = $data['reason'];
-
             $termination->status = 0;
 
             // dd($termination);
@@ -102,13 +100,22 @@ class UsersController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+    // public function destroy(string $id)
+    // {
+    //     $user = User::find($id);
+    //     $user->forceDelete();
+    //     return redirect()->route('home')->withMessage('The withdrawal process has been completed, thank you');
+        
+    // }
+
     public function destroy(string $id)
     {
-        $user = User::find($id);
-        $user->forceDelete();
-        return redirect()->route('home')->withMessage('The withdrawal process has been completed, thank you');
-        
+        $user = User::findOrFail($id);
+        $user->delete(); // ← 論理削除
+        return redirect()->route('home')
+            ->withMessage('The withdrawal process has been completed, thank you');
     }
+
 
     public function delete_confirm()
     {

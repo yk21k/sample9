@@ -31,6 +31,7 @@ use TCG\Voyager\Facades\Voyager;
 use App\Actions\SendStripeTransfer;
 use App\Actions\ImportCsvProducts;
 use App\Actions\PayToSeller;
+use App\Actions\SendPickupConfirmation;
 
 
 
@@ -68,6 +69,7 @@ class AppServiceProvider extends ServiceProvider
         Voyager::addAction(PayToSeller::class);
         Voyager::addAction(SendStripeTransfer::class);
         Voyager::addAction(ImportCsvProducts::class);
+        Voyager::addAction(SendPickupConfirmation::class);
         
         Voyager::useModel('Category', \App\Models\Categories::class);
         Voyager::useModel('Menu', \App\Models\Menu::class);

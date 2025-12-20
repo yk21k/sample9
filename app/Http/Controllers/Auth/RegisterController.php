@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Validation\Rule;
 
 use Illuminate\Validation\ValidationException;
 
@@ -53,11 +54,31 @@ class RegisterController extends Controller
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
+    // protected function validator(array $data)
+    // {
+    //     return Validator::make($data, [
+    //         // 'name' => ['required', 'string', 'max:255'],
+    //         'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],//update
+    //         // 'phone' => ['required', 'string', 'max:20'], 
+    //         'phone' => ['required', 'regex:/^0\d{9,10}$/'],
+    //         'password' => ['required', 'string', 'min:8', 'confirmed'],
+
+    //     ]);
+    // }
+
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            // 'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],//update 
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users')->whereNull('deleted_at'),
+            ],
+            'phone' => [
+                'required',
+                'regex:/^0\d{9,10}$/',
+                Rule::unique('users')->whereNull('deleted_at'),
+            ],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
     }
@@ -70,15 +91,11 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        // return User::create([
-        //     'name' => $data['name'],
-        //     'email' => $data['email'],
-        //     'password' => Hash::make($data['password']),
-        // ]);
         // dd($data);
-            $user = User::create([
+        $user = User::create([
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'phone' => $data['phone'], // ← 追加
             'email_verify_token' => base64_encode($data['email']),
         ]);
 
@@ -93,13 +110,19 @@ class RegisterController extends Controller
         $email = $request->input('email');
 
         // 同じメールで仮登録済みかどうかチェック
-        if (User::where('email', $email)->exists()) {
-            return redirect()->back()->withErrors(['email' => 'このメールアドレスはすでに登録されています。']);
+        // if (User::where('email', $email)->exists()) {
+        //     return redirect()->back()->withErrors(['email' => 'このメールアドレスはすでに登録されています。']);
+        // }
+
+        if (User::where('email', $email)->whereNull('deleted_at')->exists())
+        {
+            return redirect()->back()
+                ->withErrors(['email' => 'このメールアドレスはすでに登録されています。']);
         }
 
         $this->validator($request->all())->validate();
         //flash data
-        $request->flashOnly( 'email');
+        $request->flashOnly('email');
 
         $bridge_request = $request->all();
         // password マスキング
@@ -114,7 +137,9 @@ class RegisterController extends Controller
         $data = $request->all();
 
         // 既存ユーザーを探す
-        $user = \App\Models\User::where('email', $data['email'])->first();
+        // $user = User::where('email', $data['email'])->first();
+
+        $user = User::where('email', $data['email'])->whereNull('deleted_at')->first();
 
         if (!$user) {
             // いなければcreate()を使って新規作成
@@ -127,14 +152,6 @@ class RegisterController extends Controller
 
         return view('auth.registered');
     }
-
-
-    // public function register(Request $request)
-    // {
-    //     event(new Registered($user = $this->create( $request->all() )));
-
-    //     return view('auth.registered');
-    // }
 
     public function showForm($email_token)
     {
@@ -161,15 +178,60 @@ class RegisterController extends Controller
         }
     }
 
+    // public function mainCheck(Request $request)
+    // {
+    //     $request->validate([
+    //         'name' => 'required|string',
+    //         'birth_year' => 'required|numeric',
+    //         'birth_month' => 'required|numeric',
+    //         'birth_day' => 'required|numeric',
+    //     ]);
+    //     //データ保持用
+    //     $email_token = $request->email_token;
+
+    //     $user = new User();
+    //     $user->name = $request->name;
+    //     $user->email_token = $request->email_token;
+    //     $user->birth_year = $request->birth_year;
+    //     $user->birth_month = $request->birth_month;
+    //     $user->birth_day = $request->birth_day;
+
+    //     return view('auth.main.register_check', compact('user','email_token'));
+    // }
+
     public function mainCheck(Request $request)
     {
+        // 基本バリデーション
         $request->validate([
             'name' => 'required|string',
-            'birth_year' => 'required|numeric',
-            'birth_month' => 'required|numeric',
-            'birth_day' => 'required|numeric',
+            'birth_year' => 'required|integer',
+            'birth_month' => 'required|integer',
+            'birth_day' => 'required|integer',
         ]);
-        //データ保持用
+
+        // 生年月日チェック（不正日付対策）
+        try {
+            $birthDate = Carbon::create(
+                $request->birth_year,
+                $request->birth_month,
+                $request->birth_day
+            );
+        } catch (\Exception $e) {
+            throw ValidationException::withMessages([
+                'birth' => '正しい生年月日を入力してください。',
+            ]);
+        }
+
+        // 年齢チェック（18〜80歳）
+        $age = $birthDate->age;
+
+        if ($age < 18 || $age > 80) {
+            throw ValidationException::withMessages([
+                'birth' => '登録できる年齢は18歳以上80歳以下です。',
+            ]);
+        }
+
+        // 確認画面用データ
         $email_token = $request->email_token;
 
         $user = new User();
@@ -179,14 +241,42 @@ class RegisterController extends Controller
         $user->birth_month = $request->birth_month;
         $user->birth_day = $request->birth_day;
 
-        return view('auth.main.register_check', compact('user','email_token'));
+        return view('auth.main.register_check', compact('user', 'email_token'));
     }
+
+    // public function mainRegister(Request $request)
+    // {
+    //     // dd($request->all());
+    //     $user = User::where('email_verify_token',$request->email_token)->first();
+    //     // dd($user);
+    //     $user->status = config('const.USER_STATUS.REGISTER');
+    //     $user->name = $request->name;
+    //     $user->birth_year = $request->birth_year;
+    //     $user->birth_month = $request->birth_month;
+    //     $user->birth_day = $request->birth_day;
+    //     $user->save();
+
+    //     return view('auth.main.registered');
+    // }
 
     public function mainRegister(Request $request)
     {
-        // dd($request->all());
-        $user = User::where('email_verify_token',$request->email_token)->first();
-        // dd($user);
+        try {
+            $birthDate = Carbon::create(
+                $request->birth_year,
+                $request->birth_month,
+                $request->birth_day
+            );
+        } catch (\Exception $e) {
+            abort(403, '不正な生年月日です');
+        }
+
+        if ($birthDate->age < 18 || $birthDate->age > 80) {
+            abort(403, '年齢制限を超えています');
+        }
+
+        $user = User::where('email_verify_token', $request->email_token)->firstOrFail();
+
         $user->status = config('const.USER_STATUS.REGISTER');
         $user->name = $request->name;
         $user->birth_year = $request->birth_year;
@@ -195,7 +285,7 @@ class RegisterController extends Controller
         $user->save();
 
         return view('auth.main.registered');
-      }
+    }
 
 
 

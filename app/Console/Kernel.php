@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('licenses:check-expiry')->dailyAt('01:00');
+        $schedule->job(new \App\Jobs\GenerateDailyQrCodeJob)->dailyAt('00:00'); // 毎日0時
     }
 
     /**

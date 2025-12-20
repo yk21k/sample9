@@ -11,6 +11,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Illuminate\Session\TokenMismatchException; // TokenMismatchException をインポート　419
 
+use Illuminate\Support\Facades\Route;
+
 class Handler extends ExceptionHandler
 {
 
@@ -24,9 +26,9 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $e)
     {
         // 404エラーの場合、/homeにリダイレクト
-        if ($e instanceof NotFoundHttpException) {
-            return redirect('/home');
-        }
+        // if ($e instanceof NotFoundHttpException) {
+        //     return redirect('/home');
+        // }
 
         // 419エラー（TokenMismatchException）の場合、/homeにリダイレクト
         if ($e instanceof TokenMismatchException) {

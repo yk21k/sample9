@@ -21,6 +21,7 @@ class User extends \TCG\Voyager\Models\User
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'password',
         'email_verified',
         'email_verify_token',
@@ -107,5 +108,7 @@ class User extends \TCG\Voyager\Models\User
     {
         return $this->hasMany(Mails::class, 'user_id');
     }
+
+
 
 }

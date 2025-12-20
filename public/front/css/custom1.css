@@ -2,19 +2,6 @@ search-item {
       margin: 2px;
 }
 
-
-
-/*.sidenav {
-  width:fit-content;
-  position: fixed;
-  z-index: 1;
-  top: 80px;
-  left: 10px;
-  background: #eee;
-  padding: 8px 0;
-  margin-right: 2%;
-}
-*/
 .sidenav {
   width: 250px;
   position: fixed;

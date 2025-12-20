@@ -407,34 +407,6 @@
         });
     </script>
 
-
-    <script>//auctionsと間違わないように後で確認
-        document.addEventListener('DOMContentLoaded', function () {
-            const today = new Date();
-            const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // 時間を00:00:00に設定
-
-            // テーブルのすべての行を取得
-            const rows = document.querySelectorAll('#dataTable tbody tr'); 
-
-            rows.forEach(row => {
-                const endDateText = row.querySelectorAll('td')[16].textContent.trim();
-                const endDate = new Date(endDateText);
-                
-                const statusText = row.querySelectorAll('td')[1].textContent.trim(); // 状態（1番目の<td>）
-
-                // 終了日が本日以前で、かつ状態が'購入者決定'でない場合
-                if (endDate <= todayDate && statusText !== '購入者決定') {
-                    row.querySelectorAll('td')[1].textContent = '終了';  // 状態を'終了'に変更
-                }
-                row.querySelectorAll('td').forEach((td, index) => {
-                    console.log(`Index ${index}:`, td.textContent.trim());
-                });
-            });
-
-        });
-    </script>
-
-
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const rows = document.querySelectorAll('#dataTable tbody tr');
@@ -458,6 +430,8 @@
             }
         });
     </script>
+
+    
 
 
 

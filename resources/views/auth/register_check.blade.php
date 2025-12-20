@@ -21,6 +21,15 @@
                         </div>
 
                         <div class="form-group row">
+                            <label class="col-md-4 col-form-label text-md-right">電話番号</label>
+
+                            <div class="col-md-6">
+                                <span>{{ $phone }}</span>
+                                <input type="hidden" name="phone" value="{{ $phone }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
                             <label for="password" class="col-md-4 col-form-label text-md-right">パスワード</label>
 
                             <div class="col-md-6">

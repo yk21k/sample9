@@ -17,6 +17,8 @@ use App\Models\Product;
 use App\Models\SubOrdersArrivalReport;
 use App\Models\Auction;
 use App\Models\AuctionOrder;
+use App\Models\PickupOrder;
+
 
 use Auth;
 
@@ -38,13 +40,13 @@ class AccountController extends Controller
         $shipping_names = Order::where('user_id', Auth::user()->id)->get();
 
         // SubOrder 一覧を取得
-        $sub_orders = SubOrder::where('user_id', Auth::id())->get();
+        $sub_order = SubOrder::where('user_id', Auth::id())->get();
 
         // SubOrder の ID 一覧を取得
-        $sub_ordersIds = $sub_orders->pluck('id');
+        $sub_orderIds = $sub_order->pluck('id');
 
         // SubOrderItem を一括取得
-        $subOrder_items = SubOrderItem::whereIn('sub_order_id', $sub_ordersIds)->first();
+        $subOrder_items = SubOrderItem::whereIn('sub_order_id', $sub_orderIds)->first();
             
         
         $firstDelis = Order::where('user_id', Auth::user()->id)->latest()->first();
@@ -57,8 +59,8 @@ class AccountController extends Controller
         // $favaoriteItems = Product::with('user_favo')->find($userId);
         $favaoriteItems = Product::with('user_favo')->get();
 
-        $auction_orders = Auction::where('winner_user_id', auth()->user()->id)->get();
-        // dd($auction_orders);
+        $auction_order = Auction::where('winner_user_id', auth()->user()->id)->get();
+        // dd($auction_order);
         // dd($favaoriteItems);
         
         // $favaoriteItems = Fovorite::where('user_id', Auth::user()->id)->get();
@@ -67,7 +69,8 @@ class AccountController extends Controller
         // $arrival = SubOrdersArrivalReport::where('sub_order_id', )->first();
 
 
-        return view('account.account', compact('profiles', 'order_histories', 'firstDelis', 'savedDelis', 'shipping_names', 'favaoriteItems', 'subOrder_items', 'itemsGrouped', 'auction_orders'));
+
+        return view('account.account', compact('profiles', 'order_histories', 'firstDelis', 'savedDelis', 'shipping_names', 'favaoriteItems', 'subOrder_items', 'itemsGrouped', 'auction_order'));
     }
 
     public function updateProf(Request $request, $id)
@@ -159,7 +162,6 @@ class AccountController extends Controller
 
     }
 
-    
     public function arrival(Request $request, $id)
     {
         if($request->isMethod('post'))
@@ -193,8 +195,5 @@ class AccountController extends Controller
     }
 
 
-
-
-
-       
+      
 }        

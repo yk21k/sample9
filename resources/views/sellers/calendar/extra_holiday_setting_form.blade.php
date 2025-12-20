@@ -6,9 +6,10 @@
 	           <div class="card">
 	               <div class="card-header text-center">
 		               <a class="btn btn-outline-secondary float-left" href="{{ url('seller/extra_holiday_setting/.?date=' . $calendar->getPreviousMonth()) }}">前の月</a>
-		               <span>{{ $calendar->getTitle() }}の臨時営業日設定</span>
+		               <span>{{ $calendar->getTitle() }}の臨時営業日設定</span> 
 		               <a class="btn btn-outline-secondary float-right" href="{{ url('seller/extra_holiday_setting/.?date=' . $calendar->getNextMonth()) }}">次の月</a>
 	               </div>
+	               <small>月が相違の場合でももう一度サイドバーのShop Calendarを押してもう一度ご確認下さい</small>
 	               <div class="card-body">
 						@if (session('status'))
 	                       <div class="alert alert-success" role="alert">

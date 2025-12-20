@@ -46,6 +46,9 @@
 		    <h3><a class="nav-link link-secondary" href="#wishlist">欲しいものに登録</a></h3>
 		  </li>
 		  <li class="nav-item">
+		    <h3><a class="nav-link link-secondary" href="#opt-request">あなたの受取商品</a></h3>
+		  </li>
+		  <li class="nav-item">
 		    <h3><a class="nav-link link-secondary" href="#payment-methods">-----</a></h3>
 		  </li>
 		  <li class="nav-item">
@@ -479,6 +482,13 @@
 				</form>
 			</div><br>
         </section>
+
+		{{-- ✅ 注文履歴セクション --}}
+		
+		<section id="opt-request">
+		  <a href="{{route('pickup.otp.index')}}"><h2>店舗受取商品を受け取る</h2><a/>
+ 
+		</section>
 
         <section id="support" class="section">
             <h2>サポート</h2>

@@ -25,6 +25,16 @@ class Shop extends Model
         return $this->hasMany(Product::class, 'shop_id');
     }
 
+    public function pickup_products()
+    {
+        return $this->hasMany(PickupProduct::class, 'shop_id');
+    }
+
+    public function pickupLocations()
+    {
+        return $this->hasMany(PickupLocation::class);
+    }
+
     public function categories()
     {
         return $this->hasMany(Categories::class, 'shop_id');
@@ -70,5 +80,7 @@ class Shop extends Model
     {
         return $this->hasMany(SubOrder::class, 'seller_id');    
     }
+
+
 
 }

@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="{{ asset('front/css/custom_mb.css') }}" media="screen and (max-width:480px)">
 
     <!-- Fonts -->
+
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('front/css/custom1.css') }}">
@@ -27,8 +28,8 @@
     <link rel="stylesheet" href="{{ asset('front/css/custom93.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom94.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom95.css') }}">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
 
     @stack('css')
     
@@ -266,10 +267,55 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/js/widget.js"></script>
     @endif
+<script>
+  (() => {
+    'use strict'
+
+    const storedTheme = localStorage.getItem('theme')
+
+    const getPreferredTheme = () => {
+      if (storedTheme) {
+        return storedTheme
+      }
+      return window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light'
+    }
+
+    const setTheme = function (theme) {
+      if (theme === 'auto') {
+        document.documentElement.setAttribute(
+          'data-bs-theme',
+          window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        )
+      } else {
+        document.documentElement.setAttribute('data-bs-theme', theme)
+      }
+    }
+
+    setTheme(getPreferredTheme())
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      if (storedTheme !== 'light' && storedTheme !== 'dark') {
+        setTheme(getPreferredTheme())
+      }
+    })
+
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('[data-bs-theme-value]')
+        .forEach(toggle => {
+          toggle.addEventListener('click', () => {
+            const theme = toggle.getAttribute('data-bs-theme-value')
+            localStorage.setItem('theme', theme)
+            setTheme(theme)
+          })
+        })
+    })
+  })()
+</script>
 
 
 
-    </script>
 </body>
 
 

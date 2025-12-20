@@ -37,6 +37,7 @@ return [
         'secret' => env('STRIPE_SECRET'),
         'client_id' => env('STRIPE_CLIENT_ID'),
         'redirect_uri' => env('STRIPE_REDIRECT_URI'),
+        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
 ];

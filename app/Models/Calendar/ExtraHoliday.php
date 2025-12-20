@@ -13,11 +13,15 @@ class ExtraHoliday extends Model
     const OPEN = 1;
     const CLOSE = 2;
     protected $table = "extra_holiday";
-    
+
     protected $fillable = [
-        "date_flag",
-        "comment"
+        'shop_name',
+        'shop_id',
+        'date_key',
+        'date_flag',
+        'comment',
     ];
+    
     function isClose(){
         return $this->date_flag == ExtraHoliday::CLOSE;
     }

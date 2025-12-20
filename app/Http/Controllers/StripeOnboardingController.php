@@ -37,13 +37,6 @@ public function redirectToStripe(Request $request)
 
         // 状態を確認したいだけならここで止める（開発中のみ）
         
-        // dd([
-        //     'charges_enabled' => $account->charges_enabled,
-        //     'payouts_enabled' => $account->payouts_enabled,
-        //     'disabled_reason' => $account->disabled_reason ?? null,
-        //     'requirements' => $account->requirements->currently_due ?? [],
-        // ]);
-        
     } catch (\Exception $e) {
         return redirect()->back()->withErrors('Stripe アカウントの取得に失敗しました: ' . $e->getMessage());
     }

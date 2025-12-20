@@ -149,9 +149,14 @@
 
                             <a href=" {{ url('/seller/shop_auction_orders') }} " class="list-group-item list-group-item-action">Auction Orders</a>
 
+                            <a href=" {{ url('/seller/pickup_shop_orders') }} " class="list-group-item list-group-item-action">Pick Up Orders</a>
+
+                            <a href=" {{ route('seller.pickup.slots.create') }} " class="list-group-item list-group-item-action">Pick Up Product slot テスト</a>
+
+                            <a href=" {{ route('seller.pickup.slots.index') }} " class="list-group-item list-group-item-action">Pick Up Product Index テスト</a>
+                            
                             <a href=" {{route('seller.order.sales_order_invoice2')}} " class="list-group-item list-group-item-action">Invoice</a>
                             
-
                             <a href=" {{route('seller.order.sales_order_invoice2')}} " class="list-group-item list-group-item-action">Invoice(Auction)</a>
 
                             <a href=" {{url('/admin/shops')}} " class="list-group-item list-group-item-action">Go to Shop</a>
@@ -175,6 +180,11 @@
 
                             <a href=" {{ url('/seller/shop_setting') }} " class="list-group-item list-group-item-action">Shop Setting</a>
 
+                            <a href=" {{ url('/seller/pickup-locations/create') }} " class="list-group-item list-group-item-action">Shop Pick Up Locations</a>
+
+                            <a href=" {{ url('/seller/pickup-locations') }} " class="list-group-item list-group-item-action">Shop Pick Up Index</a>
+                            <a href=" {{url('/seller/pickup./register')}} " class="list-group-item list-group-item-action">Pick Up Staff Register</a>
+                            
                             <div class="card mb-4">
                                 <div class="card-body">
                                     @if (auth()->user()->stripe_account_id)
@@ -200,7 +210,7 @@
                                     @endif
                                 </div>
                             </div>
-
+                            
                             
 
                         </div>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Seller;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\AuctionOrder;
+use Carbon\Carbon;
 
 class AuctionOrderController extends Controller
 {
@@ -77,15 +78,27 @@ class AuctionOrderController extends Controller
         return redirect('/seller/shop_auction_orders')->withMessage('発送手配済みです (発送中)');    
     }
 
+
+
     public function markDelivered(AuctionOrder $auctionOrder, Request $request)
     {
-        $auctionOrder->delivery_status ='';
+        // 配達ステータスを更新
         $auctionOrder->delivery_status = '3';
+
+        // ✅ 配送完了日を格納（新規カラム delivered_at を利用する前提）
+        $auctionOrder->delivered_at = Carbon::now();
+
         $auctionOrder->save();
 
-        // 関連オークションが存在する場合に delivery_status を更新
+        // 関連オークションが存在する場合、オークション側にもステータスと日付を反映
         if ($auctionOrder->auction) {
             $auctionOrder->auction->delivery_status = 3;
+
+            // Auction モデルにも delivered_at があるなら更新
+            if (Schema::hasColumn('auctions', 'delivered_at')) {
+                $auctionOrder->auction->delivered_at = Carbon::now();
+            }
+
             $auctionOrder->auction->save();
         } else {
             \Log::warning('Auction not found for AuctionOrder ID: ' . $auctionOrder->id);

@@ -1,103 +1,106 @@
-
-
 @extends('layouts.app')
+
 @section('content')
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">本会員登録</div>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">本会員登録</div>
 
-                    @isset($message)
-                        <div class="card-body">
-                            {{$message}}
+                @isset($message)
+                    <div class="card-body">
+                        {{ $message }}
+                    </div>
+                @endisset
+
+                @empty($message)
+                <div class="card-body">
+                    <form method="POST" action="{{ route('register.main.check', ['email_token'=>$email_token]) }}">
+                        @csrf
+
+                        {{-- 名前 --}}
+                        <div class="form-group row">
+                            <label class="col-md-4 col-form-label text-md-right">名前</label>
+                            <div class="col-md-6">
+                                <input
+                                    type="text"
+                                    class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}"
+                                    name="name"
+                                    value="{{ old('name') }}"
+                                    required
+                                >
+
+                                @error('name')
+                                    <span class="invalid-feedback">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
                         </div>
-                    @endisset
 
-                    @empty($message)
-                        <div class="card-body">
-                            <form method="POST" action="{{ route('register.main.check', ['email_token'=>$email_token]) }}">@csrf
-                                
-                                <div class="form-group row">
-                                    <label for="name" class="col-md-4 col-form-label text-md-right">名前</label>
-                                    <div class="col-md-6">
-                                        <input
-                                            id="name" type="text"
-                                            class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}"
-                                            name="name" value="{{ old('name') }}" required>
+                        {{-- 生年月日 --}}
+                        <div class="form-group row">
+                            <label class="col-md-4 col-form-label text-md-right">生年月日</label>
+                            <div class="col-md-6">
+                                <div class="row">
 
-                                        @if ($errors->has('name'))
-                                            <span class="invalid-feedback">
-                                            <strong>{{ $errors->first('name') }}</strong>
+                                    {{-- 年 --}}
+                                    <div class="col-md-4">
+                                        <select id="birth_year" class="form-control" name="birth_year" required>
+                                            <option value="">----</option>
+                                            @for ($y = now()->year - 18; $y >= now()->year - 80; $y--)
+                                                <option value="{{ $y }}" @selected(old('birth_year') == $y)>
+                                                    {{ $y }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                        @error('birth_year')
+                                            <span class="help-block text-danger">
+                                                <strong>{{ $message }}</strong>
                                             </span>
-                                        @endif
-                                    </div>
+                                        @enderror
+                                    </div>年
+
+                                    {{-- 月 --}}
+                                    <div class="col-md-3">
+                                        <select id="birth_month" class="form-control" name="birth_month" required>
+                                            <option value="">--</option>
+                                            @for ($m = 1; $m <= 12; $m++)
+                                                <option value="{{ $m }}" @selected(old('birth_month') == $m)>
+                                                    {{ $m }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                        @error('birth_month')
+                                            <span class="help-block text-danger">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>月
+
+                                    {{-- 日 --}}
+                                    <div class="col-md-3">
+                                        <select id="birth_day" class="form-control" name="birth_day" required>
+                                            <option value="">--</option>
+                                        </select>
+                                        @error('birth_day')
+                                            <span class="help-block text-danger">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>日
                                 </div>
 
-                                
-
-                                <div class="form-group row">
-                                    <label for="name_pronunciation"
-                                           class="col-md-4 col-form-label text-md-right">生年月日</label>
-                                    <div class="col-md-6">
-                                        <div class="row">
-                                            <div class="col-md-4">
-                                                <select id="birth_year" class="form-control" name="birth_year">
-                                                    <option value="">----</option>
-                                                    @for ($i = 1980; $i <= 2005; $i++)
-                                                        <option value="{{ $i }}"
-                                                                @if(old('birth_year') == $i) selected @endif>{{ $i }}</option>
-                                                    @endfor
-                                                </select>
-                                                @if ($errors->has('birth_year'))
-                                                    <span class="help-block">
-                                                        <strong>{{ $errors->first('birth_year') }}</strong>
-                                                    </span>
-                                                @endif
-                                            </div>年
-
-                                            <div class="col-md-3">
-                                                <select id="birth_month" class="form-control" name="birth_month">
-                                                    <option value="">--</option>
-                                                    @for ($i = 1; $i <= 12; $i++)
-                                                        <option value="{{ $i }}"
-                                                            @if(old('birth_month') == $i) selected @endif>{{ $i }}</option>
-                                                    @endfor
-                                                </select>
-                                                @if ($errors->has('birth_month'))
-                                                    <span class="help-block">
-                                                        <strong>{{ $errors->first('birth_month') }}</strong>
-                                                    </span>
-                                                @endif
-                                            </div>月
-
-                                            <div class="col-md-3">
-                                                <select id="birth_day" class="form-control" name="birth_day">
-                                                    <option value="">--</option>
-                                                    @for ($i = 1; $i <= 31; $i++)
-                                                        <option value="{{ $i }}"
-                                                            @if(old('birth_day') == $i) selected @endif>{{ $i }}</option>
-                                                    @endfor
-                                                </select>
-
-                                                @if ($errors->has('birth_day'))
-                                                    <span class="help-block">
-                                                        <strong>{{ $errors->first('birth_day') }}</strong>
-                                                    </span>
-                                                @endif
-                                            </div>日
-                                        </div>
-
-                                        <div class="row col-md-6 col-md-offset-4">
-                                            @if ($errors->has('birth'))
-                                                <span class="help-block">
-                                                    <strong>{{ $errors->first('birth') }}</strong>
-                                                </span>
-                                            @endif
-                                        </div>
+                                {{-- 日付全体エラー --}}
+                                @error('birth')
+                                    <div class="mt-2 text-danger">
+                                        <strong>{{ $message }}</strong>
                                     </div>
+                                @enderror
+                            </div>
                         </div>
 
+                        {{-- 送信 --}}
                         <div class="form-group row mb-0">
                             <div class="col-md-6 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
@@ -105,11 +108,48 @@
                                 </button>
                             </div>
                         </div>
-                        </form>
+                    </form>
                 </div>
                 @endempty
             </div>
         </div>
     </div>
-    </div>
+</div>
+
+{{-- 生年月日制御 JS --}}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const year  = document.getElementById('birth_year');
+    const month = document.getElementById('birth_month');
+    const day   = document.getElementById('birth_day');
+
+    function updateDays() {
+        const y = parseInt(year.value);
+        const m = parseInt(month.value);
+
+        day.innerHTML = '<option value="">--</option>';
+
+        if (!y || !m) return;
+
+        const lastDay = new Date(y, m, 0).getDate();
+
+        for (let d = 1; d <= lastDay; d++) {
+            const opt = document.createElement('option');
+            opt.value = d;
+            opt.textContent = d;
+
+            if ("{{ old('birth_day') }}" == d) {
+                opt.selected = true;
+            }
+
+            day.appendChild(opt);
+        }
+    }
+
+    year.addEventListener('change', updateDays);
+    month.addEventListener('change', updateDays);
+
+    updateDays();
+});
+</script>
 @endsection

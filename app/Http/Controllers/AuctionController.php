@@ -197,67 +197,6 @@ class AuctionController extends Controller
                          ->with('success', '入札が完了しました。');
     }
 
-    // public function storeBid(Request $request, Auction $auction)
-    // {
-    //     // 1. オークション終了確認
-    //     if (now()->greaterThan($auction->end)) {
-    //         \Log::info('オークション終了後の入札試行');
-    //         return redirect()->back()->withErrors(['auction' => 'オークションは終了しました。']);
-    //     }
-
-    //     $bidAmount = (int) $request->input('bid_amount');
-
-    //     // 2. 現在の最高入札額を取得
-    //     $currentTopBid = Bid::where('auction_id', $auction->id)->orderByDesc('amount')->first();
-    //     $baseAmount = $currentTopBid ? $currentTopBid->amount : $auction->suggested_price;
-
-    //     $totalPrice = $auction->spot_price + $auction->shipping_fee;
-
-    //     \Log::debug('即決分岐チェック', [
-    //         'bidAmount' => $bidAmount,
-    //         'totalPrice' => $totalPrice,
-    //         'equals' => $bidAmount === $totalPrice,
-    //         'test' => $bidAmount >= $totalPrice,
-    //         'user_id' => Auth::id(),
-    //     ]);
-
-    //     // 3. 即決チェック
-    //     if ($bidAmount >= $totalPrice) {
-    //         return redirect()->route('auction.payment', ['id' => $auction->id])
-    //                          ->with('bid_amount', $bidAmount)
-    //                          ->with('auction', $auction);
-    //     }
-
-    //     // 4. 入札単位の決定
-    //     $minimumUnit = $baseAmount >= 10000 ? 1000 : ($baseAmount >= 1000 ? 100 : 10);
-        
-    //     // ここを明示的に整数にするのがポイント
-    //     $allowedBid = (int) ($baseAmount + $minimumUnit);
-
-    //     // 5. バリデーション：許可された額しか通さない
-    //     $request->validate([
-    //         'bid_amount' => ['required', 'integer', 'in:' . $allowedBid],
-    //         'bid_amount_confirm' => ['required', 'same:bid_amount'],
-    //     ], [
-    //         'bid_amount.required' => '入札金額を入力してください。',
-    //         'bid_amount.integer' => '金額は整数で入力してください（例：11000）。',
-    //         'bid_amount.in' => '入札可能額は ¥' . number_format($allowedBid+$auction->shipping_fee) . ' のみです。',
-    //         'bid_amount_confirm.required' => '確認金額を入力してください。',
-    //         'bid_amount_confirm.same' => '確認金額が一致しません。',
-    //     ]);
-
-    //     // 6. 入札保存
-    //     $bid = new Bid();
-    //     $bid->auction_id = $auction->id;
-    //     $bid->user_id = Auth::id();
-    //     $bid->amount = $bidAmount;
-    //     $bid->bid_time = now();
-    //     $bid->save();
-
-    //     return redirect()->route('home.auction.show', $auction->id)
-    //                      ->with('success', '入札が完了しました。');
-    // }
-
 
     public function payment($id)
     {
@@ -343,8 +282,6 @@ class AuctionController extends Controller
             // dd($auction_order);
 
             $auction_order->save();
-
-
 
             return redirect()->route('auction.payment.success')->with('success', '決済が完了しました。');
 
@@ -457,10 +394,4 @@ class AuctionController extends Controller
     }
 
     
-
-
-
-
-
-
 }

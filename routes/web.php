@@ -13,6 +13,12 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuctionController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PickupCatalogController;
+use App\Http\Controllers\PickupCartController;
+use App\Http\Controllers\StorePickupPaymentController;
+use App\Http\Controllers\PickupCustomerOtpController;
+use App\Http\Controllers\PickupOrderController;
+use App\Http\Controllers\PickupConfirmController;
 
 use App\Http\Controllers\Seller\OrdersController;
 use App\Http\Controllers\Seller\CalendarController;
@@ -22,7 +28,15 @@ use App\Http\Controllers\Seller\DesplayController;
 use App\Http\Controllers\Seller\ShopSettingController;
 use App\Http\Controllers\Seller\StripeConnectController;
 use App\Http\Controllers\Seller\AuctionOrderController;
+use App\Http\Controllers\Seller\PickupSlotController;
+use App\Http\Controllers\Seller\PickupLocationController;
+use App\Http\Controllers\Seller\PickupOtpController;
+use App\Http\Controllers\Seller\StaffRegisterController;
+use App\Http\Controllers\Seller\AdminQrController;
 
+
+use App\Http\Controllers\Otp\AdminOtpController;
+use App\Http\Controllers\Shop\AuthController;
 
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ShopProfController;
@@ -35,8 +49,6 @@ use App\Http\Controllers\Admin\StripePayController;
 use App\Http\Controllers\Admin\StripeTransferController;
 use App\Http\Controllers\StripeOnboardingController;
 use App\Http\Controllers\ProductImportController;
-
-
 
 use App\Models\Order;
 
@@ -55,6 +67,7 @@ Route::redirect('/', '/home');
 
 
 Auth::routes();
+
 
 Route::post('register/pre_check', [App\Http\Controllers\Auth\RegisterController::class, 'pre_check'])->middleware('throttle:1,1')->name('register.pre_check');
 
@@ -136,8 +149,6 @@ Route::resource('products', ProductController::class);
 
 Route::get('/add-to-cart/{product}', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add')->middleware('auth');
 
-
-
 Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index')->middleware('auth');
 
 Route::get('/cart/destroy/{itemId}', [App\Http\Controllers\CartController::class, 'destroy'])->name('cart.destroy')->middleware('auth');
@@ -152,6 +163,103 @@ Route::get('/cart/apply-shopcoupon', [App\Http\Controllers\CartController::class
 
 Route::post('/cart/deli-place', [App\Http\Controllers\CartController::class, 'deliPlace'])->name('cart.deli_place')->middleware('auth');
 
+// Pick Up Product Index
+Route::get('/pickup', [App\Http\Controllers\PickupCatalogController::class, 'index'])->name('pickup.catalog.index');
+Route::get('/pickup/{pickupProduct}', [App\Http\Controllers\PickupCatalogController::class, 'show'])->name('pickup.catalog.show');
+
+// Pick Up Cart
+Route::get('/pickup/cart/index', [App\Http\Controllers\PickupCartController::class, 'index'])->name('pickup.cart.index')->middleware('auth');
+
+Route::post('/pickup/cart/add/{id}', [App\Http\Controllers\PickupCartController::class, 'add'])->name('pickup.cart.add')->middleware('auth');
+
+Route::post('/pickup/cart/update-all-slots', [App\Http\Controllers\PickupCartController::class, 'updateAllSlots'])->name('pickup.cart.updateAllSlots');
+
+Route::get('/pickup/cart/get-available-slots', [App\Http\Controllers\PickupCartController::class, 'getAvailableSlots'])->name('pickup.cart.getAvailableSlots')->middleware('auth'); // 個別商品用
+
+Route::get('/pickup/cart/get-common-slots', [App\Http\Controllers\PickupCartController::class, 'getCommonSlots'])->name('pickup.cart.getCommonSlots'); // 一括用
+
+Route::post('/pickup/cart/remove/{id}', [App\Http\Controllers\PickupCartController::class, 'remove'])->name('pickup.cart.remove')->middleware('auth');
+Route::post('/pickup/cart/clear', [App\Http\Controllers\PickupCartController::class, 'clear'])->name('pickup.cart.clear')->middleware('auth');
+
+// バリデーション付きでcheckoutへ進む
+Route::post('/pickup/cart/proceed', [App\Http\Controllers\PickupCartController::class, 'proceedToCheckout'])->name('pickup.cart.proceed')->middleware('auth');
+
+// Ajax: 店舗ごとの共通スロット取得
+Route::get('/pickup/cart/get-common-slots', [App\Http\Controllers\PickupCartController::class, 'getCommonSlots'])->name('pickup.cart.getCommonSlots');
+
+// 受取先
+Route::get('/pickup/cart/pickup-place', [App\Http\Controllers\PickupCartController::class, 'pickUpPlace'])->name('pickup.cart.pickUpPlace');
+
+// 決済画面
+Route::get('pickup/cart/checkout', [App\Http\Controllers\PickupCartController::class, 'checkout'])->name('pickup.cart.checkout');
+
+Route::post('/pickup/cart/update', [App\Http\Controllers\PickupCartController::class, 'updatePickupInfo'])
+    ->name('pickup.cart.updatePickupInfo');
+
+// --- カート更新用（AJAXでセッションに保存） ---
+Route::post('/pickup/cart/save-to-session', [App\Http\Controllers\StorePickupPaymentController::class, 'storeOrder'])
+    ->name('pickup.cart.saveToSession');
+
+Route::post('/store-pickup/check-stock', [App\Http\Controllers\StorePickupPaymentController::class, 'checkStock'])
+    ->name('store-pickup.check-stock');        
+
+Route::post('pickup/payment/create', [App\Http\Controllers\StorePickupPaymentController::class, 'createPaymentIntent'])->name('store-pickup.payment.create');
+
+Route::post('/stripe/webhook', [App\Http\Controllers\StorePickupPaymentController::class, 'webhook'])->name('stripe.webhook');
+
+Route::post('pickup/order/store', [App\Http\Controllers\StorePickupPaymentController::class, 'storeOrder'])->name('store-pickup.order.store');
+
+Route::get('pickup/payment/success', [App\Http\Controllers\StorePickupPaymentController::class, 'success'])->name('store-pickup.payment.success');
+
+// 購入者側のOTP発行
+Route::get('/pickup/otp/pregenerate/', [App\Http\Controllers\PickupCustomerOtpController::class, 'index'])->name('pickup.otp.index')->middleware('auth');
+
+Route::match(['get', 'post'], '/pickup/otp/generate', [App\Http\Controllers\PickupCustomerOtpController::class, 'generate'])->name('pickup.otp.generate')->middleware('auth');
+
+Route::get('/pickup/otp/login', [App\Http\Controllers\PickupCustomerOtpController::class, 'showLoginForm'])->name('pickup.otp.login.form')->middleware('auth');
+
+Route::post('/pickup/otp/verify', [App\Http\Controllers\PickupCustomerOtpController::class, 'verifyOtp'])->name('pickup.otp.verify')->middleware('auth');
+
+Route::post('/pickup/otp/logout/{otp}', [App\Http\Controllers\PickupCustomerOtpController::class, 'logoutOtp'])
+    ->name('pickup.otp.logout')->middleware('auth');
+
+// 二段階目OTP表示
+Route::get('/pickup/secure/{otp}', [App\Http\Controllers\PickupCustomerOtpController::class, 'showSecurePage'])->name('pickup.otp.secure.show')->middleware('auth');
+
+// 購入者がわの受取確認フォーム
+Route::get('/pickup/otp/login', [App\Http\Controllers\PickupCustomerOtpController::class, 'showLoginForm'])
+    ->name('pickup.otp.login.form');
+
+Route::post('/pickup/otp/login', [App\Http\Controllers\PickupCustomerOtpController::class, 'verifyOtp'])
+    ->name('pickup.otp.login.verify');
+
+
+Route::post('/pickup/item/{id}/receive', [App\Http\Controllers\PickupConfirmController::class, 'receiveItem'])->name('pickup.item.receive'); 
+
+// 受渡完了後の購入者へのメール
+Route::get('/pickup/confirm/{token}', [App\Http\Controllers\PickupConfirmController::class, 'showForm'])
+    ->name('pickup.confirm.form'); 
+
+Route::post('/pickup/confirm', [App\Http\Controllers\PickupConfirmController::class, 'submit'])
+    ->name('pickup.confirm.submit');    
+
+
+// 20251005 要否要確認　↓
+// Pick Up Reservation
+Route::post('/pickup/order/confirm', [App\Http\Controllers\PickupOrderController::class, 'confirm'])->name('pickup.order.confirm');
+
+Route::post('pickup/create-checkout-session', [App\Http\Controllers\PickupOrderController::class, 'createCheckoutSession'])->name('pickup.checkout.session');
+Route::get('pickup/checkout-success', [App\Http\Controllers\PickupOrderController::class, 'checkoutSuccess'])->name('pickup.checkout.success');
+Route::get('pickup/checkout-cancel', [App\Http\Controllers\PickupOrderController::class, 'checkoutCancel'])->name('pickup.checkout.cancel');
+// Stripe Webhook
+Route::post('pickup//stripe/webhook', [App\Http\Controllers\PickupOrderController::class, 'handleWebhook'])->name('pickup.stripe.webhook');
+
+Route::post('pickup/checkout/process', [App\Http\Controllers\PickupCheckoutController::class, 'process'])->name('pickup.checkout.process');
+Route::get('pickup/checkout/success', [App\Http\Controllers\PickupCheckoutController::class, 'success'])->name('pickup.checkout.success');
+
+
+// 20251005 要否要確認　↑
+
 
 Route::get('/account/{id}', [App\Http\Controllers\AccountController::class, 'index'])->name('account.account')->middleware('auth');
 
@@ -162,8 +270,6 @@ Route::post('/account_addresses/{id}', [App\Http\Controllers\AccountController::
 Route::post('/account_arrival/{id}', [App\Http\Controllers\AccountController::class, 'arrival'])->name('account.arrival')->middleware('auth');
 
 Route::post('/account/addresses/{id}', [App\Http\Controllers\AccountController::class, 'update'])->name('account.addresses.update')->middleware('auth');
-
-
 
 
 Route::get('/shop-prof', [App\Http\Controllers\ShopProfController::class, 'index'])->name('shop_prof');
@@ -209,7 +315,10 @@ Route::get('paypal/checkout-success/{order}', [App\Http\Controllers\PayPalContro
 Route::get('paypal/checkout-cancel', [App\Http\Controllers\PayPalController::class, 'cancelPage'])->name('paypal.cancel');
 
 
-Route::group(['prefix' => 'admin'], function () {
+Route::group([
+    'prefix' => 'admin',
+    // 'middleware' => ['auth', 'otp'],//これだけ追加
+    ], function () {
     Voyager::routes();
 
     Route::get('/order/pay/{suborder}', [App\Http\Controllers\SubOrderController::class, 'pay'])->name('order.pay');
@@ -223,10 +332,14 @@ Route::group(['prefix' => 'admin'], function () {
 
     Route::get('/pay-to-seller/{id}', [StripePayController::class, 'handle'])->name('admin.pay.to.seller'); 
 
+    Route::post('/shop/send-pickup-confirmation/{item}', [AuthController::class, 'sendPickupConfirmation'])->name('shop.sendPickupConfirmation');
+
 
 
 });
 
+
+// Seller
 Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', 'namespace' => 'App\Http\Controllers\Seller'], function () {
 
     Route::redirect('/','seller/orders');
@@ -250,7 +363,6 @@ Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', '
     Route::get('/sales-order-invoice-slip', 'OrdersController@slip')->name('order.sales_order_invoice_slip');
     Route::get('/sales-order-invoice-slip2', 'OrdersController@slip2')->name('order.sales_order_invoice_slip2');
     
-
 
     Route::get('/shop_charts', 'OrdersController@chartPage')->name('order.shop_charts');
 
@@ -292,11 +404,64 @@ Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', '
 
     Route::post('/shop_auction_orders/delivered/{auctionOrder}', 'AuctionOrderController@markDelivered')->name('auction.delivered');
 
+    Route::get('/pickup-slots', 'PickupSlotController@index')->name('pickup.slots.index');
+    Route::get('/pickup-slots/create', 'PickupSlotController@create')->name('pickup.slots.create');
+    Route::post('/pickup-slots', 'PickupSlotController@store')->name('pickup.slots.store');
+    Route::get('/pickup-slots/{pickupSlot}/edit', 'PickupSlotController@edit')->name('pickup.slots.edit');
+    Route::put('/pickup-slots/{pickupSlot}', 'PickupSlotController@update')->name('pickup.slots.update');
+    Route::delete('/pickup-slots/{pickupSlot}', 'PickupSlotController@destroy')->name('pickup.slots.destroy');
 
+    // 月単位自動生成
+    Route::post('/pickup-slots/generate/{product}', 'PickupSlotController@generateMonthlySlots')->name('pickup.slots.generate');
+
+    // 前月コピー
+    Route::post('/pickup-slots/copy-previous-month/{product}', 'PickupSlotController@copyPreviousMonth')->name('pickup.slots.copyPreviousMonth');
+    Route::post('/pickup-slots', 'PickupSlotController@store')->name('pickup.slots.store');
+
+    Route::get('pickup-locations/create', 'PickupLocationController@create')->name('pickuplocation.create');
+    Route::post('pickup-locations', 'PickupLocationController@store')->name('pickup.locations.store');
+    Route::get('/pickup-locations', 'PickupLocationController@index')->name('pickup.locations.index');
+
+    // Shop　Staff Register
+    Route::get('pickup./register', 'StaffRegisterController@create')->name('pickup.shop.register');
+    Route::post('pickup./register', 'StaffRegisterController@store')->name('pickup.shop.register.store');
+
+    // Pick Up Order seller dashboard
+    Route::get('/pickup_shop_orders', 'PickUpOrderController@index')->name('pickup.shop_pickup_orders');
+
+    // Pick Up Order seller dashboard CSV
+    Route::post('/pickup/csv', 'PickUpOrderController@exportCsv')->name('shop.pickup.csv');
+
+    // ▼ 毎日更新される QR コードページ
+    Route::get('/staff-qr', 'AdminQrController@show')->name('admin.staff.qr');
 
 });
 
 
+// Shop　Staff をQRでたどり着けるようにする
+Route::prefix('shop')->group(function () {
+    // 🔐 ログイン関連
+    Route::get('/shop_staff/login/{token}', [AuthController::class, 'showLoginForm'])->name('shop_staff.login');
+    Route::post('/shop_staff/login', [AuthController::class, 'login'])->name('shop.login.post');
+    Route::post('/shop_staff/logout', [AuthController::class, 'logout'])->name('shop_staff.logout');
+
+    // 🏠 ダッシュボード関連（認証必須）
+
+
+    // ダッシュボード（認証必須）shop.verifyOtp
+    Route::middleware('auth:shop_staff')->group(function () {
+        Route::get('/staff/dashboard', [AuthController::class, 'dashboard'])->name('shop.dashboard');
+
+        // OTP 検証（POST）
+        Route::post('/verify-otp', [AuthController::class, 'verifyOtpStaff'])->name('shop.verifyOtp');
+
+        // 受け渡し担当者記録
+        Route::post('/staff/order/{item}/person-in-charge', [AuthController::class, 'personInCharge'])
+            ->name('staff.order.person_in_charge');
+    });
+    
+    
+});
 
 
 Route::get('/dashboard', function () {

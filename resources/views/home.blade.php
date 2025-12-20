@@ -103,6 +103,10 @@
             </li>
 
             @endforeach
+            <li>
+                <a href="{{ route('pickup.catalog.index') }}">Products available for in-store pickup(店舗受取可能な商品)
+                </a>
+            </li>
         </ul>
 </div>
 
@@ -256,8 +260,8 @@
 
     <br><br><br> 
 
-    {{-- 免税事業者の商品 --}}
-    <h3>免税事業者の商品一覧</h3>
+    {{-- 非課税事業者の商品 --}}
+    <h3>非課税事業者の商品一覧</h3>
     <div class="row">
         @foreach ($discountedProducts->whereNull('shop.invoice_number') as $product)
             <div class="col-4">
@@ -304,25 +308,44 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 </script>
+
 <script>
-document.querySelectorAll('.price-box').forEach(function(box) {
-  box.addEventListener('mouseenter', function() {
-    const original = box.querySelector('.original-price');
-    const discount = box.querySelector('.discount-price');
+(() => {
+  const storedTheme = localStorage.getItem('theme')
 
-    original.style.textDecoration = 'line-through';
-    discount.style.display = 'inline';
-  });
+  const getPreferredTheme = () => {
+    if (storedTheme) {
+      return storedTheme
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  }
 
-  box.addEventListener('mouseleave', function() {
-    const original = box.querySelector('.original-price');
-    const discount = box.querySelector('.discount-price');
+  const setTheme = function (theme) {
+    if (theme === 'auto') {
+      document.documentElement.setAttribute(
+        'data-bs-theme',
+        window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      )
+    } else {
+      document.documentElement.setAttribute('data-bs-theme', theme)
+    }
+  }
 
-    original.style.textDecoration = 'none';
-    discount.style.display = 'none';
-  });
-});
+  setTheme(getPreferredTheme())
+
+  window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-bs-theme-value]')
+      .forEach(toggle => {
+        toggle.addEventListener('click', () => {
+          const theme = toggle.getAttribute('data-bs-theme-value')
+          localStorage.setItem('theme', theme)
+          setTheme(theme)
+        })
+      })
+  })
+})()
 </script>
+
 
 
 

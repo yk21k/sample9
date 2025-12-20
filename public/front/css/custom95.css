@@ -251,3 +251,33 @@
     }
 }
 
+/* ==========================
+   Eye-friendly Light Theme
+   ========================== */
+
+:root[data-bs-theme="light"],
+:root[data-bs-theme="auto"] {
+  --bs-body-bg: #99dfff;     /* 白を感じない薄いグレー */
+  --bs-body-color: #2b2b2b;
+  --bs-card-bg: #f0eee9;    /* 純白を避ける */
+  --bs-border-color: #cfcac2;
+}
+
+
+
+/* Laravel構造対策 */
+html,
+body,
+#app,
+main {
+  background-color: var(--bs-body-bg) !important;
+}
+
+.card {
+  background-color: var(--bs-card-bg) !important;
+}
+
+
+
+
+
