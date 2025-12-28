@@ -1,0 +1,96 @@
+/* ===== Layout ===== */
+.main-content {
+    margin-left: 280px;
+    padding: 2rem;
+    color: #0f172a;
+}
+
+/* ===== SideNav ===== */
+.sidenav {
+    width: 250px;
+    position: fixed;
+    top: 80px;
+    left: 10px;
+    background: #0f172a;
+    color: #e5e7eb;
+    border-radius: 12px;
+    padding: 1.2rem;
+}
+
+.sidenav-title {
+    color: #facc15;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.sidenav a {
+    color: #e5e7eb;
+    text-decoration: none;
+    display: block;
+    padding: 6px 8px;
+    border-radius: 6px;
+}
+
+.sidenav a:hover {
+    background: rgba(255,255,255,0.08);
+}
+
+.pickup-link a {
+    color: #fa374a;
+    font-weight: bold;
+}
+
+/* ===== Product ===== */
+.featured-product {
+    background: #020617;
+    border: 2px solid gold;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 40px;
+    color: #fa374a;
+}
+
+.product-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.product-card {
+    flex: 1;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.product-score {
+    font-weight: bold;
+    color: #2563eb;
+}
+
+/* ===== Video ===== */
+.video-wrapper {
+    position: relative;
+    margin-top: 16px;
+}
+
+.video-wrapper video {
+    width: 100%;
+    border-radius: 12px;
+}
+
+.video-overlay-button {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: rgba(255,255,255,0.9);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    display: none;
+}
+
+.video-wrapper:hover .video-overlay-button {
+    display: block;
+}

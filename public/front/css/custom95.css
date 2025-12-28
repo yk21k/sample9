@@ -257,7 +257,7 @@
 
 :root[data-bs-theme="light"],
 :root[data-bs-theme="auto"] {
-  --bs-body-bg: #99dfff;     /* 白を感じない薄いグレー */
+  --bs-body-bg: #738f9c;     /* 白を感じない薄いグレー */
   --bs-body-color: #2b2b2b;
   --bs-card-bg: #f0eee9;    /* 純白を避ける */
   --bs-border-color: #cfcac2;

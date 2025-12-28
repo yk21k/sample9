@@ -1,0 +1,37 @@
+/* BotMan 全体を最前面に */
+#botmanWidgetRoot {
+    z-index: 99999 !important;
+}
+
+/* 右下の丸いボタン（確実に捕まえる） */
+#botmanWidgetRoot button {
+    width: 72px !important;
+    height: 72px !important;
+    border-radius: 50% !important;
+
+    background-color: #2563eb !important;
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7) !important;
+
+    animation: botman-pulse 2s infinite !important;
+}
+
+.botman-attention {
+    animation: botman-pulse 2s infinite !important;
+}
+
+/* パルスアニメーション（強制） */
+@keyframes botmanPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(59,130,246, 0.6);
+  }
+  70% {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 20px rgba(59,130,246, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(59,130,246, 0);
+  }
+}
+

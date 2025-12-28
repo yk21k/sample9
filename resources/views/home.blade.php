@@ -5,6 +5,8 @@
 <!-- Side navigation -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <link href="https://vjs.zencdn.net/7.21.1/video-js.css" rel="stylesheet" />
+<link rel="stylesheet" href="{{ asset('front/css/custom96.css') }}">
+
 <script src="https://vjs.zencdn.net/7.21.1/video.min.js"></script>
 <style>
 
@@ -59,89 +61,104 @@
 
 </style>
 
-<div class="sidenav shadow-sm">
-    <div style="color: black;"><a><h3>Category Menu</h3></a></div>
-        <ul class="multilevel-dropdown-menu">
-            @foreach($categories as $category)
+{{-- ===== Side Navigation ===== --}}
+<aside class="sidenav shadow-sm">
+    <h3 class="sidenav-title">Category Menu</h3>
 
-            <li class="parent"><a href="{{ route('products.index', ['category_id' => $category->id]) }}">{{ $category->name }}</a>
-                @php 
+    <ul class="multilevel-dropdown-menu">
+        @foreach($categories as $category)
+            <li class="parent">
+                <a href="{{ route('products.index', ['category_id' => $category->id]) }}">
+                    {{ $category->name }}
+                </a>
 
+                @php
                     $children = TCG\Voyager\Models\Category::where('parent_id', $category->id)->get();
-
                 @endphp
-                @if($children->isNotEmpty())
-                    @foreach($children as $child)
-                    <ul class="child">
-                        <li class="parent"><a href="{{ route('products.index', ['category_id' => $child->id]) }}">{{ $child->name }} <span class="expand">»</span></a>
-                            @php 
-                                $grandChild = TCG\Voyager\Models\Category::where('parent_id', $child->id)->get();
-                            @endphp
-                            @if($grandChild->isNotEmpty())
-                                @foreach($grandChild as $c)
-                                <ul class="child">
-                                    <li class="parent"><a href="{{ route('products.index', ['category_id' => $c->id]) }}">{{ $c->name }}</a>
-                                        @php 
-                                            $greatGrandchild = TCG\Voyager\Models\Category::where('parent_id', $c->id)->get();
-                                        @endphp
-                                        @if($greatGrandchild->isNotEmpty())
 
-                                            @foreach($greatGrandchild as $ch)
-                                            <ul class="child">
-                                                <li class="parent"><a href="{{ route('products.index', ['category_id' => $ch->id]) }}">{{ $ch->name }}</a></li>
-                                            </ul>
-                                            @endforeach
-                                        @endif    
-                                    </li>    
-                                </ul>
-                                @endforeach
-                            @endif
-                        </li>
+                @if($children->isNotEmpty())
+                    <ul class="child">
+                        @foreach($children as $child)
+                            <li class="parent">
+                                <a href="{{ route('products.index', ['category_id' => $child->id]) }}">
+                                    {{ $child->name }} <span class="expand">»</span>
+                                </a>
+
+                                @php
+                                    $grandChild = TCG\Voyager\Models\Category::where('parent_id', $child->id)->get();
+                                @endphp
+
+                                @if($grandChild->isNotEmpty())
+                                    <ul class="child">
+                                        @foreach($grandChild as $c)
+                                            <li class="parent">
+                                                <a href="{{ route('products.index', ['category_id' => $c->id]) }}">
+                                                    {{ $c->name }}
+                                                </a>
+
+                                                @php
+                                                    $greatGrandchild = TCG\Voyager\Models\Category::where('parent_id', $c->id)->get();
+                                                @endphp
+
+                                                @if($greatGrandchild->isNotEmpty())
+                                                    <ul class="child">
+                                                        @foreach($greatGrandchild as $ch)
+                                                            <li>
+                                                                <a href="{{ route('products.index', ['category_id' => $ch->id]) }}">
+                                                                    {{ $ch->name }}
+                                                                </a>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @endif
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+                            </li>
+                        @endforeach
                     </ul>
-                    @endforeach
                 @endif
             </li>
+        @endforeach
 
-            @endforeach
-            <li>
-                <a href="{{ route('pickup.catalog.index') }}">Products available for in-store pickup(店舗受取可能な商品)
-                </a>
-            </li>
-        </ul>
-</div>
+        <li class="pickup-link">
+            <a href="{{ route('pickup.catalog.index') }}">
+                Products available for in-store pickup（店舗受取可能な商品）
+            </a>
+        </li>
+    </ul>
+</aside>
 
-<div class="container">        
+{{-- ===== Main Content ===== --}}
+<main class="container main-content">
+    <h2 class="page-title">Products test</h2>
 
-    <div class="row">
-
-        <h2>Products test</h2>
-        <br><br><br>
-        <div class="text-animation1">  
+    {{-- ===== Holiday Information ===== --}}
+    <section class="holiday-info">
+        <div class="text-animation1">
             @foreach($holidays as $holiday)
-                    <p>Holiday Store: {{ $holiday['shop_name'] }}</p>
-                &nbsp;&nbsp;&nbsp;           
+                <p>Holiday Store: {{ $holiday['shop_name'] }}</p>
             @endforeach
         </div>
-        @foreach($extra_holidays as $ex_holiday)
-            <div class="text-animation2"> 
-                @if($ex_holiday['date_flag'] === 2) 
-                
-                    <p>Stores Temporarily Closed :: {{ $ex_holiday['shop_name'] }}</p>
-                
-                @endif
-                </div> 
-                <div class="text-animation3">     
-                @if($ex_holiday['date_flag'] === 1)
-                    
-                    <p>📣📣📣　Temporary Store :: {{ $ex_holiday['shop_name'] }}　📣📣📣</p><br><br><br>
-                    
-                @endif 
-            </div>          
-        @endforeach
-        <br><br><br><br><br><br>   
-            
 
-        @php
+        @foreach($extra_holidays as $ex_holiday)
+            @if($ex_holiday['date_flag'] === 2)
+                <div class="text-animation2">
+                    <p>Stores Temporarily Closed :: {{ $ex_holiday['shop_name'] }}</p>
+                </div>
+            @endif
+
+            @if($ex_holiday['date_flag'] === 1)
+                <div class="text-animation3">
+                    <p>📣📣📣 Temporary Store :: {{ $ex_holiday['shop_name'] }} 📣📣📣</p>
+                </div>
+            @endif
+        @endforeach
+    </section>
+
+    {{-- ===== Product Ranking ===== --}}
+    @php
         $products = collect();
         foreach($norm_products_pres as $attr) {
             foreach($attr->fovo_dises as $n) {
@@ -154,129 +171,97 @@
         }
         $sorted = $products->sortByDesc('score')->values();
         $tax_rate = App\Models\TaxRate::current()?->rate;
+    @endphp
+
+    @foreach($sorted as $index => $item)
+        @php
+            $attr = $item['attr'];
+            $score = $item['score'];
+            $movies = $item['movie'];
         @endphp
 
-        @foreach($sorted as $index => $item)
-            @php
-                $attr = $item['attr'];
-                $score = $item['score'];
-                $movies = $item['movie'];
-            @endphp
+        {{-- ===== No.1 Product ===== --}}
+        @if($index === 0)
+            <section class="featured-product">
+                <h2>🏆 お薦め度（1位）</h2>
+                <p class="product-name">Name: {{ $attr->name }}</p>
+                <p class="product-price">
+                    Price: {{ floor(($attr->price+$attr->shipping_fee)*($tax_rate+1)) }}
+                </p>
+                <p class="product-score">Score: {{ $score }}</p>
 
-            @if($index === 0)
-            <!-- 🏆 1位（特別表示） -->
-            <div class="guaranteed-product" style="border: 2px solid gold; padding: 20px; margin-bottom: 30px; background: darkslategray;">
-                <h2>🏆 保証品（1位）</h2>
-                <p style="font-size: 1.2em;">Name: {{ $attr->name }}</p>
-                <p style="font-size: 1.2em;">Price: {{ floor(($attr->price+$attr->shipping_fee)*($tax_rate+1)) }}</p>
-                <p style="font-size: 1.2em;">Score: {{ $score }}</p>
-
-                @foreach ($movies as $movie)
-                    <div class="video-wrapper" data-product-id="{{ $attr->id }}" style="position: relative; display: inline-block; width: 100%; max-width: 800px; margin: 20px auto; /* 中央寄せ＋上下余白 */">
-
-                        <video class="my-video video-js" controls preload="auto" width="850" height="" data-setup="{}" muted style="max-height: 450px;">
+                @foreach($movies as $movie)
+                    <div class="video-wrapper" data-product-id="{{ $attr->id }}">
+                        <video class="my-video video-js" controls preload="auto" muted>
                             <source src="{{ asset('storage/'.$movie['download_link']) }}" type="video/mp4">
                         </video>
 
-                        <div class="overlay-btn video-overlay-button" style="
-                            position: absolute;
-                            top: 20px;
-                            right: 20px;
-                            z-index: 10;
-                            background: rgba(255,255,255,0.85);
-                            padding: 10px 12px;
-                            border-radius: 6px;
-                            font-weight: bold;
-                            cursor: pointer;
-                            display: none;
-                            font-size: 1em;
-                            color:black;">
-                            🔥 商品を見る　
+                        <div class="overlay-btn video-overlay-button">
+                            🔥 商品を見る
                         </div>
                     </div>
                 @endforeach
-            </div>
+            </section>
 
-            @else
-                @if($index % 2 === 1)
-                    <div class="product-row" style="display: flex; gap: 20px; margin-bottom: 30px;">
-                @endif
-                <div class="product" style="flex: 1; border: 1px solid #ccc; padding: 10px;">
-                    <p>Name: {{ $attr->name }}</p>
-                    <p>Price: {{ floor(($attr->price+$attr->shipping_fee)*($tax_rate+1)) }}</p>
-                    <p>Score: {{ $score }}</p>
-
-                    @foreach ($movies as $movie)
-                        <div class="video-wrapper" data-product-id="{{ $attr->id }}" style="position: relative; display: inline-block;">
-                            <video class="my-video video-js" controls preload="auto" width="640" height="360"data-setup="{}" muted>
-                                <source src="{{ asset('storage/'.$movie['download_link']) }}" type="video/mp4">
-                            </video>
-
-                            <div class="overlay-btn video-overlay-button" style="
-                                position: absolute;
-                                top: 20px;
-                                right: 20px;
-                                z-index: 10;
-                                background: rgba(255,255,255,0.85);
-                                padding: 8px 12px;
-                                border-radius: 6px;
-                                font-weight: bold;
-                                cursor: pointer;
-                                display: none;
-                                color: black;">
-                                🔥 商品を見る
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-
-                @if($index % 2 === 0 || $loop->last)
-                    </div>
-                @endif
+        {{-- ===== Other Products ===== --}}
+        @else
+            @if($index % 2 === 1)
+                <div class="product-row">
             @endif
-        @endforeach
 
+            <article class="product-card">
+                <p>Name: {{ $attr->name }}</p>
+                <p>Price: {{ floor(($attr->price+$attr->shipping_fee)*($tax_rate+1)) }}</p>
+                <p class="product-score">Score: {{ $score }}</p>
 
+                @foreach($movies as $movie)
+                    <div class="video-wrapper" data-product-id="{{ $attr->id }}">
+                        <video class="my-video video-js" controls muted>
+                            <source src="{{ asset('storage/'.$movie['download_link']) }}" type="video/mp4">
+                        </video>
 
-        <br><br><br>        
+                        <div class="overlay-btn video-overlay-button">
+                            🔥 商品を見る
+                        </div>
+                    </div>
+                @endforeach
+            </article>
 
+            @if($index % 2 === 0 || $loop->last)
+                </div>
+            @endif
+        @endif
+    @endforeach
 
-        
-    </div><br>
+    {{-- ===== Tax Sections ===== --}}
+    <section class="tax-products">
+        <h3>課税事業者の商品一覧</h3>
+        <div class="row">
+            @foreach ($discountedProducts->whereNotNull('shop.invoice_number') as $product)
+                <div class="col-4">
+                    @include('partials.product_card', [
+                        'product' => $product,
+                        'tax_rate' => $tax_rate,
+                        'product_attributes' => $product_attributes
+                    ])
+                </div>
+            @endforeach
+        </div>
 
-    {{-- 課税事業者の商品 --}}
-    <h3>課税事業者の商品一覧</h3>
-    <div class="row">
-        @foreach ($discountedProducts->whereNotNull('shop.invoice_number') as $product)
-            <div class="col-4">
-                @include('partials.product_card', [
-                    'product' => $product, 
-                    'tax_rate' => $tax_rate,
-                    'product_attributes' => $product_attributes
-                ])
-            </div>
-        @endforeach
-    </div>
-
-    <br><br><br> 
-
-    {{-- 非課税事業者の商品 --}}
-    <h3>非課税事業者の商品一覧</h3>
-    <div class="row">
-        @foreach ($discountedProducts->whereNull('shop.invoice_number') as $product)
-            <div class="col-4">
-                @include('partials.product_card', [
-                    'product' => $product, 
-                    'tax_rate' => 0,
-                    'product_attributes' => $product_attributes
-                ])
-            </div>
-        @endforeach
-    </div>
-
-    
-
-</div><br>
+        <h3>非課税事業者の商品一覧</h3>
+        <div class="row">
+            @foreach ($discountedProducts->whereNull('shop.invoice_number') as $product)
+                <div class="col-4">
+                    @include('partials.product_card', [
+                        'product' => $product,
+                        'tax_rate' => 0,
+                        'product_attributes' => $product_attributes
+                    ])
+                </div>
+            @endforeach
+        </div>
+    </section>
+</main>
     
 <script src="https://vjs.zencdn.net/7.21.1/video.min.js"></script>
 <script>
