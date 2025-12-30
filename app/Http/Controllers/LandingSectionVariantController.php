@@ -10,15 +10,22 @@ class LandingSectionVariantController extends Controller
 {
     public function firstSection(Request $request)
     {
-        $seller = LandingSectionVariant::active('seller')->first();
-        $buyer  = LandingSectionVariant::active('buyer')->first();
-
         $type = $request->cookie('entrance_type'); // seller / buyer
+
+        $seller = LandingSectionVariant::where('section_type', 'seller')
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->first();
+
+        $buyer = LandingSectionVariant::where('section_type', 'buyer')
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->first();
 
         return view('top.firstSection', [
             'publicType' => $type,
             'seller' => $seller,
-            'buyer' => $buyer,
+            'buyer'  => $buyer,
         ]);
     }
 

@@ -10,12 +10,10 @@
             <br><small>画面右上のdarkモードをお勧めします</small>
         </p>
     </div>
-    <h2 style="color:red">DEBUG: BEFORE SELLER</h2>
 
     <div class="row justify-content-center g-5">
         {{-- 出店者 --}}
         @if(isset($seller))
-        <h3 style="color:green">SELLER EXISTS</h3>
         <div class="col-md-5 seller-panel">
             <div class="card h-100 shadow-sm" style="background-color: {{ $seller->bg_color ?? '#0f172a' }}">
                 <div class="card-body text-center">
@@ -44,7 +42,6 @@
 
         {{-- 購入者 --}}
         @if(isset($buyer))
-        <h3 style="color:blue">BUYER EXISTS</h3>
         <div class="col-md-5 buyer-panel">
             <div class="card h-100 shadow-sm" style="background-color: {{ $buyer->bg_color ?? '#1e1b2e' }}">
                 <div class="card-body text-center">
