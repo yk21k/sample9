@@ -50,7 +50,7 @@
     border-radius: 16px;
     color: #fa374a;
     box-sizing: border-box;
-    overflow-x: hidden;            /* 横はみ出し最終防止 */
+    overflow: visible;            /* 横はみ出し最終防止 */
 }
 
 .product-row {
