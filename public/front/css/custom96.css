@@ -82,6 +82,7 @@
 
 /* ===== Video.js 本体 ===== */
 .video-js {
+    position: relative;        /* ★ これが無いと高さ 0 になる */
     width: 100%;
     max-width: 100%;
 }
@@ -117,6 +118,7 @@
 .video-wrapper:hover .video-overlay-button {
     display: block;
 }
+
 
 
 
