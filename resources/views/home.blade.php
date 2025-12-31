@@ -192,7 +192,7 @@
 
                 @foreach($movies as $movie)
                     <div class="video-wrapper" data-product-id="{{ $attr->id }}">
-                        <video id="video-{{ $loop->index }}"　class="video-js my-video" controls preload="auto" muted playsinline>
+                        <video id="video-{{ $loop->index }}" class="video-js my-video" controls preload="auto" muted playsinline>
                             <source src="{{ asset('storage/'.$movie['download_link']) }}" type="video/mp4">
                         </video>
 
