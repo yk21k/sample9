@@ -94,3 +94,47 @@
 .video-wrapper:hover .video-overlay-button {
     display: block;
 }
+
+/* セクション全体 */
+.featured-product {
+    max-width: 900px;        /* セクションの最大幅 */
+    margin: 0 auto 40px;     /* 中央寄せ */
+    padding: 20px;
+    background: #2f4f4f;
+    border-radius: 12px;
+    box-sizing: border-box;
+}
+
+/* 動画の外枠 */
+.featured-product .video-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;        /* はみ出し防止 */
+    margin: 20px auto;
+    border-radius: 10px;
+}
+
+/* video 本体 */
+.featured-product video {
+    width: 100% !important;  /* セクション幅に合わせる */
+    height: auto !important;
+    max-height: 480px;       /* 高さ制限 */
+    object-fit: contain;     /* 枠内に収める */
+    display: block;
+    border-radius: 10px;
+}
+
+/* オーバーレイボタン */
+.featured-product .video-overlay-button {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: rgba(255,255,255,0.9);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10;
+}
+
