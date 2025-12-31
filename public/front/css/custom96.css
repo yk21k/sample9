@@ -117,6 +117,52 @@
     display: block;
 }
 
+/* =========================
+   Mobile Responsive (追加)
+========================= */
+@media (max-width: 768px) {
+
+    /* ===== Layout ===== */
+    .main-content {
+        margin-left: 0;        /* サイドナビ分を解除 */
+        padding: 1rem;
+    }
+
+    /* ===== SideNav ===== */
+    .sidenav {
+        display: none;         /* スマホでは非表示 */
+    }
+
+    /* ===== Product ===== */
+    .featured-product {
+        max-width: 100%;
+        padding: 16px;
+        margin-bottom: 24px;
+    }
+
+    .product-row {
+        flex-direction: column; /* 2列 → 1列 */
+        gap: 16px;
+    }
+
+    .product-card {
+        padding: 12px;
+    }
+
+    /* ===== Video ===== */
+    .video-wrapper {
+        aspect-ratio: 16 / 9;  /* 念のため再指定 */
+        border-radius: 10px;
+    }
+
+    /* hover が効かない端末対策 */
+    .video-overlay-button {
+        display: block;
+        font-size: 0.9rem;
+        padding: 6px 10px;
+    }
+}
+
 
 
 
