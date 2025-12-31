@@ -280,7 +280,7 @@
     /* tax-products 内のカードを適正サイズに制限 */
     .tax-products .col-4 {
         width: 100% !important;
-        max-width: 420px;          /* ← これが核心 */
+        max-width: 360px;          /* ← これが核心 */
         margin-left: auto;
         margin-right: auto;
         flex: 0 0 auto !important;
