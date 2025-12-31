@@ -135,9 +135,11 @@
 
     /* ===== Product ===== */
     .featured-product {
+        width: 100%;
         max-width: 100%;
         padding: 16px;
         margin-bottom: 24px;
+        box-sizing: border-box; /* ← これが最重要 */
     }
 
     .product-row {
@@ -203,6 +205,13 @@
     }
 }
 
+@media (max-width: 768px) {
+
+    html, body {
+        overflow-x: hidden;
+    }
+
+}
 
 
 
