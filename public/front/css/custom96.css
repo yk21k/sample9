@@ -163,6 +163,40 @@
     }
 }
 
+/* =========================
+   Mobile Minimum Support
+========================= */
+@media (max-width: 768px) {
+
+    /* サイドナビを消す */
+    .sidenav {
+        display: none;
+    }
+
+    /* コンテンツを全幅に */
+    .main-content {
+        margin-left: 0;
+        padding: 1rem;
+    }
+
+    /* 商品を縦並びに */
+    .product-row {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    /* No.1 商品の余白調整 */
+    .featured-product {
+        max-width: 100%;
+        padding: 16px;
+    }
+
+    /* スマホは hover が無いので常に表示 */
+    .video-overlay-button {
+        display: block;
+    }
+}
+
 
 
 
