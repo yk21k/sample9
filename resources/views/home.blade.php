@@ -192,7 +192,7 @@
 
                 @foreach($movies as $movie)
                     <div class="video-wrapper" data-product-id="{{ $attr->id }}">
-                        <video class="my-video video-js" controls preload="auto" muted>
+                        <video class="video-js vjs-fluid my-video" controls preload="auto" muted>
                             <source src="{{ asset('storage/'.$movie['download_link']) }}" type="video/mp4">
                         </video>
 
@@ -216,7 +216,7 @@
 
                 @foreach($movies as $movie)
                     <div class="video-wrapper" data-product-id="{{ $attr->id }}">
-                        <video class="my-video video-js" controls muted>
+                        <video class="vjs-fluid my-video video-js" controls muted>
                             <source src="{{ asset('storage/'.$movie['download_link']) }}" type="video/mp4">
                         </video>
 

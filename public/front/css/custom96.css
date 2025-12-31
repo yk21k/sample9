@@ -42,12 +42,15 @@
 
 /* ===== Product ===== */
 .featured-product {
+    max-width: 900px;              /* セクション最大幅 */
+    margin: 0 auto 40px;           /* 中央寄せ */
+    padding: 24px;
     background: #020617;
     border: 2px solid gold;
     border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 40px;
     color: #fa374a;
+    box-sizing: border-box;
+    overflow-x: hidden;            /* 横はみ出し最終防止 */
 }
 
 .product-row {
@@ -69,17 +72,34 @@
     color: #2563eb;
 }
 
-/* ===== Video ===== */
+/* ===== Video Wrapper ===== */
 .video-wrapper {
     position: relative;
-    margin-top: 16px;
-}
-
-.video-wrapper video {
     width: 100%;
+    margin-top: 20px;
+    overflow: hidden;              /* ← はみ出し防止の要 */
     border-radius: 12px;
 }
 
+/* ===== Video.js / video 本体 ===== */
+.video-js,
+.video-wrapper video {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    display: block;
+}
+
+/* Video.js 内部実体 */
+.video-js .vjs-tech {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 480px;
+    object-fit: contain;
+    border-radius: 12px;
+}
+
+/* ===== Overlay Button ===== */
 .video-overlay-button {
     position: absolute;
     top: 16px;
@@ -88,6 +108,8 @@
     padding: 8px 12px;
     border-radius: 8px;
     font-weight: bold;
+    cursor: pointer;
+    z-index: 10;
     display: none;
 }
 
@@ -95,73 +117,6 @@
     display: block;
 }
 
-/* セクション全体 */
-.featured-product {
-    max-width: 900px;        /* セクションの最大幅 */
-    margin: 0 auto 40px;     /* 中央寄せ */
-    padding: 20px;
-    background: #2f4f4f;
-    border-radius: 12px;
-    box-sizing: border-box;
-}
 
-/* 動画の外枠 */
-.featured-product .video-wrapper {
-    position: relative;
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;        /* はみ出し防止 */
-    margin: 20px auto;
-    border-radius: 10px;
-}
-
-/* video 本体 */
-.featured-product video {
-    width: 100% !important;  /* セクション幅に合わせる */
-    height: auto !important;
-    max-height: 480px;       /* 高さ制限 */
-    object-fit: contain;     /* 枠内に収める */
-    display: block;
-    border-radius: 10px;
-}
-
-/* オーバーレイボタン */
-.featured-product .video-overlay-button {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    background: rgba(255,255,255,0.9);
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 10;
-}
-
-/* ===== Video.js 強制上書き ===== */
-.featured-product .video-js,
-.featured-product video {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: auto !important;
-}
-
-/* Video.js 内部ラッパー対策 */
-.featured-product .vjs-tech {
-    width: 100% !important;
-    height: auto !important;
-    max-height: 480px;
-    object-fit: contain;
-}
-
-/* wrapper を絶対に超えさせない */
-.featured-product .video-wrapper {
-    overflow: hidden;
-}
-
-/* セクション自体も安全装置 */
-.featured-product {
-    overflow-x: hidden;
-}
 
 
