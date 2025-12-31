@@ -290,9 +290,9 @@
 /* tax-products 内の商品画像を必ず枠内に収める */
 .tax-products img,
 .tax-products .card-img-top {
-    width: 100%;
+    width: 90%;
     height: auto;          /* ← 最重要 */
-    max-width: 100%;
+    max-width: 90%;
     object-fit: contain;  /* ← 見切れ防止 */
     display: block;
 }
