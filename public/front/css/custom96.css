@@ -163,6 +163,47 @@
     }
 }
 
+/* =========================
+   Mobile (<=480px)
+========================= */
+@media (max-width: 480px) {
+
+    /* 全体余白をさらに詰める */
+    .main-content {
+        padding: 0.75rem;
+    }
+
+    /* 見出しを小さく */
+    .page-title {
+        font-size: 1.2rem;
+    }
+
+    /* No.1 商品 */
+    .featured-product {
+        padding: 12px;
+        border-radius: 12px;
+    }
+
+    /* 商品カード */
+    .product-card {
+        padding: 10px;
+    }
+
+    /* 動画ボタン：指で押しやすく */
+    .video-overlay-button {
+        top: 8px;
+        right: 8px;
+        padding: 6px 10px;
+        font-size: 0.85rem;
+    }
+
+    /* サイドナビ完全無効（念押し） */
+    .sidenav {
+        display: none !important;
+    }
+}
+
+
 
 
 
