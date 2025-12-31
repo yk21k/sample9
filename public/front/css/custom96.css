@@ -77,7 +77,7 @@
 .video-wrapper {
     position: relative;
     width: 100%;
-    /*aspect-ratio: 16 / 9;   /* 高さはここで確定 */
+    aspect-ratio: 16 / 9;   
     overflow: hidden;
     border-radius: 12px;
 }
