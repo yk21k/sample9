@@ -264,13 +264,18 @@
     }
 }
 
-/* tax-products 内だけ Bootstrap の負マージンを殺す */
+/* tax-products 内だけ Bootstrap row/col を正規化 */
 .tax-products .row {
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: -15px;
+    margin-right: -15px;
 }
 
-/* 画像は必ずカード幅にフィット */
+.tax-products .col-4 {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* 画像はカード幅にフィット */
 .tax-products img,
 .tax-products .card-img-top {
     width: 100%;
@@ -286,6 +291,7 @@
         max-width: 100%;
     }
 }
+
 
 
 
