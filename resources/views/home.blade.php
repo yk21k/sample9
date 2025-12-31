@@ -264,40 +264,26 @@
 </main>
     
 
-
 <script src="https://vjs.zencdn.net/7.21.1/video.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.my-video').forEach(video => {
-        videojs(video, {
-            fluid: false,
-            responsive: false
-        });
-    });
-});
-
-</script>
-<script>
 document.addEventListener('DOMContentLoaded', function () {
-    const videoElements = document.querySelectorAll('.my-video');
-
-    videoElements.forEach((videoEl) => {
+    document.querySelectorAll('.my-video').forEach((videoEl) => {
         const wrapper = videoEl.closest('.video-wrapper');
         if (!wrapper) return;
 
         const overlayBtn = wrapper.querySelector('.overlay-btn');
         const productId = wrapper.dataset.productId;
 
-        /* ===== Video.js 初期化（重要）===== */
+        /* ===== Video.js 初期化（1回だけ）===== */
         const player = videojs(videoEl, {
-            fluid: true,            // ← Chrome / Safari 必須
-            aspectRatio: '16:9',    // ← 高さ安定
+            fluid: false,          // ← CSSで高さ管理するので false
+            responsive: false,
             controls: true,
             preload: 'metadata',
         });
 
-        player.ready(function () {
-            player.on('play', function () {
+        player.ready(() => {
+            player.on('play', () => {
                 setTimeout(() => {
                     if (overlayBtn) {
                         overlayBtn.style.display = 'block';
@@ -307,7 +293,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         if (overlayBtn) {
-            overlayBtn.addEventListener('click', function () {
+            overlayBtn.addEventListener('click', () => {
                 if (productId) {
                     window.location.href = `/product/${productId}`;
                 } else {
@@ -318,6 +304,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+
 
 
 
