@@ -200,20 +200,16 @@
       </ul>
     </div>    
 
-        <!-- header part -->
-            <div class="wrapper" >
-                @include('layouts.header')      
-            </div>
+    {{-- header --}}
+    @include('layouts.header')
 
-            <div class="wrapper" style="margin-left: 3%;">
-                <div class="wrapper" style=" margin-left: 250px;">
-                    @yield('content')
-                </div>
-            </div>    
-        <!-- footer part -->
-            <div class="wrapper" style="margin: 5%;">
-                @include('layouts.footer')
-            </div>
+    {{-- main --}}
+    <main class="main-content">
+        @yield('content')
+    </main>
+
+    {{-- footer --}}
+    @include('layouts.footer')
 
     <!--====== Noscript ======-->
     <style>
