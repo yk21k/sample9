@@ -298,6 +298,13 @@
     display: block;
 }
 
+.tax-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
 
 
 

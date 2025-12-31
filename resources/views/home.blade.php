@@ -245,32 +245,34 @@
     @endforeach
 
     {{-- ===== Tax Sections ===== --}}
-    <section class="tax-products featured-product">
-        <h3>課税事業者の商品一覧</h3>
-        <div class="row">
-            @foreach ($discountedProducts->whereNotNull('shop.invoice_number') as $product)
-                <div class="col-4">
-                    @include('partials.product_card', [
-                        'product' => $product,
-                        'tax_rate' => $tax_rate,
-                        'product_attributes' => $product_attributes
-                    ])
-                </div>
-            @endforeach
-        </div>
+    <section class="tax-products">
+        <div class="tax-inner">
+            <h3>課税事業者の商品一覧</h3>
+            <div class="row">
+                @foreach ($discountedProducts->whereNotNull('shop.invoice_number') as $product)
+                    <div class="col-4">
+                        @include('partials.product_card', [
+                            'product' => $product,
+                            'tax_rate' => $tax_rate,
+                            'product_attributes' => $product_attributes
+                        ])
+                    </div>
+                @endforeach
+            </div>
 
-        <h3>非課税事業者の商品一覧</h3>
-        <div class="row">
-            @foreach ($discountedProducts->whereNull('shop.invoice_number') as $product)
-                <div class="col-4">
-                    @include('partials.product_card', [
-                        'product' => $product,
-                        'tax_rate' => 0,
-                        'product_attributes' => $product_attributes
-                    ])
-                </div>
-            @endforeach
-        </div>
+            <h3>非課税事業者の商品一覧</h3>
+            <div class="row">
+                @foreach ($discountedProducts->whereNull('shop.invoice_number') as $product)
+                    <div class="col-4">
+                        @include('partials.product_card', [
+                            'product' => $product,
+                            'tax_rate' => 0,
+                            'product_attributes' => $product_attributes
+                        ])
+                    </div>
+                @endforeach
+            </div>
+        </div>    
     </section>
 </main>
     
