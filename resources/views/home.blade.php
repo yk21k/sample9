@@ -183,24 +183,35 @@
         {{-- ===== No.1 Product ===== --}}
         @if($index === 0)
             <section class="featured-product">
-                <h2>🏆 お薦め度（1位）</h2>
-                <p class="product-name">Name: {{ $attr->name }}</p>
-                <p class="product-price">
-                    Price: {{ floor(($attr->price+$attr->shipping_fee)*($tax_rate+1)) }}
-                </p>
-                <p class="product-score">Score: {{ $score }}</p>
+                <header class="featured-header">
+                    <h2>🏆 お薦め度（1位）</h2>
+                    <p class="product-name">Name: {{ $attr->name }}</p>
+                    <p class="product-price">
+                        Price: {{ floor(($attr->price+$attr->shipping_fee)*($tax_rate+1)) }}
+                    </p>
+                    <p class="product-score">Score: {{ $score }}</p>
+                </header>
 
-                @foreach($movies as $movie)
-                    <div class="video-wrapper" data-product-id="{{ $attr->id }}">
-                        <video id="video-{{ $loop->index }}" class="video-js my-video" controls preload="auto" muted playsinline>
-                            <source src="{{ asset('storage/'.$movie['download_link']) }}" type="video/mp4">
-                        </video>
+                <div class="featured-videos">
+                    @foreach($movies as $movie)
+                        <div class="video-container">
+                            <div class="video-wrapper" data-product-id="{{ $attr->id }}">
+                                <video id="video-{{ $loop->index }}"
+                                       class="video-js my-video"
+                                       controls
+                                       muted
+                                       playsinline
+                                       preload="metadata">
+                                    <source src="{{ asset('storage/'.$movie['download_link']) }}" type="video/mp4">
+                                </video>
 
-                        <div class="overlay-btn video-overlay-button">
-                            🔥 商品を見る
+                                <div class="overlay-btn video-overlay-button">
+                                    🔥 商品を見る
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
             </section>
 
         {{-- ===== Other Products ===== --}}
@@ -216,7 +227,7 @@
 
                 @foreach($movies as $movie)
                     <div class="video-wrapper" data-product-id="{{ $attr->id }}">
-                        <video class="my-video video-js" controls muted playsinline>
+                        <video class="video-js my-video" controls muted playsinline preload="metadata">
                             <source src="{{ asset('storage/'.$movie['download_link']) }}" type="video/mp4">
                         </video>
 

@@ -233,6 +233,12 @@
         padding-right: 0 !important;
     }
 
+    .video-container {
+        width: 100%;
+        max-width: 100%;
+        display: block;
+    }
+
     .featured-product {
         width: 100% !important;
         max-width: 100% !important;
