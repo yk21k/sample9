@@ -247,6 +247,18 @@
         box-sizing: border-box;
     }
 
+    /* Other Products を featured と同じ幅にする */
+    .product-card {
+        width: 100%;
+        max-width: 100%;
+        flex: none;              /* ← これが決定打 */
+        box-sizing: border-box;
+    }
+
+    .product-row {
+        display: block;          /* flex を完全解除 */
+    }
+
     html, body {
         overflow-x: hidden;
     }
