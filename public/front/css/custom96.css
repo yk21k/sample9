@@ -264,46 +264,29 @@
     }
 }
 
-/* tax-products 内だけ Bootstrap を上書き */
+/* tax-products 内だけ Bootstrap の負マージンを殺す */
 .tax-products .row {
     margin-left: 0;
     margin-right: 0;
 }
 
-.tax-products [class^="col-"] {
-    padding-left: 8px;
-    padding-right: 8px;
-}
-
-/* スマホでは1列表示 */
-@media (max-width: 768px) {
-    /* tax-products 内のカードを適正サイズに制限 */
-    .tax-products .col-4 {
-        width: 100% !important;
-        max-width: 300px;          /* ← これが核心 */
-        margin-left: auto;
-        margin-right: auto;
-        flex: 0 0 auto !important;
-    }
-}
-
-/* tax-products 内の商品画像を必ず枠内に収める */
+/* 画像は必ずカード幅にフィット */
 .tax-products img,
 .tax-products .card-img-top {
-    width: 90%;
-    height: auto;          /* ← 最重要 */
-    max-width: 90%;
-    padding: 3px;
-    object-fit: contain;  /* ← 見切れ防止 */
+    width: 100%;
+    height: auto;
+    object-fit: contain;
     display: block;
 }
 
-.tax-inner {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 24px;
-    box-sizing: border-box;
+/* スマホは1列 */
+@media (max-width: 768px) {
+    .tax-products .col-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
 }
+
 
 
 
