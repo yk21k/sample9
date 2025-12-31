@@ -138,3 +138,30 @@
     z-index: 10;
 }
 
+/* ===== Video.js 強制上書き ===== */
+.featured-product .video-js,
+.featured-product video {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* Video.js 内部ラッパー対策 */
+.featured-product .vjs-tech {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 480px;
+    object-fit: contain;
+}
+
+/* wrapper を絶対に超えさせない */
+.featured-product .video-wrapper {
+    overflow: hidden;
+}
+
+/* セクション自体も安全装置 */
+.featured-product {
+    overflow-x: hidden;
+}
+
+
