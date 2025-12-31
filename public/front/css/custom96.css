@@ -76,14 +76,15 @@
 .video-wrapper {
     position: relative;
     width: 100%;
-    aspect-ratio: 16 / 9;   /* 高さはここで確定 */
+    /*aspect-ratio: 16 / 9;   /* 高さはここで確定 */
     overflow: hidden;
     border-radius: 12px;
 }
 
 /* ===== Video.js 本体 ===== */
 .video-js {
-    position: absolute;
+    /*position: absolute;*/
+    position: relative;
     inset: 0;
     width: 100%;
     height: 100%;
@@ -153,7 +154,7 @@
 
     /* ===== Video ===== */
     .video-wrapper {
-        aspect-ratio: 16 / 9;  /* 念のため再指定 */
+        /*aspect-ratio: 16 / 9;  */
         border-radius: 10px;
     }
 
@@ -208,6 +209,7 @@
 @media (max-width: 768px) {
 
     html, body {
+        max-width: 100%;
         overflow-x: hidden;
     }
 
