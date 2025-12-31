@@ -76,14 +76,17 @@
 .video-wrapper {
     position: relative;
     width: 100%;
-    margin-top: 20px;
+    aspect-ratio: 16 / 9;   /* ← 最重要 */
+    overflow: hidden;
     border-radius: 12px;
 }
 
 /* ===== Video.js 本体 ===== */
 .video-js {
-    position: relative;        /* ★ これが無いと高さ 0 になる */
+    position: absolute; 
+    inset: 0;
     width: 100%;
+    height: 100%;      
     max-width: 100%;
 }
 
