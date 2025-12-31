@@ -245,7 +245,7 @@
     @endforeach
 
     {{-- ===== Tax Sections ===== --}}
-    <section class="tax-products">
+    <section class="tax-products featured-product">
         <h3>課税事業者の商品一覧</h3>
         <div class="row">
             @foreach ($discountedProducts->whereNotNull('shop.invoice_number') as $product)
