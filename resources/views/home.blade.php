@@ -192,7 +192,7 @@
 
                 @foreach($movies as $movie)
                     <div class="video-wrapper" data-product-id="{{ $attr->id }}">
-                        <video class="video-js vjs-fluid my-video" controls preload="auto" muted>
+                        <video class="video-js vjs-fluid my-video" controls preload="auto" muted playsinline data-setup="{}">
                             <source src="{{ asset('storage/'.$movie['download_link']) }}" type="video/mp4">
                         </video>
 
@@ -216,7 +216,7 @@
 
                 @foreach($movies as $movie)
                     <div class="video-wrapper" data-product-id="{{ $attr->id }}">
-                        <video class="vjs-fluid my-video video-js" controls muted>
+                        <video class="vjs-fluid my-video video-js" controls muted playsinline data-setup="{}">
                             <source src="{{ asset('storage/'.$movie['download_link']) }}" type="video/mp4">
                         </video>
 
@@ -263,74 +263,51 @@
     </section>
 </main>
     
+
+
 <script src="https://vjs.zencdn.net/7.21.1/video.min.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const videoElements = document.querySelectorAll('.my-video');
 
     videoElements.forEach((videoEl) => {
-        const player = videojs(videoEl);
         const wrapper = videoEl.closest('.video-wrapper');
+        if (!wrapper) return;
+
         const overlayBtn = wrapper.querySelector('.overlay-btn');
         const productId = wrapper.dataset.productId;
+
+        /* ===== Video.js 初期化（重要）===== */
+        const player = videojs(videoEl, {
+            fluid: true,            // ← Chrome / Safari 必須
+            aspectRatio: '16:9',    // ← 高さ安定
+            controls: true,
+            preload: 'metadata',
+        });
 
         player.ready(function () {
             player.on('play', function () {
                 setTimeout(() => {
-                    overlayBtn.style.display = 'block';
+                    if (overlayBtn) {
+                        overlayBtn.style.display = 'block';
+                    }
                 }, 1000);
             });
         });
 
-        overlayBtn.addEventListener('click', function () {
-            if (productId) {
-                window.location.href = `/product/${productId}`;
-            } else {
-                alert("商品IDが見つかりませんでした。");
-            }
-        });
+        if (overlayBtn) {
+            overlayBtn.addEventListener('click', function () {
+                if (productId) {
+                    window.location.href = `/product/${productId}`;
+                } else {
+                    alert("商品IDが見つかりませんでした。");
+                }
+            });
+        }
     });
 });
-
 </script>
-
-<script>
-(() => {
-  const storedTheme = localStorage.getItem('theme')
-
-  const getPreferredTheme = () => {
-    if (storedTheme) {
-      return storedTheme
-    }
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-  }
-
-  const setTheme = function (theme) {
-    if (theme === 'auto') {
-      document.documentElement.setAttribute(
-        'data-bs-theme',
-        window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-      )
-    } else {
-      document.documentElement.setAttribute('data-bs-theme', theme)
-    }
-  }
-
-  setTheme(getPreferredTheme())
-
-  window.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[data-bs-theme-value]')
-      .forEach(toggle => {
-        toggle.addEventListener('click', () => {
-          const theme = toggle.getAttribute('data-bs-theme-value')
-          localStorage.setItem('theme', theme)
-          setTheme(theme)
-        })
-      })
-  })
-})()
-</script>
-
 
 
 
