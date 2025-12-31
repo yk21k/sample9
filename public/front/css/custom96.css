@@ -213,6 +213,21 @@
         overflow-x: hidden;
     }
 
+    /* Bootstrap container の制限解除 */
+    .container {
+        max-width: 100%;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    /* main-content を header と同幅に */
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 0 12px; /* ← 少し余白が欲しければ */
+        box-sizing: border-box;
+    }
+
 }
 
 
