@@ -293,6 +293,7 @@
     width: 90%;
     height: auto;          /* ← 最重要 */
     max-width: 90%;
+    padding: 3px;
     object-fit: contain;  /* ← 見切れ防止 */
     display: block;
 }
