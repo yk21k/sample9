@@ -192,7 +192,7 @@
 
                 @foreach($movies as $movie)
                     <div class="video-wrapper" data-product-id="{{ $attr->id }}">
-                        <video class="video-js vjs-fluid my-video" controls preload="auto" muted playsinline data-setup="{}">
+                        <video class="video-js vjs-fluid my-video" controls preload="auto" muted playsinline>
                             <source src="{{ asset('storage/'.$movie['download_link']) }}" type="video/mp4">
                         </video>
 
@@ -216,7 +216,7 @@
 
                 @foreach($movies as $movie)
                     <div class="video-wrapper" data-product-id="{{ $attr->id }}">
-                        <video class="vjs-fluid my-video video-js" controls muted playsinline data-setup="{}">
+                        <video class="vjs-fluid my-video video-js" controls muted playsinline>
                             <source src="{{ asset('storage/'.$movie['download_link']) }}" type="video/mp4">
                         </video>
 
@@ -266,7 +266,16 @@
 
 
 <script src="https://vjs.zencdn.net/7.21.1/video.min.js"></script>
-
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.video-js').forEach(video => {
+        videojs(video, {
+            fluid: true,
+            responsive: true
+        });
+    });
+});
+</script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const videoElements = document.querySelectorAll('.my-video');
