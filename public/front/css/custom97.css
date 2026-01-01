@@ -21,3 +21,10 @@
         transform: scale(1.2); /* チェックボックスをタップしやすく */
     }
 }
+
+@media (max-width: 767px) {
+    .main-content {
+        padding-bottom: 200px; /* footer とキーボード用余裕 */
+    }
+}
+
