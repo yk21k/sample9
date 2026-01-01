@@ -49,7 +49,7 @@
     margin: 0;
 }
 
-.site-footer .footer-list li + li {
+.site-footer .footer-list li + li { 
     margin-top: 10px;
 }
 
