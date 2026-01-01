@@ -33,14 +33,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastScrollY = window.scrollY;
 
     window.addEventListener('scroll', () => {
-        const currentScrollY = window.scrollY;
+		const scrollBottom = window.scrollY + window.innerHeight;
 
-        // 下にスクロールした場合のみ表示
-        if (currentScrollY > 3600) { 
-            footer.classList.add('show');
-        } else {
-            footer.classList.remove('show');
-        }
+		if (scrollBottom >= document.body.scrollHeight - 100) {
+		    footer.classList.add('show');
+		} else {
+		    footer.classList.remove('show');
+		}
 
         lastScrollY = currentScrollY;
     }, { passive: true });
