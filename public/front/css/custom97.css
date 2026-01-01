@@ -76,9 +76,54 @@
     }
 }
 
-/* モバイルでは非表示 */
+/* モバイルではfooter非表示 */
 @media (max-width: 767px) {
     .site-footer {
         display: none !important;
     }
 }
+
+/* ===== モバイル用 (max-width: 767px) ===== */
+@media (max-width: 767px) {
+
+    /* カード全体に左右マージンを確保 */
+    .card {
+        margin-left: 8px;
+        margin-right: 8px;
+    }
+
+    /* カード内パディング調整 */
+    .card-body {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    /* 入力欄 */
+    .card-body input.form-control,
+    .card-body textarea.form-control {
+        width: 100%;          /* カード内に収める */
+        max-width: 100%;      /* はみ出さない */
+        box-sizing: border-box; /* padding込みで幅計算 */
+        padding: 0.5rem 0.75rem; /* タップしやすい */
+        font-size: 16px;      /* モバイル向け */
+    }
+
+    /* チェックボックス */
+    .form-check-input {
+        transform: scale(1.2);
+    }
+
+    /* ボタン */
+    .d-grid button.btn {
+        width: 100%;         /* カード内に収める */
+        max-width: 100%;
+        padding: 0.5rem 0;   /* タップしやすく */
+        font-size: 16px;     /* モバイル向け */
+    }
+
+    /* footer 非表示 */
+    .site-footer {
+        display: none !important;
+    }
+}
+
