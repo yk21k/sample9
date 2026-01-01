@@ -69,18 +69,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const footer = document.querySelector('.site-footer');
     if (!footer) return;
 
-    // 初期で footer 表示
+    // 初期で表示
     footer.classList.add('show');
 
-    // 入力フォーカス中は非表示
+    // 入力フォーカスで非表示
     document.querySelectorAll('.card-body input, .card-body textarea').forEach(input => {
-        input.addEventListener('focus', () => {
-            footer.classList.remove('show');
-        });
-        input.addEventListener('blur', () => {
-            footer.classList.add('show');
-        });
+        input.addEventListener('focus', () => footer.classList.remove('show'));
+        input.addEventListener('blur', () => footer.classList.add('show'));
     });
 });
+
 </script>
 @endsection
