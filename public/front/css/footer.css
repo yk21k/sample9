@@ -1,33 +1,44 @@
-/* =========================
-   Footer (Mobile First)
-   ========================= */
+/* ===== safety ===== */
+.site-footer,
+.site-footer * {
+    box-sizing: border-box;
+}
 
+/* ===== base ===== */
 .site-footer {
     background-color: #111;
     color: #eee;
     padding: 24px 16px;
     font-size: 14px;
+
+    /* 横はみ出し防止（最重要） */
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
-/* inner layout */
+/* ===== inner ===== */
 .site-footer .footer-inner {
     display: flex;
     flex-direction: column;
     gap: 24px;
+
+    /* PCでも画面内に収める */
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-/* section */
+/* ===== section ===== */
 .site-footer .footer-section {
     width: 100%;
 }
 
+/* text */
 .site-footer .footer-title {
     font-size: 15px;
     font-weight: 600;
     margin-bottom: 12px;
 }
 
-/* list */
 .site-footer .footer-list {
     list-style: none;
     padding: 0;
@@ -43,13 +54,13 @@
     padding: 6px 0;
     color: #ccc;
     text-decoration: none;
+
+    /* 長文リンク対策（超重要） */
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
-.site-footer .footer-list a:hover {
-    color: #fff;
-}
-
-/* bottom */
+/* ===== bottom ===== */
 .site-footer .footer-bottom {
     margin-top: 32px;
     text-align: center;
@@ -57,17 +68,15 @@
     font-size: 12px;
 }
 
-/* =========================
-   Tablet / PC
-   ========================= */
+/* ===== PC ===== */
 @media (min-width: 768px) {
     .site-footer .footer-inner {
         flex-direction: row;
-        justify-content: space-between;
+        gap: 32px;
     }
 
     .site-footer .footer-section {
-        width: auto;          /* ← 削除 or auto */
-        flex: 1;              /* ← 均等割り */
+        flex: 1;
+        min-width: 0; /* ← これがないと切れる */
     }
 }
