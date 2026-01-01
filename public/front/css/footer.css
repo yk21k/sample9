@@ -6,14 +6,19 @@
 
 /* ===== base ===== */
 .site-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+
+    width: 100%;
     background-color: #111;
     color: #eee;
     padding: 24px 16px;
     font-size: 14px;
 
-    /* 横はみ出し防止（最重要） */
-    max-width: 100%;
-    overflow-x: hidden;
+    /* footer は切らない */
+    overflow: visible;
+    z-index: 1000;
 }
 
 /* ===== inner ===== */
@@ -22,7 +27,6 @@
     flex-direction: column;
     gap: 24px;
 
-    /* PCでも画面内に収める */
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -55,14 +59,13 @@
     color: #ccc;
     text-decoration: none;
 
-    /* 長文リンク対策（超重要） */
     word-break: break-word;
     overflow-wrap: anywhere;
 }
 
 /* ===== bottom ===== */
 .site-footer .footer-bottom {
-    margin-top: 32px;
+    margin-top: 24px;
     text-align: center;
     color: #888;
     font-size: 12px;
@@ -70,31 +73,13 @@
 
 /* ===== PC ===== */
 @media (min-width: 768px) {
-
-    .footer-sync {
-        height: 100%;
-        overflow: hidden; /* ここは hidden */
-    }
-
-    .footer-inner {
-        display: flex;
-        gap: 32px;
-
-        min-width: 1400px; /* PC横スクロール前提 */
-    }
-
-    /* 横に広がる中身 */
     .site-footer .footer-inner {
-        display: flex;
         flex-direction: row;
         gap: 32px;
-        min-width: 1200px; /* ← 横スクロール前提 */
     }
 
-    /* 子要素 */
     .site-footer .footer-section {
-        flex: 0 0 auto;   /* ← 均等割りしない */
-        min-width: 300px; /* ← 各カラム幅 */
+        flex: 1;
+        min-width: 0;
     }
 }
-
