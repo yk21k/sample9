@@ -61,7 +61,7 @@
         </div>
     </div>
 </div>
-
+@include('layouts.footer') 
 <script>
     
     const footer = document.querySelector('.site-footer');
