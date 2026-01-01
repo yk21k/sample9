@@ -7,3 +7,17 @@
         width: auto; /* PCではボタン幅を内容に合わせる */
     }
 }
+
+/* モバイル（スマホ）用 */
+@media (max-width: 767px) {
+    .card-body input.form-control {
+        width: 100%;
+        max-width: 100%; /* 画面幅を超えない */
+        box-sizing: border-box; /* padding込みで幅を計算 */
+        padding: 0.5rem 0.75rem; /* 適度な余白 */
+    }
+
+    .card-body .form-check-input {
+        transform: scale(1.2); /* チェックボックスをタップしやすく */
+    }
+}
