@@ -76,17 +76,9 @@
     }
 }
 
-/* ===== モバイル入力改善 ===== */
+/* モバイルでは非表示 */
 @media (max-width: 767px) {
-    .card-body input.form-control,
-    .card-body textarea.form-control {
-        width: 100%;
-        max-width: 100%;
-        box-sizing: border-box;
-        padding: 0.5rem 0.75rem;
-    }
-
-    .form-check-input {
-        transform: scale(1.2);
+    .site-footer {
+        display: none !important;
     }
 }
