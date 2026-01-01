@@ -71,10 +71,16 @@
 /* ===== PC ===== */
 @media (min-width: 768px) {
 
-    /* 横スクロール担当 */
-    .site-footer .footer-scroll {
-        overflow-x: auto;
-        overflow-y: hidden;
+    .footer-sync {
+        height: 100%;
+        overflow: hidden; /* ここは hidden */
+    }
+
+    .footer-inner {
+        display: flex;
+        gap: 32px;
+
+        min-width: 1400px; /* PC横スクロール前提 */
     }
 
     /* 横に広がる中身 */

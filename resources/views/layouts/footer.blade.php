@@ -3,7 +3,7 @@
 
 
 <footer class="site-footer">
-	<div class="footer-scroll">
+	<div class="footer-sync">
 	    <div class="footer-inner">
 
 	        <section class="footer-section">
@@ -43,4 +43,15 @@
 	    </div>
 	</div>    
 </footer>
+
+<script>
+document.addEventListener('scroll', () => {
+    const footerInner = document.querySelector('.footer-inner');
+    if (!footerInner) return;
+
+    footerInner.style.transform =
+        `translateX(${-window.scrollX}px)`;
+}, { passive: true });
+</script>
+
 
