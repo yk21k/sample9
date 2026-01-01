@@ -1,0 +1,72 @@
+/* =========================
+   Footer (Mobile First)
+   ========================= */
+
+.site-footer {
+    background-color: #111;
+    color: #eee;
+    padding: 24px 16px;
+    font-size: 14px;
+}
+
+/* inner layout */
+.site-footer .footer-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* section */
+.site-footer .footer-section {
+    width: 100%;
+}
+
+.site-footer .footer-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+/* list */
+.site-footer .footer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.site-footer .footer-list li + li {
+    margin-top: 10px;
+}
+
+.site-footer .footer-list a {
+    display: block;
+    padding: 6px 0;
+    color: #ccc;
+    text-decoration: none;
+}
+
+.site-footer .footer-list a:hover {
+    color: #fff;
+}
+
+/* bottom */
+.site-footer .footer-bottom {
+    margin-top: 32px;
+    text-align: center;
+    color: #888;
+    font-size: 12px;
+}
+
+/* =========================
+   Tablet / PC
+   ========================= */
+@media (min-width: 768px) {
+    .site-footer .footer-inner {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .site-footer .footer-section {
+        width: 30%;
+    }
+}

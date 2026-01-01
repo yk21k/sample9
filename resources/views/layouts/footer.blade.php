@@ -1,25 +1,44 @@
-<div class="footer">
-</div>
+{{-- footer css --}}
+<link rel="stylesheet" href="{{ asset('front/css/footer.css') }}">
 
-<div class="container" style="margin-left: 300";>
-	<h2> Footer Part </h2>
-	
-	<!-- Operator -->
 
-	<h3> Company Profile </h3>
-	<h3> Contact Us </h3>
+<footer class="site-footer">
+    <div class="footer-inner">
 
-	<!-- Shop person in charge -->
+        <section class="footer-section">
+            <h4 class="footer-title">運営者情報</h4>
+            <ul class="footer-list">
+                <li><a href="{{ url('/company-profile') }}">Company Profile</a></li>
+                <li><a href="{{ url('/contact') }}">Contact Us</a></li>
+            </ul>
+        </section>
 
-	<h3> Product Seller </h3>
-	<h3><a href="{{ url('/shop-prof') }}"> Company Profile (Product Seller)　</h3>
-	<h3><a href="{{ url('/privacy-policy') }}">Privacy policy　</a></h3>
-	<h3><a href="{{ url('/personal-information') }}">Personal information </a></h3>
-	<h3><a href="{{ url('/terms-of-service') }}">Terms of Service</a></h3>
-	<h3><a href="{{ url('/listing_terms') }}">Listing terms</a></h3>
-	<h3><a href="https://www.recall.caa.go.jp/" target="_blank">消費者庁リコール情報サイト</a></h3>
+        <section class="footer-section">
+            <h4 class="footer-title">出店者向け</h4>
+            <ul class="footer-list">
+                <li><a href="{{ url('/shop-prof') }}">Company Profile (Product Seller)</a></li>
+                <li><a href="{{ url('/listing_terms') }}">Listing terms</a></li>
+            </ul>
+        </section>
 
-	<h3> Management policy, mechanism, listing terms</h3>
-	<h3> Management policy, mechanism, listing terms</h3>
+        <section class="footer-section">
+            <h4 class="footer-title">規約・ポリシー</h4>
+            <ul class="footer-list">
+                <li><a href="{{ url('/privacy-policy') }}">Privacy Policy</a></li>
+                <li><a href="{{ url('/personal-information') }}">Personal Information</a></li>
+                <li><a href="{{ url('/terms-of-service') }}">Terms of Service</a></li>
+                <li>
+                    <a href="https://www.recall.caa.go.jp/" target="_blank" rel="noopener">
+                        消費者庁リコール情報
+                    </a>
+                </li>
+            </ul>
+        </section>
 
-</div>
+    </div>
+
+    <div class="footer-bottom">
+        <small>© {{ date('Y') }} Your Mall Name</small>
+    </div>
+</footer>
+
