@@ -1,39 +1,92 @@
+/* ===== main 余白 ===== */
+.main-content {
+    padding-bottom: 180px; /* footer + モバイル余裕 */
+}
+
+/* ===== footer 基本 ===== */
 .site-footer {
-    transform: translateY(0); /* 初期表示する場合 */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #111;
+    color: #eee;
+    padding: 20px 16px;
+    font-size: 14px;
+    transform: translateY(0);
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000;
 }
 
 .site-footer.show {
-    transform: translateY(0); /* ここは必ず表示位置 */
+    transform: translateY(0);
 }
 
+.site-footer .footer-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
 
+.site-footer .footer-section {
+    width: 100%;
+}
+
+.site-footer .footer-title {
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.site-footer .footer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.site-footer .footer-list li + li {
+    margin-top: 8px;
+}
+
+.site-footer .footer-list a {
+    color: #ccc;
+    text-decoration: none;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.site-footer .footer-bottom {
+    margin-top: 20px;
+    text-align: center;
+    color: #888;
+    font-size: 12px;
+}
+
+/* ===== PC ===== */
 @media (min-width: 768px) {
-    .card {
-        padding: 2rem; /* PCでは少し余白を広く */
+    .site-footer .footer-inner {
+        flex-direction: row;
+        gap: 32px;
     }
 
-    .btn-lg {
-        width: auto; /* PCではボタン幅を内容に合わせる */
+    .site-footer .footer-section {
+        flex: 1;
+        min-width: 0;
     }
 }
 
-/* モバイル（スマホ）用 */
+/* ===== モバイル入力改善 ===== */
 @media (max-width: 767px) {
-    .card-body input.form-control {
+    .card-body input.form-control,
+    .card-body textarea.form-control {
         width: 100%;
-        max-width: 100%; /* 画面幅を超えない */
-        box-sizing: border-box; /* padding込みで幅を計算 */
-        padding: 0.5rem 0.75rem; /* 適度な余白 */
+        max-width: 100%;
+        box-sizing: border-box;
+        padding: 0.5rem 0.75rem;
     }
 
-    .card-body .form-check-input {
-        transform: scale(1.2); /* チェックボックスをタップしやすく */
-    }
-}
-
-@media (max-width: 767px) {
-    .main-content {
-        padding-bottom: 200px; /* footer とキーボード用余裕 */
+    .form-check-input {
+        transform: scale(1.2);
     }
 }
-

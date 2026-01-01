@@ -4,9 +4,9 @@
 <link rel="stylesheet" href="{{ asset('front/css/custom97.css') }}">
 
 <div class="wrapper">
-    <div class="container px-3 py-4">
+    <div class="container px-3 py-4 main-content">
         <div class="row justify-content-center">
-            <div class="col-12 col-md-8"> <!-- col-12: スマホ全幅 -->
+            <div class="col-12 col-md-8"> <!-- スマホ全幅、PCは中央8割 -->
                 <div class="card shadow-sm">
                     <div class="card-header text-center fw-bold">{{ __('Login') }}</div>
 
@@ -61,23 +61,26 @@
         </div>
     </div>
 </div>
-@include('layouts.footer') 
-<script>
-    
-    document.addEventListener('DOMContentLoaded', () => {
-        const footer = document.querySelector('.site-footer');
-        if (!footer) return; // footer が存在しない場合はスキップ
 
-        document.querySelectorAll('.card-body input, .card-body textarea').forEach(input => {
-            input.addEventListener('focus', () => {
-                footer.classList.remove('show'); // 一時的に非表示
-            });
-            input.addEventListener('blur', () => {
-                footer.classList.add('show'); // フォーカス外れたら再表示
-            });
+@include('layouts.footer') <!-- footer を必ず追加 -->
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const footer = document.querySelector('.site-footer');
+    if (!footer) return;
+
+    // 初期で footer 表示
+    footer.classList.add('show');
+
+    // 入力フォーカス中は非表示
+    document.querySelectorAll('.card-body input, .card-body textarea').forEach(input => {
+        input.addEventListener('focus', () => {
+            footer.classList.remove('show');
+        });
+        input.addEventListener('blur', () => {
+            footer.classList.add('show');
         });
     });
-
-   
+});
 </script>
 @endsection
