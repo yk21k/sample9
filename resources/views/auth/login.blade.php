@@ -5,7 +5,7 @@
 
 <div class="wrapper">
     <div class="container px-3 py-4 main-content">
-        <div class="row justify-content-center">
+        <div class="row justify-content-center no-gutters">
             <div class="col-12 col-md-8"> <!-- スマホ全幅、PCは中央8割 -->
                 <div class="card shadow-sm">
                     <div class="card-header text-center fw-bold">{{ __('Login') }}</div>
