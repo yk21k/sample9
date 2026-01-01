@@ -67,6 +67,7 @@
     }
 
     .site-footer .footer-section {
-        width: 30%;
+        width: auto;          /* ← 削除 or auto */
+        flex: 1;              /* ← 均等割り */
     }
 }
