@@ -2,6 +2,8 @@
     display: inline-flex;
     height: 100px;
     width: 100%;
+    max-width: 100%;/*追加*/
+    
     line-height: 100px;
     position: absolute;
     top: 50px;

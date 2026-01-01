@@ -70,13 +70,25 @@
 
 /* ===== PC ===== */
 @media (min-width: 768px) {
-    .site-footer .footer-inner {
-        flex-direction: row;
-        gap: 32px;
+
+    /* 横スクロール担当 */
+    .site-footer .footer-scroll {
+        overflow-x: auto;
+        overflow-y: hidden;
     }
 
+    /* 横に広がる中身 */
+    .site-footer .footer-inner {
+        display: flex;
+        flex-direction: row;
+        gap: 32px;
+        min-width: 1200px; /* ← 横スクロール前提 */
+    }
+
+    /* 子要素 */
     .site-footer .footer-section {
-        flex: 1;
-        min-width: 0; /* ← これがないと切れる */
+        flex: 0 0 auto;   /* ← 均等割りしない */
+        min-width: 300px; /* ← 各カラム幅 */
     }
 }
+
