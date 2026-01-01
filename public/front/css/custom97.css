@@ -1,0 +1,9 @@
+@media (min-width: 768px) {
+    .card {
+        padding: 2rem; /* PCでは少し余白を広く */
+    }
+
+    .btn-lg {
+        width: auto; /* PCではボタン幅を内容に合わせる */
+    }
+}

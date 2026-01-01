@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
+<link rel="stylesheet" href="{{ asset('front/css/custom97.css') }}">
+
 <div class="wrapper">
     <div class="container px-3 py-4">
         <div class="row justify-content-center">
