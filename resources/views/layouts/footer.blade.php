@@ -27,7 +27,6 @@
     </div>
 </footer>
 
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const footer = document.querySelector('.site-footer');
@@ -37,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentScrollY = window.scrollY;
 
         // 下にスクロールした場合のみ表示
-        if (currentScrollY > 300) { 
+        if (currentScrollY > 900) { 
             footer.classList.add('show');
         } else {
             footer.classList.remove('show');
