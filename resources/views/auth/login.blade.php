@@ -64,15 +64,20 @@
 @include('layouts.footer') 
 <script>
     
-    const footer = document.querySelector('.site-footer');
-    document.querySelectorAll('.card-body input, .card-body textarea').forEach(input => {
-        input.addEventListener('focus', () => {
-            footer.classList.remove('show'); // 一時的に非表示
-        });
-        input.addEventListener('blur', () => {
-            footer.classList.add('show'); // フォーカス外れたら再表示
+    document.addEventListener('DOMContentLoaded', () => {
+        const footer = document.querySelector('.site-footer');
+        if (!footer) return; // footer が存在しない場合はスキップ
+
+        document.querySelectorAll('.card-body input, .card-body textarea').forEach(input => {
+            input.addEventListener('focus', () => {
+                footer.classList.remove('show'); // 一時的に非表示
+            });
+            input.addEventListener('blur', () => {
+                footer.classList.add('show'); // フォーカス外れたら再表示
+            });
         });
     });
+
    
 </script>
 @endsection
