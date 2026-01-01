@@ -16,9 +16,15 @@
     padding: 24px 16px;
     font-size: 14px;
 
-    /* footer は切らない */
-    overflow: visible;
+    /* 初期は画面下に隠す */
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
     z-index: 1000;
+}
+
+/* 表示状態用 */
+.site-footer.show {
+    transform: translateY(0);
 }
 
 /* ===== inner ===== */
@@ -49,7 +55,7 @@
     margin: 0;
 }
 
-.site-footer .footer-list li + li { 
+.site-footer .footer-list li + li {
     margin-top: 10px;
 }
 
@@ -58,7 +64,6 @@
     padding: 6px 0;
     color: #ccc;
     text-decoration: none;
-
     word-break: break-word;
     overflow-wrap: anywhere;
 }
@@ -82,4 +87,9 @@
         flex: 1;
         min-width: 0;
     }
+}
+
+/* ===== main余白 ===== */
+.main-content {
+    padding-bottom: 150px; /* footer高さ＋余裕 */
 }
