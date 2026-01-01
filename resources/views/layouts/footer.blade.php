@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentScrollY = window.scrollY;
 
         // 下にスクロールした場合のみ表示
-        if (currentScrollY > 900) { 
+        if (currentScrollY > 3600) { 
             footer.classList.add('show');
         } else {
             footer.classList.remove('show');
