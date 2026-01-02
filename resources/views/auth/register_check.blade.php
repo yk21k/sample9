@@ -40,6 +40,33 @@
                             </div>
                         </div>
 
+                        {{-- 同意チェック --}}
+                        <div class="mb-4">
+
+                            <div class="form-check mb-2">
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    id="agree_usage"
+                                    name="agree_usage"
+                                    required
+                                >
+                                <label class="form-check-label" for="agree_usage">
+                                    登録したメールアドレスおよび電話番号の利用目的について確認しました
+                                </label>
+                            </div>
+
+                            <div class="small text-muted ms-4">
+                                <ul class="mb-0 ps-3">
+                                    <li>メールアドレスは、本人確認・重要なお知らせ・パスワード再設定に利用されます</li>
+                                    <li>電話番号は、本人確認および緊急時の連絡のために利用されます</li>
+                                    <li>本人の同意なく第三者に提供することはありません</li>
+                                </ul>
+                            </div>
+
+                        </div>
+
+
                         <div class="form-group row mb-0">
                             <div class="col-md-6 offset-md-4">
                                 <button type="submit" class="btn btn-primary" id="submit-button">

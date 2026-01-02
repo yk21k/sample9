@@ -68,6 +68,7 @@
     <ul class="multilevel-dropdown-menu">
         @foreach($categories as $category)
             <li class="parent">
+
                 <a href="{{ route('products.index', ['category_id' => $category->id]) }}">
                     {{ $category->name }}
                 </a>
@@ -132,7 +133,9 @@
 
 {{-- ===== Main Content ===== --}}
 <main class="container main-content">
-    <h2 class="page-title">Products test</h2>
+    <h2 style="color: red;" class="page-title">Products test</h2>
+
+    <a href="{{ route('entrance') }}"><h4>案内板へ戻る</h4></a>
 
     {{-- ===== Holiday Information ===== --}}
     <section class="holiday-info">

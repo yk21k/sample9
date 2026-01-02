@@ -80,6 +80,20 @@ class RegisterController extends Controller
                 Rule::unique('users')->whereNull('deleted_at'),
             ],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+        
+            // ▼ 追加：同意チェック（ここだけ足す）
+            'agreements' => ['required', 'array'],
+
+            'agreements.email_usage' => ['required', 'accepted'],
+            'agreements.email_validity' => ['required', 'accepted'],
+            'agreements.phone_usage' => ['required', 'accepted'],
+            'agreements.phone_validity' => ['required', 'accepted'],
+            'agreements.third_party' => ['required', 'accepted'],
+
+        ], [
+            // エラーメッセージ（任意だが推奨）
+            'agreements.required' => 'すべての確認事項に同意してください。',
+            'agreements.*.accepted' => 'すべての利用目的に同意する必要があります。',
         ]);
     }
 
