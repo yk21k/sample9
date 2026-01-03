@@ -1,0 +1,71 @@
+/*shops*******overview.blade*/
+/* ===== base ===== */
+
+/* モバイルではfooter非表示 */
+@media (max-width: 767px) {
+    .site-footer {
+        display: none !important;
+    }
+}
+
+.shop-profile {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #333;
+}
+
+/* title */
+.shop-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+/* info block */
+.shop-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* row */
+.info-row {
+    background: #f8f9fa;
+    padding: 12px 14px;
+    border-radius: 8px;
+}
+
+/* label */
+.info-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+/* value */
+.info-value {
+    font-size: 1rem;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* button */
+.btn-primary {
+    font-size: 1rem;
+    padding: 12px;
+}
+
+/* ===== PC ===== */
+@media (min-width: 768px) {
+
+    .shop-profile {
+        max-width: 800px;
+    }
+
+    .shop-title {
+        font-size: 1.8rem;
+    }
+
+    .info-row {
+        padding: 16px 20px;
+    }
+}

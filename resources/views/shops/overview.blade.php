@@ -1,77 +1,49 @@
 @extends('layouts.app')
 
 @section('content')
-<head>
-    <title>Company Profile - Celebration</title>
-    <style>
-        body {
-            font-family: 'Times New Roman', Times, serif;
-            background-color: #f9f3e7;
-            color: #5d3f29;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            width: 80%;
-            margin: 50px auto;
-            padding: 30px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        h1 {
-            font-size: 3em;
-            color: #d36f6f;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-        }
-        h3, h4 {
-            font-size: 1.5em;
-            color: #4d4d4d;
-        }
-        p {
-            font-size: 1.2em;
-            margin: 10px 0;
-        }
-        .link {
-            font-size: 1.2em;
-            text-decoration: none;
-            color: #d36f6f;
-            border: 2px solid #d36f6f;
-            padding: 10px 20px;
-            border-radius: 5px;
-            transition: all 0.3s ease;
-        }
-        .link:hover {
-            background-color: #d36f6f;
-            color: white;
-        }
-        .celebration {
-            background-color: #f0e6d2;
-            padding: 20px;
-            border-radius: 8px;
-            font-size: 1.4em;
-            margin-top: 20px;
-        }
-    </style>
-</head>
+<link rel="stylesheet" href="{{ asset('front/css/custom102.css') }}">
 
-<body>
+<div class="shop-profile container my-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
 
-    <div class="container">
-        <h1>🎉 Congratulations on Your Business! 🎉</h1>
+            <h1 class="shop-title text-center mb-4">
+                🏬 当サイトでのShop情報です
+            </h1>
 
-        <div class="celebration">
-            <h3>Business Name: {{ $parts->name }}</h3>
-            <p><strong>Business Description:</strong> {{ $parts->description }}</p>
-            <p><strong>Contact Method:</strong> Inquiry from within the site</p>
-            <p>
-                <a class="link" href="{{ route('inquiries.create', ['id' => $parts->id]) }}">Contact Us</a>
-            </p>
-            <p><strong>Contact Shop Manager:</strong> {{ $parts->manager }}</p>
+            <div class="shop-info">
+
+                <div class="info-row">
+                    <h3 class="info-label">ショップ名</h3>
+                    <p class="info-value">{{ $parts->name }}</p>
+                </div>
+
+                <div class="info-row">
+                    <h3 class="info-label">ショップ説明</h3>
+                    <p class="info-value">{{ $parts->description }}</p>
+                </div>
+
+                <div class="info-row">
+                    <h3 class="info-label">お問い合わせ方法</h3>
+                    <p class="info-value">サイト内のお問い合わせフォームよりご連絡ください</p>
+                </div>
+
+                <div class="info-row text-center mt-4">
+                    <a href="{{ route('customer.inquiry', ['shopId'=>$parts->id]) }}">
+                        <h5>Shop へお問い合わせする</h5>
+                    </a>
+                    
+                </div>
+
+                <div class="info-row mt-3">
+                    <h3 class="info-label">ショップ担当者</h3>
+                    <p class="info-value">{{ $parts->manager }}</p>
+                </div>
+
+            </div>
+
         </div>
     </div>
-
-</body>
+</div>
 @endsection
+
