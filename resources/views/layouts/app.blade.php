@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="{{ asset('front/css/custom4.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom5.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom6.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/css/custom91.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom93.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom94.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom95.css') }}">
@@ -201,6 +202,9 @@
 
     {{-- header --}}
     @include('layouts.header')
+
+    {{-- ===== Holiday Information ===== --}}
+    @include('partials.holiday-info') 
 
     {{-- main --}}
     <main class="main-content">

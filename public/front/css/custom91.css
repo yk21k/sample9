@@ -1,36 +1,38 @@
-/* ===== Holiday Information ===== */
-.holiday-info {
-    position: relative;
-    z-index: 1;              /* navbarより下 */
-    pointer-events: none;    /* 操作を奪わない */
-}
-
-/* アニメ共通 */
-.text-animation {
-    position: absolute;
-    top: 56px;               /* navbarの下 */
-    left: 0;
+/* ===== Holiday Bar ===== */
+.holiday-bar {
     width: 100%;
-    height: 32px;
+    background: #fff7f0;
+    border-bottom: 1px solid #f0e0d0;
     overflow: hidden;
-    pointer-events: none;
 }
 
-.text-animation p {
-    margin: 0;
+/* 横スクロール風 */
+.holiday-track {
+    display: inline-flex;
+    gap: 40px;
     white-space: nowrap;
-    font-size: 16px;
-    animation: holiday_scroll 40s linear infinite;
+    padding: 8px 0;
+    animation: holiday-scroll 40s linear infinite;
 }
 
-/* モバイルでは完全非表示（正解） */
-@media (max-width: 768px) {
-    .holiday-info {
-        display: none;
-    }
+/* アイテム */
+.holiday-item {
+    font-size: 14px;
 }
 
-@keyframes holiday_scroll {
+.holiday-normal { color: tomato; }
+.holiday-close  { color: palevioletred; }
+.holiday-temp   { color: springgreen; }
+
+/* animation */
+@keyframes holiday-scroll {
     from { transform: translateX(100%); }
     to   { transform: translateX(-100%); }
+}
+
+/* ===== モバイル：完全非表示 ===== */
+@media (max-width: 768px) {
+    .holiday-bar {
+        display: none;
+    }
 }
