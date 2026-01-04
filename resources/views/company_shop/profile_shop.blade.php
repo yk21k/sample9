@@ -138,19 +138,24 @@
             <section id="about">
                 <h2>会社情報</h2>
                 <h3>{{ $shop_data->shop->name }}</h3>
-                <p>{{ $shop_data->pr1 }}</p>
-
+                <p>消費税と配送料について<br><small>(出品者からの回答です)</small>{{ $shop_data->pr1 }}</p>
+                <p>直営店舗ありますか<br><small>(出品者からの回答です)</small>{{ $shop_data->pr2 }}</p>
+                <p>商品や会社PRをお願いします<br><small>(出品者からの回答です)</small>{{ $shop_data->pr3 }}</p>
                 <!-- 店舗紹介動画 -->
                 <div class="video-wrapper">
-                    <h4>店舗紹介動画</h4>
+                    <h4>店舗/取扱会社/出品者紹介動画</h4>
+                    当サイトに掲載される動画は、出品者が提示した外部サービス（YouTube等）上のURLに基づき表示されるものです。
+                    当サイトは、当該動画の正当な管理者、作成者、または公式性について、確認・保証を行うものではありません。
+                    動画の内容や権利関係についてのご質問・お問い合わせは、当該動画の掲載元または出品者へ直接お願いいたします。
+                    なお、権利侵害やなりすましの疑いがある場合には、当サイト所定のお問い合わせでご連絡ください。当サイトは、適切な範囲で確認・対応を行います。
                     <div class="video-container">
                         <iframe width="560" height="315" 
-                            src="https://www.youtube.com/embed/【店舗紹介動画のID】" 
+                            src="{{ $shop_data->url }}" 
                             title="店舗紹介動画"
                             frameborder="0" 
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                             allowfullscreen>
-                        </iframe>
+                        </iframe>                   
                     </div>
                 </div>
 
@@ -178,6 +183,7 @@
                             <!-- 商品紹介動画（あれば表示） -->
                             @if(!empty($shop_product->youtube_url))
                                 <div class="video-container">
+
                                     <iframe width="560" height="315" 
                                         src="https://www.youtube.com/embed/{{ $shop_product->youtube_url }}" 
                                         title="{{ $shop_product->name }} 紹介動画"

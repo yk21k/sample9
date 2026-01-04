@@ -112,12 +112,7 @@
                                     @endif
                                 </div>
                             @endforeach
-                            
-
-                            
-                            
-                            
-
+                        
                         </div><!-- panel-body -->
 
                         <div class="panel-footer">
@@ -159,6 +154,51 @@
         </div>
     </div>
     <!-- End Delete File Modal -->
+
+    <!-- Video URL Notice Modal -->
+    <div class="modal fade" id="videoNoticeModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">
+                        動画URLについての重要なご案内
+                    </h4>
+                </div>
+
+                <div class="modal-body">
+                    <p>
+                        当サイトは、出品者が入力した動画URLについて、
+                        正当な管理者・作成者・公式性を保証するものではありません。実際の購入者様向けのページにおいても表示します。また、お問い合わせ時も当サイトでは権利関係の詳細は、お答えできない内容になりますので出品者様にてご対応ください。
+                    </p>
+                    <p>
+                        YouTube等の外部サービス上の動画は、各動画の掲載元に帰属します。
+                    </p>
+
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="video_notice_agree">
+                            上記内容を理解し、同意します
+                        </label>
+                        <input type="hidden" name="video_notice_agreed" id="video_notice_agreed" value="0">
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        閉じる
+                    </button>
+                    <button type="button" class="btn btn-primary" id="videoNoticeConfirm" disabled>
+                        同意する
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 @stop
 
 @section('javascript')
@@ -234,4 +274,45 @@
             $('[data-toggle="tooltip"]').tooltip();
         });
     </script>
+    <script>
+        $(function () {
+
+            let noticeShown = false;
+
+            // 対象URLフィールド（必要に応じてname変更）
+            const $videoUrlInput = $('input[name="url"]');
+
+            if ($videoUrlInput.length === 0) return;
+
+            $videoUrlInput.on('blur', function () {
+                const val = $(this).val();
+
+                if (val && !noticeShown) {
+                    $('#videoNoticeModal').modal('show');
+                    noticeShown = true;
+                }
+            });
+
+            // チェックボックス制御
+            $('#video_notice_agree').on('change', function () {
+                $('#videoNoticeConfirm').prop('disabled', !this.checked);
+            });
+
+            // 同意ボタン
+            $('#videoNoticeConfirm').on('click', function () {
+                $('#video_notice_agreed').val(1);
+                $('#videoNoticeModal').modal('hide');
+            });
+
+            // 保存時チェック（同意必須）
+            $('form.form-edit-add').on('submit', function (e) {
+                if ($videoUrlInput.val() && $('#video_notice_agreed').val() !== '1') {
+                    e.preventDefault();
+                    toastr.error('動画URLを登録するには、注意事項への同意が必要です');
+                }
+            });
+
+        });
+    </script>
+
 @stop

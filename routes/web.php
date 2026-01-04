@@ -88,10 +88,6 @@ Route::get('/seller/qanda', [\App\Http\Controllers\SellerQandAController::class,
 Route::get('/seller/qanda/{slug}', [\App\Http\Controllers\SellerQandAController::class, 'show'])
     ->name('seller.qanda.show');
 
-
-
-
-
 Route::middleware(['passed.entrance'])->group(function () {
 
     Route::post('register/pre_check', [App\Http\Controllers\Auth\RegisterController::class, 'pre_check'])->middleware('throttle:1,1')->name('register.pre_check');
@@ -167,7 +163,6 @@ Route::middleware(['passed.entrance'])->group(function () {
 
 
     Route::resource('products', ProductController::class);
-
 
 
     Route::get('/add-to-cart/{product}', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add')->middleware('auth');
@@ -298,13 +293,11 @@ Route::middleware(['passed.entrance'])->group(function () {
     Route::get('/shop-prof', [App\Http\Controllers\ShopProfController::class, 'index'])->name('shop_prof');
 
 
-
     Route::get('/cutomer-inquiry/{shopId}', [App\Http\Controllers\CustomerInquiryController::class, 'inquiryForm'])->name('customer.inquiry')->middleware('auth');
 
     Route::post('/cutomer-inquiry', [App\Http\Controllers\CustomerInquiryController::class, 'inquiryAnswer'])->name('customer.inquiries')->middleware('auth');
 
     Route::get('/cutomer-answers/{shopId}', [App\Http\Controllers\CustomerInquiryController::class, 'answers'])->name('customer.answers')->middleware('auth');
-
 
 
     Route::get('inquiries/{id}', [App\Http\Controllers\InquiriesController::class, 'create'])->name('inquiries.create')->middleware('auth');
