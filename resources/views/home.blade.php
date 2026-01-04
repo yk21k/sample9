@@ -6,7 +6,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <link href="https://vjs.zencdn.net/7.21.1/video-js.css" rel="stylesheet" />
 
-<link rel="stylesheet" href="{{ asset('front/css/custom91.css') }}">
 <link rel="stylesheet" href="{{ asset('front/css/custom96.css') }}">
 
 <script src="https://vjs.zencdn.net/7.21.1/video.min.js"></script>
