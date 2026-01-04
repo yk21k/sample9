@@ -40,10 +40,16 @@
     to   { transform: translateX(-100%); }
 }
 
-/* ===== モバイル対応 ===== */
-/* ===== モバイルでは完全非表示 ===== */
+
+/* ===== モバイルでは完全非表示（最終） ===== */
 @media (max-width: 768px) {
-    .holiday-info {
+
+    section.holiday-info,
+    section.holiday-info * {
         display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        overflow: hidden !important;
     }
 }
+
