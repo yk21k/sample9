@@ -90,5 +90,9 @@
 .text-animation1,
 .text-animation2,
 .text-animation3 {
+    position: absolute;
+    width: 100%;
+    height: 40px; /* ← 100pxは大きすぎ */
+    overflow: hidden;
     pointer-events: none;
 }
