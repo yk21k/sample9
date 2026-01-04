@@ -41,19 +41,9 @@
 }
 
 /* ===== モバイル対応 ===== */
+/* ===== モバイルでは完全非表示 ===== */
 @media (max-width: 768px) {
-
-    /* モバイルではアニメ停止 */
-    .text-animation p {
-        animation: none;
-        transform: none;
-        font-size: 14px;
-    }
-
-    /* 通常フローに戻す */
-    .text-animation {
-        position: static;
-        height: auto;
-        margin-bottom: 6px;
+    .holiday-info {
+        display: none !important;
     }
 }
