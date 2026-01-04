@@ -1,98 +1,59 @@
-.text-animation1 {
-    display: inline-flex;
-    height: 100px;
-    width: 100%;
-    max-width: 100%;/*追加*/
-    
-    line-height: 100px;
-    position: absolute;
-    top: 50px;
-    z-index: 100;
-    overflow: hidden;
+/* ===== Holiday Information wrapper ===== */
+.holiday-info {
+    position: relative;
+    z-index: 1;            /* navbarより必ず下 */
+    pointer-events: none; /* ← これが最重要 */
 }
-    
-.text-animation1 p {
-    display: inline-block;
-    color: tomato;
-    font-size: 20px;
+
+/* ===== 共通 animation ===== */
+.text-animation {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 36px;
+    overflow: hidden;
+
+    pointer-events: none; /* ← タップ完全透過 */
+}
+
+/* 行ごとの位置 */
+.text-animation1 { top: 0; }
+.text-animation2 { top: 36px; }
+.text-animation3 { top: 72px; }
+
+/* テキスト */
+.text-animation p {
+    margin: 0;
     white-space: nowrap;
-    animation: text_scroll 40s linear infinite;
-    padding-left: 100%;
+    font-size: 16px;
+    animation: holiday_scroll 40s linear infinite;
 }
 
-@keyframes text_scroll {
-    0% {
-        transform: translateX(0)
-    }
-    100% {
-        transform: translateX(-300%)
-    }
+/* 色 */
+.text-animation1 p { color: tomato; }
+.text-animation2 p { color: palevioletred; }
+.text-animation3 p { color: springgreen; }
+
+/* アニメーション */
+@keyframes holiday_scroll {
+    from { transform: translateX(100%); }
+    to   { transform: translateX(-100%); }
 }
 
-.text-animation2 {
-    display: inline-flex;
-    height: 100px;
-    width: 100%;
-    line-height: 100px;
-    position: absolute;
-    top: 70px;
-    z-index: 100;
-    overflow: hidden;
-}
-    
-.text-animation2 p {
-    display: inline-block;
-    color: palevioletred;
-    font-size: 20px;
-    white-space: nowrap;
-    animation: text_scroll 40s linear infinite;
-    padding-left: 100%;
-}
+/* ===== モバイル対応 ===== */
+@media (max-width: 768px) {
 
-@keyframes text_scroll {
-    0% {
-        transform: translateX(0)
+    /* モバイルではアニメ停止 */
+    .text-animation p {
+        animation: none;
+        transform: none;
+        font-size: 14px;
     }
-    100% {
-        transform: translateX(-300%)
-    }
-}
 
-.text-animation3 {
-    display: inline-flex;
-    height: 100px;
-    width: 100%;
-    line-height: 100px;
-    position: absolute;
-    top: 90px;
-    z-index: 100;
-    overflow: hidden;
-}
-    
-.text-animation3 p {
-    display: inline-block;
-    color: springgreen;
-    font-size: 20px;
-    white-space: nowrap;
-    animation: text_scroll 70s linear infinite;
-    padding-left: 100%;
-}
-
-@keyframes text_scroll {
-    0% {
-        transform: translateX(0)
+    /* 通常フローに戻す */
+    .text-animation {
+        position: static;
+        height: auto;
+        margin-bottom: 6px;
     }
-    100% {
-        transform: translateX(-300%)
-    }
-}
-
-.text-animation1,
-.text-animation2,
-.text-animation3 {
-    position: absolute;
-    width: 100%;
-    height: 40px; /* ← 100pxは大きすぎ */
-    overflow: hidden;
-    pointer-events: none;
 }

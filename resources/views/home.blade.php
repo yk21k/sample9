@@ -196,7 +196,8 @@
 
             {{-- ===== Holiday Information ===== --}}
             <section class="holiday-info">
-                <div class="text-animation1">
+
+                <div class="text-animation text-animation1">
                     @foreach($holidays as $holiday)
                         <p>Holiday Store: {{ $holiday['shop_name'] }}</p>
                     @endforeach
@@ -204,18 +205,20 @@
 
                 @foreach($extra_holidays as $ex_holiday)
                     @if($ex_holiday['date_flag'] === 2)
-                        <div class="text-animation2">
+                        <div class="text-animation text-animation2">
                             <p>Stores Temporarily Closed :: {{ $ex_holiday['shop_name'] }}</p>
                         </div>
                     @endif
 
                     @if($ex_holiday['date_flag'] === 1)
-                        <div class="text-animation3">
-                            <p>📣📣📣 Temporary Store :: {{ $ex_holiday['shop_name'] }} 📣📣📣</p>
+                        <div class="text-animation text-animation3">
+                            <p>📣 Temporary Store :: {{ $ex_holiday['shop_name'] }} 📣</p>
                         </div>
                     @endif
                 @endforeach
+
             </section>
+
 
         {{-- ===== Other Products ===== --}}
         @else
