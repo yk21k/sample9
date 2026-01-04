@@ -86,3 +86,9 @@
         transform: translateX(-300%)
     }
 }
+
+.text-animation1,
+.text-animation2,
+.text-animation3 {
+    pointer-events: none;
+}
