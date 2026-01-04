@@ -203,9 +203,6 @@
     {{-- header --}}
     @include('layouts.header')
 
-    {{-- ===== Holiday Information ===== --}}
-    @include('partials.holiday-info') 
-
     {{-- main --}}
     <main class="main-content">
         @yield('content')

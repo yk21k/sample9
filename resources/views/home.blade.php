@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <link href="https://vjs.zencdn.net/7.21.1/video-js.css" rel="stylesheet" />
 
+<link rel="stylesheet" href="{{ asset('front/css/custom91.css') }}">
 <link rel="stylesheet" href="{{ asset('front/css/custom96.css') }}">
 
 <script src="https://vjs.zencdn.net/7.21.1/video.min.js"></script>
@@ -130,6 +131,36 @@
             </a>
         </li>
     </ul>
+
+    {{-- ===== Holiday Information ===== --}}
+    @if($holidays->isNotEmpty() || $extra_holidays->isNotEmpty())
+    <div class="holiday-bar">
+
+        <div class="holiday-track">
+            @foreach($holidays as $holiday)
+                <span class="holiday-item holiday-normal">
+                    Holiday Store: {{ $holiday['shop_name'] }}
+                </span>
+            @endforeach
+
+            @foreach($extra_holidays as $ex_holiday)
+                @if($ex_holiday['date_flag'] === 2)
+                    <span class="holiday-item holiday-close">
+                        Stores Temporarily Closed :: {{ $ex_holiday['shop_name'] }}
+                    </span>
+                @endif
+
+                @if($ex_holiday['date_flag'] === 1)
+                    <span class="holiday-item holiday-temp">
+                        📣 Temporary Store :: {{ $ex_holiday['shop_name'] }} 📣
+                    </span>
+                @endif
+            @endforeach
+        </div>
+
+    </div>
+    @endif
+
 </aside>
 
 {{-- ===== Main Content ===== --}}
