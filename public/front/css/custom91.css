@@ -1,4 +1,34 @@
+/* ===== Holiday Bar ===== */
+.holiday-bar {
+    width: 100%;
+    background: #fff7f0;
+    border-bottom: 1px solid #f0e0d0;
+    overflow: hidden;
+}
 
+/* 横スクロール風 */
+.holiday-track {
+    display: inline-flex;
+    gap: 40px;
+    white-space: nowrap;
+    padding: 8px 0;
+    animation: holiday-scroll 40s linear infinite;
+}
+
+/* アイテム */
+.holiday-item {
+    font-size: 14px;
+}
+
+.holiday-normal { color: tomato; }
+.holiday-close  { color: palevioletred; }
+.holiday-temp   { color: springgreen; }
+
+/* animation */
+@keyframes holiday-scroll {
+    from { transform: translateX(100%); }
+    to   { transform: translateX(-100%); }
+}
 
 /* ===== モバイル：完全非表示 ===== */
 @media (max-width: 768px) {

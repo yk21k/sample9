@@ -61,6 +61,11 @@
       margin-left: 8px;
     }
 
+    svg.theme-icon-active {
+        pointer-events: none;
+    }
+
+
 </style>
 
 {{-- ===== Side Navigation ===== --}}

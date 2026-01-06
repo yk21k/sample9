@@ -29,7 +29,18 @@
     <link rel="stylesheet" href="{{ asset('front/css/custom94.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/custom95.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+    <style>
+      .bd-mode-toggle {
+          pointer-events: auto;
+          z-index: 1050; /* navbar(1030)より上にするなら明示 */
+      }
+
+      /* SVGはイベントを奪わない */
+      .bd-mode-toggle svg,
+      .bd-mode-toggle use {
+          pointer-events: none;
+      }
+    </style>
 
     @stack('css')
     
