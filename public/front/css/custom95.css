@@ -277,10 +277,6 @@ main {
   background-color: var(--bs-card-bg) !important;
 }
 
-/* ダークモード表示用SVGはクリックを奪わない */
-.theme-icon-active {
-    pointer-events: none;
-}
 
 
 
