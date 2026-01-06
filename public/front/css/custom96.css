@@ -297,6 +297,10 @@
     }
 }
 
+/* ダークモード表示用SVGはクリックを奪わない */
+.theme-icon-active {
+    pointer-events: none;
+}
 
 
 

@@ -49,12 +49,7 @@
                         </button>
                     </a>
                 </li>
-                {{-- ここに一時的に入れてください --}}
-                <li class="nav-item">
-                    <span style="color:red">
-                        auth: {{ auth()->check() ? 'YES' : 'NO' }}
-                    </span>
-                </li>
+
                 @guest
                     @if (Route::has('login'))
                         <li class="nav-item">
