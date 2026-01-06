@@ -14,6 +14,7 @@
         border-radius: 4px;
     }
 </style>
+<link rel="stylesheet" href="{{ asset('front/css/custom103.css') }}">
 
 
 <h2>Submit Your Shop </h2>

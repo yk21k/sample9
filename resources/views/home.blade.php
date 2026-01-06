@@ -157,7 +157,7 @@
                 @endif
             @endforeach
         </div>
-
+        <br>
     </div>
     @endif
 

@@ -1,0 +1,7 @@
+/*2026*******create**.******.blade*/
+/* モバイルではfooter非表示 */
+@media (max-width: 767px) {
+    .site-footer {
+        display: none !important;
+    }
+}
