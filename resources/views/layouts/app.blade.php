@@ -30,16 +30,23 @@
     <link rel="stylesheet" href="{{ asset('front/css/custom95.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-      .bd-mode-toggle {
-          pointer-events: auto;
-          z-index: 1050; /* navbar(1030)より上にするなら明示 */
-      }
+/* bd-mode-toggle 自体の当たり判定を限定 */
+.bd-mode-toggle {
+    width: auto;
+    height: auto;
+    pointer-events: auto;
+    z-index: 1050;
+}
 
-      /* SVGはイベントを奪わない */
-      .bd-mode-toggle svg,
-      .bd-mode-toggle use {
-          pointer-events: none;
-      }
+/* SVGは絶対にイベントを取らせない */
+.bd-mode-toggle svg,
+.bd-mode-toggle use {
+    pointer-events: none !important;
+}
+.bd-mode-toggle {
+    outline: 3px solid red !important;
+    background: rgba(255,0,0,0.05);
+}
     </style>
 
     @stack('css')
