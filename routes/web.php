@@ -54,6 +54,8 @@ use App\Http\Controllers\ProductImportController;
 
 use App\Models\Order;
 
+use App\Http\Controllers\ShopLicenseController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -625,4 +627,10 @@ Route::get('/admin/shop-license/{shop}/{file}', function($shopId, $fileName) {
         'Content-Disposition' => 'inline; filename="'.$fileName.'"'
     ]);
 })->name('admin.shop-license.show')->middleware('auth');
+
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('shop-license/{shop}/{file}', [ShopLicenseController::class, 'show'])
+        ->name('shop-license.show');
+});
 
