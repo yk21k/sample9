@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 use Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ShopController extends Controller
 {
@@ -225,6 +226,9 @@ class ShopController extends Controller
         // 保存先を private ストレージに変更
         $basePath = "licenses/{$dateFolder}/{$userEmail}";
 
+        // ディレクトリがなければ作成
+        Storage::makeDirectory($basePath);
+
         // ファイル名生成関数
         $generateFileName = fn($file) =>
             rand(1111, 9999999) . $userEmail . rand(1111, 9999999) . $file->getClientOriginalName();
@@ -239,7 +243,7 @@ class ShopController extends Controller
             if ($request->hasFile($key)) {
                 $file = $request->file($key);
                 $photoNames[$i] = $generateFileName($file);
-                $file->storeAs($basePath, $photoNames[$i]);
+                Storage::putFileAs($basePath, $file, $photoNames[$i]);
             }
         }
 
@@ -249,13 +253,14 @@ class ShopController extends Controller
             if ($request->hasFile($key)) {
                 $file = $request->file($key);
                 $fileNames[$i] = $generateFileName($file);
-                $file->storeAs($basePath, $fileNames[$i]);
+                Storage::putFileAs($basePath, $file, $fileNames[$i]);
             }
         }
 
-        // identification の処理
+        // identification 処理
         $registrationType = $request->registration_type;
-        $identification_1 = $identification_2 = null;
+        $identification_1 = null;
+        $identification_2 = null;
         $licenseFileName = null;
 
         if (in_array($registrationType, ['個人', '個人事業主'])) {
@@ -263,8 +268,9 @@ class ShopController extends Controller
             $licenseExpiry = $request->input('license_expiry');
 
             if ($request->hasFile('file_1')) {
-                $licenseFileName = $generateFileName($request->file('file_1'));
-                $request->file('file_1')->storeAs($basePath, $licenseFileName);
+                $licenseFile = $request->file('file_1');
+                $licenseFileName = $generateFileName($licenseFile);
+                Storage::putFileAs($basePath, $licenseFile, $licenseFileName);
                 $fileNames[1] = $licenseFileName; // file_1 としても保持
             }
         }
@@ -313,7 +319,7 @@ class ShopController extends Controller
             'file_4' => $fileNames[4] ?? 'no_file.txt',
         ]);
 
-        // 保存後の通知
+        // 下書きでなければ管理者へ通知
         if (!$isDraft) {
             $admins = User::whereHas('role', fn($q) => $q->where('name', 'admin'))->get();
             Mail::to($admins)->send(new ShopActivationRequest($shop));
@@ -323,6 +329,7 @@ class ShopController extends Controller
 
         return back()->withMessage('下書きを保存しました。');
     }
+
 
 
     /**
