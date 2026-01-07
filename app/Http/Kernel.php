@@ -21,6 +21,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+
     ];
 
     /**
@@ -66,6 +67,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'otp' => \App\Http\Middleware\RequireOtp::class,
         'passed.entrance' => \App\Http\Middleware\PassedEntrance::class,
+        'admin' => \App\Http\Middleware\AdminMiddleware::class,
 
 
     ];
