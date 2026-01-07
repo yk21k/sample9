@@ -596,3 +596,33 @@ Route::get('/test', function(){
 
     $o->generateSubOrders();
 });
+
+// shop licenses
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Response;
+use App\Models\Shop;
+
+Route::get('/admin/shop-license/{shop}/{file}', function($shopId, $fileName) {
+    $shop = Shop::findOrFail($shopId);
+
+    // 管理者のみアクセス可能
+    if (!auth()->user() || !auth()->user()->hasRole('admin')) {
+        abort(403);
+    }
+
+    // ファイルパス
+    $filePath = "licenses/{$shop->created_at->format('Ymd')}/{$shop->user->email}/{$fileName}";
+
+    if (!Storage::exists($filePath)) {
+        abort(404);
+    }
+
+    $file = Storage::get($filePath);
+    $type = Storage::mimeType($filePath);
+
+    return Response::make($file, 200, [
+        'Content-Type' => $type,
+        'Content-Disposition' => 'inline; filename="'.$fileName.'"'
+    ]);
+})->name('admin.shop-license.show')->middleware('auth');
+
