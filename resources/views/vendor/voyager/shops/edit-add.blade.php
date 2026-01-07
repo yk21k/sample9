@@ -27,19 +27,27 @@
                 <a href="{{url('/seller/orders')}}" class="">Order Management</a>
             </div>
 
-            @foreach($dataTypeRows as $row)
-                <td>
-                    @if($dataTypeContent->{$row->field} && auth()->user()->hasRole('admin'))
+            @php
+                $files = [
+                    'photo_1','photo_2','photo_3','photo_4','photo_5','photo_6','photo_7',
+                    'file_1','file_2','file_3','file_4'
+                ];
+            @endphp
+
+            @foreach($files as $file)
+                <div>
+                    @if($dataTypeContent->{$file} && auth()->user()->hasRole('admin'))
                         <a class="btn btn-sm btn-primary" 
-                           href="{{ route('admin.shop-license.show', [$dataTypeContent->id, $dataTypeContent->{$row->field}]) }}" 
+                           href="{{ route('admin.shop-license.show', [$dataTypeContent->id, $dataTypeContent->{$file}]) }}" 
                            target="_blank">
-                            ファイル確認
+                            {{ $file }} 確認
                         </a>
                     @else
-                        <span class="text-muted">非表示</span>
+                        <span class="text-muted">{{ $file }} 非表示</span>
                     @endif
-                </td>
+                </div>
             @endforeach
+
 
 
 
