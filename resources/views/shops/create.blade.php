@@ -1,3 +1,4 @@
+
 @extends('layouts.app')
 
 
@@ -135,6 +136,19 @@
         <label for="license_expiry" class="form-label"><h3>上記の運転免許証/パスポートの有効期限</h3></label>
         <input class="form-control" type="date" name="license_expiry" id="license_expiry" value="{{ old('license_expiry', optional($shop_sets)->license_expiry ? \Carbon\Carbon::parse($shop_sets->license_expiry)->format('Y-m-d') : '') }}"
 >
+        <div id="fileGroup1" class="form-group">
+            <div class="form-group">
+                <label for="file_1">  <div id="output1" style="font-size:20pt">クレジットカードの請求書（当月を含む最新）</div></label>
+                <input
+                    type="file"
+                    class="form-control"
+                    id="identification_3"
+                    name="identification_3"
+                    accept="application/pdf"
+                    required
+                >
+            </div>
+        </div>
     </div> 
     &nbsp;  
     <div id="identificationGroup1" style="display: none;">
