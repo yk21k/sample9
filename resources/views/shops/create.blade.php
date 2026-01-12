@@ -138,7 +138,7 @@
 >
         <div id="fileGroup1" class="form-group">
             <div class="form-group">
-                <label for="file_1">  <div id="output1" style="font-size:20pt">クレジットカードの請求書（当月を含む最新）</div></label>
+                <label for="file_1">  <div id="output1" style="font-size:20pt">クレジットカードの利用履歴のある請求書（当月を含む最新）</div></label>
                 <input
                     type="file"
                     class="form-control"

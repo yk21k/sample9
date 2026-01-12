@@ -46,6 +46,7 @@
                         <span class="text-muted">{{ $file }} 非表示</span>
                     @endif
                 </div>
+                <small>開業届や...はfile2</small>
             @endforeach
 
 
