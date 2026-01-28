@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 use App\Models\Shop;
 use App\Models\User;
+use App\Models\ChecklistItem;
 
 use App\Mail\ShopActivationRequest;
 use Illuminate\Support\Facades\Mail;
@@ -34,7 +35,14 @@ class ShopController extends Controller
     {
         $shop_sets = Shop::where('user_id', Auth::user()->id)->first();
         // dd($shop_sets);
-        return view('shops.create', compact('shop_sets'));
+
+        // ショップ未作成時
+        $shop_sets = null;
+
+        // Voyager 管理画面と完全同期
+        $help = ChecklistItem::get()->keyBy('name'); // ← ★ここが超重要
+
+        return view('shops.create', compact('shop_sets', 'help'));
     }
 
     /**
@@ -137,6 +145,7 @@ class ShopController extends Controller
             'person_2' => $request->input('person_2'),
             'person_3' => $request->input('person_3'),
             'license_expiry' => $request->input('license_expiry'),
+            'corporate_number' => $request->input('corporate_number'),
 
             'representative' => $request->input('representative'),
             'manager' => $request->input('manager'),

@@ -49,9 +49,6 @@
                 <small>開業届や...はfile2</small>
             @endforeach
 
-
-
-
             <div class="col-md-12">
 
                 <div class="panel panel-bordered">

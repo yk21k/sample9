@@ -85,7 +85,7 @@ class StoreShopRequest extends FormRequest
             }
 
             if (in_array($type, ['法人', '業務請負'])) {
-                $rules['identification_2_2'] = 'required|string|in:商業・法人登記簿（履歴事項全部証明書）';
+                $rules['identification_2_2'] = 'required|string|in:business_card';
             }
 
             // registration_type によるファイル必須

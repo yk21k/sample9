@@ -14,6 +14,11 @@
         padding: 4px 8px;
         border-radius: 4px;
     }
+
+    #helpModal .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
 </style>
 <link rel="stylesheet" href="{{ asset('front/css/custom103.css') }}">
 
@@ -32,9 +37,44 @@
 <div class="container mt-3">
   <form class="h-adr" id="shopForm" action="{{route('shops.store')}}" method="post" enctype="multipart/form-data">@csrf
     {{-- {{ csrf_field() }} --}}
+    {{-- {{ helpModal }} --}}
+    <div class="modal fade" id="helpModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="helpTitle"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <h6>この項目は何に使いますか？</h6>
+                    <p id="helpPurpose"></p>
+
+                    <h6>おすすめの書き方</h6>
+                    <p id="helpRecommendation"></p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 
     <div class="form-group">
-      <label><h3>登録区分 *</h3></label>
+      <label for="registration_type"><h3>登録区分 *</h3></label>
+        {{-- ❓ ヘルプ --}}
+        @if(isset($help['registration_type']))
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary help-btn"
+            data-label="{{ $help['registration_type']->label }}"
+            data-purpose="{{ e($help['registration_type']->purpose) }}"
+            data-recommendation="{{ e($help['registration_type']->recommendation) }}"
+        >
+            ?
+        </button>
+        @endif
+        <br>はてなボタンを押して確認して下さい
       <div class="form-check">
         <input class="form-check-input" type="radio" name="registration_type" id="individual" value="個人">
         <label class="form-check-label" for="individual">個人</label>
@@ -56,6 +96,20 @@
 
     <div class="form-group">
         <label for="name"><h3>店名 * 上記の登録区分を必ず選択して下さい</h3></label>
+
+        {{-- ❓ ヘルプ --}}
+        @if(isset($help['name']))
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary help-btn"
+            data-label="{{ $help['name']->label }}"
+            data-purpose="{{ e($help['name']->purpose) }}"
+            data-recommendation="{{ e($help['name']->recommendation) }}"
+        >
+            ?
+        </button>
+        @endif
+
         <input type="text" class="form-control" name="name" id="name" aria-describedby="helpId" value="{{ old('name', $shop_sets->name ?? '') }}" required>
     </div>
     &nbsp;<br><br>
@@ -64,6 +118,20 @@
 
     <div class="form-group">
         <label for="invoice_number"><h3>インボイス番号：</h3></label>
+
+        {{-- ❓ ヘルプ --}}
+        @if(isset($help['invoice_number']))
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary help-btn"
+            data-label="{{ $help['invoice_number']->label }}"
+            data-purpose="{{ e($help['invoice_number']->purpose) }}"
+            data-recommendation="{{ e($help['invoice_number']->recommendation) }}"
+        >
+            ?
+        </button>
+        @endif
+
         <input type="text" id="invoiceFormField" name="invoice_number" placeholder="T1234567890123"
        pattern="^[A-Za-z]\d{13}$"
        title="先頭は英字1文字、その後に数字13桁で入力してください。">
@@ -71,18 +139,62 @@
 
     <div class="form-group">
         <label for="description"><h3>店舗概要 *</h3></label>
+
+        {{-- ❓ ヘルプ --}}
+        @if(isset($help['description']))
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary help-btn"
+            data-label="{{ $help['description']->label }}"
+            data-purpose="{{ e($help['description']->purpose) }}"
+            data-recommendation="{{ e($help['description']->recommendation) }}"
+        >
+            ?
+        </button>
+        @endif
+
         <textarea class="form-control" name="description" id="description" rows="3" required>{{ old('description', $shop_sets->description ?? '') }}</textarea>
     </div>
     &nbsp;
 
     <div class="form-group">
         <label for="representative"> <h3>代表 *</h3></label>
+
+        {{-- ❓ ヘルプ --}}
+        @if(isset($help['representative']))
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary help-btn"
+            data-label="{{ $help['representative']->label }}"
+            data-purpose="{{ e($help['representative']->purpose) }}"
+            data-recommendation="{{ e($help['representative']->recommendation) }}"
+        >
+            ?
+        </button>
+        @endif
+
         <input type="text" class="form-control" name="representative" id="representative" aria-describedby="helpId" value="{{ old('representative', $shop_sets->representative ?? '') }}" required>
     </div>
     <br>
 
     <div class="form-group">
-        <label for="location_1"> <h3>所在地 * </h3><small>郵便番号で検索して下さい</small></label><br>
+        <label for="location_1"> 
+            <h3>所在地 * </h3>
+        </label>
+        
+        {{-- ❓ ヘルプ --}}
+        @if(isset($help['location']))
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary help-btn"
+            data-label="{{ $help['location']->label }}"
+            data-purpose="{{ e($help['location']->purpose) }}"
+            data-recommendation="{{ e($help['location']->recommendation) }}"
+        >
+            ?
+        </button>
+        @endif
+        <small>郵便番号で検索して下さい</small>
         <span class="p-country-name" style="display:none;">Japan</span>
         <label for="post-code">郵便番号:</label>
         <input type="text" class="p-postal-code" size="8" maxlength="8"><br>
@@ -91,24 +203,73 @@
     &nbsp;
 
     <div class="form-group">
-        <label for="location_2"> <h3>配送先 </h3></label>
+        <label for="location_2"> <h3>配送先 * </h3></label>
+        {{-- ❓ ヘルプ --}}
+        @if(isset($help['shipping_address']))
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary help-btn"
+            data-label="{{ $help['shipping_address']->label }}"
+            data-purpose="{{ e($help['shipping_address']->purpose) }}"
+            data-recommendation="{{ e($help['shipping_address']->recommendation) }}"
+        >
+            ?
+        </button>
+        @endif
+
         <input type="text" class="form-control" name="location_2" id="location_2" aria-describedby="helpId" placeholder="Please enter the address if different from the address above." value="{{ old('location_2', $shop_sets->location_2 ?? '') }}">
     </div>
     &nbsp;
 
     <div class="form-group">
         <label for="telephone"> <h3>電話番号 *</h3></label>
+        {{-- ❓ ヘルプ --}}
+        @if(isset($help['telephone']))
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary help-btn"
+            data-label="{{ $help['telephone']->label }}"
+            data-purpose="{{ e($help['telephone']->purpose) }}"
+            data-recommendation="{{ e($help['telephone']->recommendation) }}"
+        >
+            ?
+        </button>
+        @endif
         <input type="text" class="form-control" id="telephone" name="telephone" aria-describedby="helpId" placeholder="You can accept numbers with HYPHEN from both mobile and landline phones." value="{{ old('telephone', $shop_sets->telephone ?? '') }}" required>
     </div>
     &nbsp;
 
     <div class="form-group">
         <label for="email"> <h3>Email *</h3></label>
+        {{-- ❓ ヘルプ --}}
+        @if(isset($help['email']))
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary help-btn"
+            data-label="{{ $help['email']->label }}"
+            data-purpose="{{ e($help['email']->purpose) }}"
+            data-recommendation="{{ e($help['email']->recommendation) }}"
+        >
+            ?
+        </button>
+        @endif
         <input type="email" class="form-control" name="email" id="email" aria-describedby="helpId" value="{{ old('email', $shop_sets->email ?? '') }}" required>
     </div>
     <br>
     <div id="idGroup1" style="display: none;">
-        <label for="identification_1" class="form-label"><h3>ID card (運転免許証　or パスポート)</h3></label>
+        <label for="identification_1" class="form-label"><h3>ID card (運転免許証　or パスポート) *</h3></label>
+        {{-- ❓ ヘルプ --}}
+        @if(isset($help['license_expiry']))
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary help-btn"
+            data-label="{{ $help['license_expiry']->label }}"
+            data-purpose="{{ e($help['license_expiry']->purpose) }}"
+            data-recommendation="{{ e($help['license_expiry']->recommendation) }}"
+        >
+            ?
+        </button>
+        @endif
         <input class="form-control" list="identification1" name="identification_1" id="identification_1" value="{{ old('identification_1', $shop_sets->identification_1 ?? '') }}">
           <datalist id="identification1">
               <option value="運転免許証">
@@ -124,21 +285,49 @@
                 <input type="file" class="form-control" id="file_1" name="file_1" class="form-control" multiple>
             </div>
         </div>
-        <br>
+        <br><br>
         <div id="fileGroup5" class="form-group">
             <div class="form-group">
                 <label for="photo_4">  <div id="" style="font-size:20pt">上記の内容をアップロード(運転免許証の場合の裏面）</div></label>
                 <input type="file" class="form-control" id="photo_4" name="photo_4" class="form-control" multiple>
             </div>
         </div>
-        <br>
+        <br><br>
 
         <label for="license_expiry" class="form-label"><h3>上記の運転免許証/パスポートの有効期限</h3></label>
+        {{-- ❓ ヘルプ --}}
+        @if(isset($help['license_expiry']))
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary help-btn"
+            data-label="{{ $help['license_expiry']->label }}"
+            data-purpose="{{ e($help['license_expiry']->purpose) }}"
+            data-recommendation="{{ e($help['license_expiry']->recommendation) }}"
+        >
+            ?
+        </button>
+        @endif
         <input class="form-control" type="date" name="license_expiry" id="license_expiry" value="{{ old('license_expiry', optional($shop_sets)->license_expiry ? \Carbon\Carbon::parse($shop_sets->license_expiry)->format('Y-m-d') : '') }}"
->
+        ><br><br>
         <div id="fileGroup1" class="form-group">
             <div class="form-group">
-                <label for="file_1">  <div id="output1" style="font-size:20pt">クレジットカードの利用履歴のある請求書（当月を含む最新）</div></label>
+                <label for="file_1">
+                    <div id="output1" style="font-size:20pt">
+                        クレジットカードの利用履歴のある請求書*<br>
+                    </div>
+                </label>
+                {{-- ❓ ヘルプ --}}
+                @if(isset($help['file_1']))
+                <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary help-btn"
+                    data-label="{{ $help['file_1']->label }}"
+                    data-purpose="{{ e($help['file_1']->purpose) }}"
+                    data-recommendation="{{ e($help['file_1']->recommendation) }}"
+                >
+                    ?
+                </button>
+                @endif
                 <input
                     type="file"
                     class="form-control"
@@ -153,10 +342,23 @@
     &nbsp;  
     <div id="identificationGroup1" style="display: none;">
       <label for="identification_2_1" class="form-label">
-        <h3>個人事業開始届出証明書
+        <h3>個人事業開始届出証明書 *
           <small>※請負の場合は発注者ではなく、受注者のもの</small>
         </h3>
-      </label><br>
+      </label>
+      {{-- ❓ ヘルプ --}}
+        @if(isset($help['identification_2_1']))
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary help-btn"
+            data-label="{{ $help['identification_2_1']->label }}"
+            data-purpose="{{ e($help['identification_2_1']->purpose) }}"
+            data-recommendation="{{ e($help['identification_2_1']->recommendation) }}"
+        >
+            ?
+        </button>
+        @endif
+      <br>
       
       <!-- identificationGroup1 -->
     　<input class="form-control" list="identification_list_1" name="identification_2_1" id="identification_2_1" value="個人事業開始届出証明書" readonly required>
@@ -168,35 +370,118 @@
     &nbsp;
 
     &nbsp;
-    <div id="identificationGroup2" style="display: none;">
-      <label for="identification_2_2" class="form-label">
-        <h3>商業・法人登記簿（履歴事項全部証明書）
-          <small>※請負の場合は発注者ではなく、受注者のもの</small>
-        </h3>
-      </label><br>
-      
-    　<!-- identificationGroup2 -->
-    　<input class="form-control" list="identification_list_2" name="identification_2_2" id="identification_2_2" value="商業・法人登記簿（履歴事項全部証明書）" readonly required>
-      
-      <datalist id="identification_list_2">
-        <option value="商業・法人登記簿（履歴事項全部証明書）">
-      </datalist>
-    </div> 
-    <br>
 
-    <div id="fileGroup2" style="display: none;">
+    <div id="identificationGroup2" style="display: none;">
+        <label for="identification_2_2" class="form-label">
+            <h3>代表か担当者の名刺のアップロードをお願いします *
+            <small>※請負の場合は発注者ではなく、受注者のもの</small>
+            </h3>
+        </label>
+        {{-- ❓ ヘルプ --}}
+        @if(isset($help['']))
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary help-btn"
+            data-label="{{ $help['']->label }}"
+            data-purpose="{{ e($help['']->purpose) }}"
+            data-recommendation="{{ e($help['']->recommendation) }}"
+        >
+            ?
+        </button>
+        @endif
+        <br>
+
+        <input
+          class="form-control"
+          name="identification_2_2"
+          id="identification_2_2"
+          value="business_card"
+          readonly
+          required
+        >
+          
+        <datalist id="identification_list_2">
+            <option value="名刺">
+        </datalist>
+     
+        <br>
+
+        <div id="fileGroup2" style="display: none;">
+            <div class="form-group">
+                <label for="file_2">  <div id="output2" style="font-size:20pt">上記の内容のアップロード *</div></label>
+                <input type="file" class="form-control" id="file_2" name="file_2" class="form-control" multiple>
+            </div>
+        </div>
+        <br>
         <div class="form-group">
-            <label for="file_2">  <div id="output2" style="font-size:20pt">上記の内容のアップロード</div></label>
-            <input type="file" class="form-control" id="file_2" name="file_2" class="form-control" multiple>
+            <label for="">
+                <h3>法人番号 *</h3>
+                <a href="https://www.houjin-bangou.nta.go.jp/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-decoration-underline"
+                >
+                    社会保障・税番号制度  
+                    国税庁 法人番号公表サイト
+                </a>
+            </label>
+            {{-- ❓ ヘルプ --}}
+            @if(isset($help['corporate_number']))
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary help-btn"
+                data-label="{{ $help['corporate_number']->label }}"
+                data-purpose="{{ e($help['corporate_number']->purpose) }}"
+                data-recommendation="{{ e($help['corporate_number']->recommendation) }}"
+            >
+                ?
+            </button>
+            @endif
+
+            <br>
+            <input
+                type="text"
+                class="form-control"
+                id="corporate_number"
+                name="corporate_number"
+                placeholder="法人番号（13桁）"
+                value="{{ old('corporate_number', isset($shop) ? $shop->corporate_number : '') }}"
+                required
+                pattern="\d{13}"
+                inputmode="numeric"
+            >
         </div>
     </div>
     <br>
 
     <div class="form-group">
-        <label for="person_1">  <h3>(担当者氏名１) *</h3></label>
+        <label for="person_1">  <h3>(担当者氏名１)</h3></label>
+        {{-- ❓ ヘルプ --}}
+        @if(isset($help['person_1']))
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary help-btn"
+            data-label="{{ $help['person_1']->label }}"
+            data-purpose="{{ e($help['person_1']->purpose) }}"
+            data-recommendation="{{ e($help['person_1']->recommendation) }}"
+        >
+            ?
+        </button>
+        @endif
         <input type="text" class="form-control" id="person_1" name="person_1" class="form-control" value="{{ old('person_1', $shop_sets->person_1 ?? '') }}" multiple>
         <br>
         <label for="id_1_1" class="form-label"><h3>担当者1の証明</h3></label>
+        @if(isset($help['id_1_1']))
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary help-btn"
+            data-label="{{ $help['id_1_1']->label }}"
+            data-purpose="{{ e($help['id_1_1']->purpose) }}"
+            data-recommendation="{{ e($help['id_1_1']->recommendation) }}"
+        >
+            ?
+        </button>
+        @endif
         <select class="form-control" name="id_1_1" id="id_1_1" required>
             <option value="選択して下さい">選択して下さい</option>
             <option value="運転免許証">運転免許証</option>
@@ -210,15 +495,38 @@
         <input type="file" class="form-control" id="photo_1" name="photo_1" class="form-control" multiple>
         <br>
 
-        <label for="photo_5">  <h3>上記の内容をアップロード(運転免許証の場合の裏面） *</h3></label>
+        <label for="photo_5">  <h3>上記の内容をアップロード(運転免許証の場合の裏面）</h3></label>
         <input type="file" class="form-control" id="photo_5" name="photo_5" class="form-control" multiple>
     </div>
     
 
     <div class="form-group">
-        <label for="person_2">  <h3>(担当者氏名２) *</h3></label>
+        <label for="person_2">  <h3>(担当者氏名２) </h3></label>
+        {{-- ❓ ヘルプ --}}
+        @if(isset($help['person_2']))
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary help-btn"
+            data-label="{{ $help['person_2']->label }}"
+            data-purpose="{{ e($help['person_2']->purpose) }}"
+            data-recommendation="{{ e($help['person_2']->recommendation) }}"
+        >
+            ?
+        </button>
+        @endif
         <input type="text" class="form-control" id="person_2" name="person_2" class="form-control" value="{{ old('person_2', $shop_sets->person_2 ?? '') }}" multiple>
         <label for="id_2_1" class="form-label"><h3>担当者2の証明</h3></label>
+        @if(isset($help['id_2_1']))
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary help-btn"
+            data-label="{{ $help['id_2_1']->label }}"
+            data-purpose="{{ e($help['id_2_1']->purpose) }}"
+            data-recommendation="{{ e($help['id_2_1']->recommendation) }}"
+        >
+            ?
+        </button>
+        @endif
         <select class="form-control" name="id_2_1" id="id_2_1" required>
             <option value="選択して下さい">選択して下さい</option>
             <option value="運転免許証">運転免許証</option>
@@ -228,19 +536,43 @@
             <option value="労働契約書">労働契約書</option>
         </select>
         <br>
-        <label for="photo_2">  <h3>(上記内容のアップロード) *</h3></label>
+        <label for="photo_2">  <h3>(上記内容のアップロード) </h3></label>
         <input type="file" class="form-control" id="photo_2" name="photo_2" class="form-control" multiple>
         <br>
-        <label for="photo_6">  <h3>上記の内容をアップロード(運転免許証の場合の裏面） *</h3></label>
+        <label for="photo_6">  <h3>上記の内容をアップロード(運転免許証の場合の裏面）</h3></label>
         <input type="file" class="form-control" id="photo_6" name="photo_6" class="form-control" multiple>
         <br>
     </div>
     &nbsp;
 
     <div class="form-group">
-        <label for="person_3">  <h3>(担当者氏名３) *</h3></label>
+        <label for="person_3">  <h3>(担当者氏名３) </h3></label>
+        {{-- ❓ ヘルプ --}}
+        @if(isset($help['person_3']))
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary help-btn"
+            data-label="{{ $help['person_3']->label }}"
+            data-purpose="{{ e($help['person_3']->purpose) }}"
+            data-recommendation="{{ e($help['person_3']->recommendation) }}"
+        >
+            ?
+        </button>
+        @endif
         <input type="text" class="form-control" id="person_3" name="person_3" class="form-control" value="{{ old('person_3', $shop_sets->person_3 ?? '') }}" multiple>
         <label for="id_3_1" class="form-label"><h3>担当者3の証明</h3></label>
+        {{-- ❓ ヘルプ --}}
+        @if(isset($help['id_3_1']))
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary help-btn"
+            data-label="{{ $help['id_3_1']->label }}"
+            data-purpose="{{ e($help['id_3_1']->purpose) }}"
+            data-recommendation="{{ e($help['id_3_1']->recommendation) }}"
+        >
+            ?
+        </button>
+        @endif
         <select class="form-control" name="id_3_1" id="id_3_1" required>
             <option value="選択して下さい">選択して下さい</option>
             <option value="運転免許証">運転免許証</option>
@@ -249,10 +581,10 @@
             <option value="名刺">名刺</option>
         </select>
         <br>
-        <label for="photo_3">  <h3>(上記内容のアップロード)*</h3></label>
+        <label for="photo_3">  <h3>(上記内容のアップロード) </h3></label>
         <input type="file" class="form-control" id="photo_3" name="photo_3" class="form-control" multiple>
         <br>
-        <label for="photo_7">  <h3>上記の内容をアップロード(運転免許証の場合の裏面） *</h3></label>
+        <label for="photo_7">  <h3>上記の内容をアップロード(運転免許証の場合の裏面）</h3></label>
         <input type="file" class="form-control" id="photo_7" name="photo_7" class="form-control" multiple>
         <br>
     </div>
@@ -274,25 +606,73 @@
  
     <div id="extraFields" style="display: none;">
         <div class="form-group">
-            <label for="manager">  <h3>manager *</h3></label>
+            <label for="manager">  <h3>主な担当者 *</h3></label>
+            {{-- ❓ ヘルプ --}}
+            @if(isset($help['manager']))
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary help-btn"
+                data-label="{{ $help['manager']->label }}"
+                data-purpose="{{ e($help['manager']->purpose) }}"
+                data-recommendation="{{ e($help['manager']->recommendation) }}"
+            >
+                ?
+            </button>
+            @endif
             <input type="text" class="form-control" name="manager" id="manager" aria-describedby="helpId" value="{{ old('manager', $shop_sets->manager ?? '') }}" >
         </div>
         &nbsp;
 
         <div class="form-group">
-            <label for="product_type">  <h3>product_type *</h3></label>
+            <label for="product_type">  <h3>商品の種類 *</h3></label>
+            {{-- ❓ ヘルプ --}}
+            @if(isset($help['product_type']))
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary help-btn"
+                data-label="{{ $help['product_type']->label }}"
+                data-purpose="{{ e($help['product_type']->purpose) }}"
+                data-recommendation="{{ e($help['product_type']->recommendation) }}"
+            >
+                ?
+            </button>
+            @endif
             <input type="text" class="form-control" name="product_type" id="product_type" aria-describedby="helpId" value="{{ old('product_type', $shop_sets->product_type ?? '') }}" >
         </div>
         &nbsp;
 
         <div class="form-group">
-            <label for="volume">  <h3>volume *</h3></label>
+            <label for="volume">  <h3>予想される取引量 *</h3></label>
+            {{-- ❓ ヘルプ --}}
+            @if(isset($help['volume']))
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary help-btn"
+                data-label="{{ $help['volume']->label }}"
+                data-purpose="{{ e($help['volume']->purpose) }}"
+                data-recommendation="{{ e($help['volume']->recommendation) }}"
+            >
+                ?
+            </button>
+            @endif
             <input type="text" class="form-control" name="volume" id="volume" aria-describedby="helpId" value="{{ old('volume', $shop_sets->volume ?? '') }}">
         </div>
         &nbsp;
 
         <div class="form-group">
-            <label for="note">  <h3>note</h3></label>
+            <label for="note">  <h3>伝達事項（簡潔にお願いします）</h3></label>
+            {{-- ❓ ヘルプ --}}
+            @if(isset($help['note']))
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary help-btn"
+                data-label="{{ $help['note']->label }}"
+                data-purpose="{{ e($help['note']->purpose) }}"
+                data-recommendation="{{ e($help['note']->recommendation) }}"
+            >
+                ?
+            </button>
+            @endif
             <input type="text" class="form-control" name="note" id="" aria-describedby="helpId" value="{{ old('note', $shop_sets->note ?? '') }}">
         </div>
         &nbsp;
@@ -385,6 +765,7 @@
 
       // 法人 or 業務請負（同じ扱い）
       else if (selectedType === "法人" || selectedType === "業務請負") {
+        idGroup1.style.display = 'block';
         identificationGroup2.style.display = 'block';
         fileGroup2.style.display = 'block';
         extraFields.style.display = 'block';
@@ -406,22 +787,44 @@
 </script>
 
 <script>
-document.getElementById('saveDraftBtn').addEventListener('click', function () {
-    // フォーム内の全ての required 属性を一時的に無効に
-    document.querySelectorAll('#shopForm [required]').forEach(el => {
-        el.removeAttribute('required');
+    document.getElementById('saveDraftBtn').addEventListener('click', function () {
+        // フォーム内の全ての required 属性を一時的に無効に
+        document.querySelectorAll('#shopForm [required]').forEach(el => {
+            el.removeAttribute('required');
+        });
+
+        // 下書き保存用に hidden を追加
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'save_type';
+        input.value = 'draft';
+        document.getElementById('shopForm').appendChild(input);
+
+        document.getElementById('shopForm').submit();
     });
-
-    // 下書き保存用に hidden を追加
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'save_type';
-    input.value = 'draft';
-    document.getElementById('shopForm').appendChild(input);
-
-    document.getElementById('shopForm').submit();
-});
 </script>
+
+<script>
+    document.querySelectorAll('.help-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+
+            document.getElementById('helpTitle').innerText =
+                this.dataset.label;
+
+            document.getElementById('helpPurpose').innerText =
+                this.dataset.purpose || '説明はありません。';
+
+            document.getElementById('helpRecommendation').innerText =
+                this.dataset.recommendation || '特に指定はありません。';
+
+            const modal = new bootstrap.Modal(
+                document.getElementById('helpModal')
+            );
+            modal.show();
+        });
+    });
+</script>
+
 
 
 <!-- インボイスPOST -->
