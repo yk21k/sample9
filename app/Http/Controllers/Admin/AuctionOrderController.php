@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use TCG\Voyager\Database\Schema\SchemaManager;
 use TCG\Voyager\Http\Controllers\VoyagerBaseController;
 
-class ShopsController extends VoyagerBaseController
+class AuctionOrderController extends VoyagerBaseController
 {
     //***************************************
     //               ____
@@ -64,7 +64,7 @@ class ShopsController extends VoyagerBaseController
             // query to display seller's shop only　＊＊＊＊＊
             if(auth()->user()->hasRole('seller')){
 
-                $query->where('user_id', auth()->user()->id);
+                $query->where('shop_id', auth()->user()->shop->id);
 
             }
 

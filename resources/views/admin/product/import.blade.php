@@ -1,6 +1,14 @@
 @extends('voyager::master')
 
 @section('content')
+
+@if ($errors->has('csv_error'))
+<div class="alert alert-danger">
+    {{ $errors->first('csv_error') }}
+</div>
+@endif
+
+
 <div class="container-fluid">
     <h2>商品一括登録（CSV）</h2>
     @if(session('message'))

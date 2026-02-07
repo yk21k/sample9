@@ -6,7 +6,7 @@
     $flow = Flow::with(['steps' => function ($q) {
         $q->orderBy('step_order');
     }])
-    ->where('slug', 'product_registration_flow')
+    ->where('slug', 'shop_registration_flow')
     ->first();
 
 
@@ -20,6 +20,7 @@
     <h1 class="page-title">
         <i class="{{ $dataType->icon }}"></i> {{ $dataType->getTranslatedAttribute('display_name_plural') }}
     </h1>
+
     @can('add', app($dataType->model_name))
     <a href="{{ route('voyager.'.$dataType->slug.'.create') }}" class="btn btn-success btn-add-new">
         <i class="voyager-plus"></i> <span>{{ __('voyager::generic.add_new') }}</span>
@@ -51,6 +52,8 @@
 </div>
 @stop
 
+
+
 @section('content')
 
     @parent
@@ -61,6 +64,7 @@
         ])
     @endif
 
+
 <div class="page-content browse container-fluid">
     @include('voyager::alerts')
     <div class="row">
@@ -68,16 +72,6 @@
             <div>
                 <a href="{{url('/seller/orders')}}" class="">Order Management</a>
             </div>
-            {{-- browse.blade.php のどこかに追加（例：上部ツールバー） --}}
-            <a href="{{ route('products.import.form') }}" class="btn btn-primary" style="margin-right: 10px;">
-                <i class="voyager-upload"></i> CSV一括登録
-            </a>
-
-            <a href="{{ route('products.csv.template') }}"
-               class="btn btn-outline-primary">
-                📥 CSV雛形をダウンロード
-            </a>
-
             <div class="panel panel-bordered">
                 <div class="panel-body">
                     @if ($isServerSide)
@@ -123,25 +117,28 @@
                                     <th>
                                         <input type="checkbox" class="select_all">
                                     </th>
-
                                     @endif
-                                    @foreach($dataType->browseRows as $row)
-                                    <th>
-                                        @if ($isServerSide)
-                                        <a href="{{ $row->sortByUrl($orderBy, $sortOrder) }}">
+                                    @foreach($dataType->browseRows as $row)                    
+
+                                        <th>
+                                            @if($isServerSide)
+                                            <a href="{{ $row->sortByUrl($orderBy, $sortOrder) }}">
+                                                @endif
+                                                  
+                                                        {{ $row->getTranslatedAttribute('display_name') }}
+                                                        
+                                                @if ($isServerSide)
+                                                @if ($row->isCurrentSortField($orderBy))
+                                                @if ($sortOrder == 'asc')
+                                                <i class="voyager-angle-up pull-right"></i>
+                                                @else
+                                                <i class="voyager-angle-down pull-right"></i>
+                                                @endif
+                                                @endif
+                                            </a>
                                             @endif
-                                            {{ $row->getTranslatedAttribute('display_name') }}
-                                            @if ($isServerSide)
-                                            @if ($row->isCurrentSortField($orderBy))
-                                            @if ($sortOrder == 'asc')
-                                            <i class="voyager-angle-up pull-right"></i>
-                                            @else
-                                            <i class="voyager-angle-down pull-right"></i>
-                                            @endif
-                                            @endif
-                                        </a>
-                                        @endif
-                                    </th>
+                                        </th>
+                                            
                                     @endforeach
                                     <th class="actions text-right">{{ __('voyager::generic.actions') }}</th>
                                 </tr>
@@ -154,19 +151,46 @@
                                         <input type="checkbox" name="row_id" id="checkbox_{{ $data->getKey() }}"
                                             value="{{ $data->getKey() }}">
                                     </td>
-
                                     @endif
                                     @foreach($dataType->browseRows as $row)
                                     @php
-                                    if ($data->{$row->field.'_browse'}) {
-                                    $data->{$row->field} = $data->{$row->field.'_browse'};
-                                    }
+                                        if ($data->{$row->field.'_browse'}) {
+                                        $data->{$row->field} = $data->{$row->field.'_browse'};
+                                        }
+
+                                        
+                                        // 非表示対象は seller 固定
+                                        // details を配列として安全に取得
+                                        $details = json_decode(json_encode($row->details), true) ?? [];
+
+                                        // hide_for_roles（なければ空配列）
+                                        $hideRoles = $details['hide_for_roles'] ?? [];
+
+                                        $user = auth()->user();
+                                        $userRoles = [];
+
+                                        // admin（単数ロール）
+                                        if ($user->role) {
+                                            $userRoles[] = $user->role->name;
+                                        }
+
+                                        // seller（複数ロール）
+                                        if ($user->roles && $user->roles->count()) {
+                                            $userRoles = array_merge(
+                                                $userRoles,
+                                                $user->roles->pluck('name')->toArray()
+                                            );
+                                        }
+
+                                        // 表示可否判定
+                                        $canViewField = empty(array_intersect($hideRoles, $userRoles));
+
+ 
                                     @endphp
+
                                     <td>
 
                                         @if (isset($row->details->view))
-
-                                            
 
                                         @include($row->details->view, ['row' => $row, 'dataType' => $dataType,
                                         'dataTypeContent' => $dataTypeContent, 'content' => $data->{$row->field},
@@ -189,7 +213,12 @@
                                         @if(property_exists($row->details, 'relationship'))
 
                                         @foreach($data->{$row->field} as $item)
-                                        {{ $item->{$row->field} }}
+
+                                            
+                                                {{ $item->{$row->field} }}
+                                                
+
+                                               
                                         @endforeach
 
                                         @elseif(property_exists($row->details, 'options'))
@@ -229,14 +258,12 @@
                                         {{ $data->{$row->field} }}
                                         @endif
                                         @elseif($row->type == 'checkbox')
-
                                         @if(property_exists($row->details, 'on') && property_exists($row->details,
                                         'off'))
                                         @if($data->{$row->field})
                                         <span class="label label-info">{{ $row->details->on }}</span>
                                         @else
                                         <span class="label label-primary">{{ $row->details->off }}</span>
-                                        
                                         @endif
                                         @else
                                         {{ $data->{$row->field} }}
@@ -251,7 +278,13 @@
                                              
 
                                         <div>
-                                            {{ mb_strlen( $data->{$row->field} ) > 200 ? mb_substr($data->{$row->field}, 0, 200) . ' ...' : $data->{$row->field} }}
+
+
+                                            @if($canViewField)
+                                                {{ mb_strlen( $data->{$row->field} ) > 200 ? mb_substr($data->{$row->field}, 0, 200) . ' ...' : $data->{$row->field} }}
+                                            @else
+                                                足りない時や不鮮明時は連絡します  
+                                            @endif
                                         </div>
                                         @elseif($row->type == 'text_area')
                                         @include('voyager::multilingual.input-hidden-bread-browse')
@@ -264,7 +297,9 @@
                                         @foreach(json_decode($data->{$row->field}) as $file)
                                         <a href="{{ Storage::disk(config('voyager.storage.disk'))->url($file->download_link) ?: '' }}"
                                             target="_blank">
-                                            {{ $file->original_name ?: '' }}
+                                            
+                                                {{ $file->original_name ?: '' }}
+                                            
                                         </a>
                                         <br />
                                         @endforeach
@@ -295,7 +330,7 @@
                                         if (is_array($data->{$row->field})) {
                                         $files = $data->{$row->field};
                                         } else {
-                                        $files = json_decode($data->{$row->field});
+                                            $files = json_decode($data->{$row->field});
                                         }
                                         @endphp
                                         @if ($files)
@@ -308,7 +343,10 @@
                                         @else
                                         <ul>
                                             @foreach (array_slice($files, 0, 3) as $file)
-                                            <li>{{ $file }}</li>
+                                                
+
+                                                <li>{{ $file }}</li>
+
                                             @endforeach
                                         </ul>
                                         @endif
@@ -323,7 +361,10 @@
                                         <img src="@if( !filter_var($data->{$row->field}, FILTER_VALIDATE_URL)){{ Voyager::image( $data->{$row->field} ) }}@else{{ $data->{$row->field} }}@endif"
                                             style="width:50px">
                                         @else
-                                        {{ $data->{$row->field} }}
+                                            
+
+                                                {{ $data->{$row->field} }}
+                                               
                                         @endif
                                         @else
                                         {{ trans_choice('voyager::media.files', 0) }}
@@ -333,6 +374,7 @@
                                         <span>{{ $data->{$row->field} }}</span>
                                         @endif
                                     </td>
+                                    
                                     @endforeach
                                     <td class="no-sort no-click bread-actions">
                                         @foreach($actions as $action)
@@ -341,14 +383,9 @@
                                         @endif
                                         @endforeach
 
-                                        @if($data->status == 'completed')
-                                            <a href="{{ route('order.pay', $data) }}"
-                                                class="btn btn-sm btn-success pull-right" style="margin-right: 5px;">
-                                                <i class="{{ $action->getIcon() }}"></i> <span class="hidden-xs hidden-sm">Pay</span>
-                                            </a>
-
-                                        @endif
+                                        
                                     </td>
+                                   
 
                                 </tr>
                                 @endforeach
@@ -406,184 +443,186 @@
 </div><!-- /.modal -->
 @stop
 
+
+
 @section('css')
 @if(!$dataType->server_side && config('dashboard.data_tables.responsive'))
 <link rel="stylesheet" href="{{ voyager_asset('lib/css/responsive.dataTables.min.css') }}">
 @endif
 <!-- ２０２６０１２８追加 -->
 <style>
-    /* =============================
-       共通（モバイルファースト）
-    ============================= */
+/* =============================
+   共通（モバイルファースト）
+============================= */
 
+.flow-overlay {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    width: 100%;
+    max-height: 85vh;
+
+    background: #ffffff;
+    border-radius: 16px 16px 0 0;
+    padding: 16px;
+
+    z-index: 9999;
+    box-shadow: 0 -10px 30px rgba(0,0,0,.25);
+    overflow-y: auto;
+
+    transition: transform .25s ease;
+}
+
+/* 非表示 */
+.flow-overlay.hidden {
+    transform: translateY(100%);
+}
+
+/* =============================
+   タイトル周り
+============================= */
+
+.flow-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.flow-title {
+    font-size: 17px;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* =============================
+   概要
+============================= */
+
+.flow-overview {
+    font-size: 13px;
+    color: #6c757d;
+    margin-bottom: 14px;
+}
+
+/* =============================
+   ステップ
+============================= */
+
+.flow-steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.flow-step {
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.flow-step.required {
+    border-left: 5px solid #dc3545;
+    background: #fff5f5;
+}
+
+.flow-step.optional {
+    border-left: 5px solid #0dcaf0;
+    background: #f5fbff;
+}
+
+.flow-step-title {
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.flow-step-desc {
+    font-size: 13px;
+    color: #333;
+}
+
+/* =============================
+   開くボタン
+============================= */
+
+.flow-open-btn {
+    position: fixed;
+    right: 16px;     /* モバイル：右 */
+    bottom: 16px;
+    z-index: 9998;
+}
+
+/* =============================
+   PC表示（768px以上）
+============================= */
+
+@media (min-width: 768px) {
     .flow-overlay {
-        position: fixed;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        top: 50%;
+        left: 50%;
+        bottom: auto;
 
-        width: 100%;
-        max-height: 85vh;
+        width: 680px;
+        max-height: 80vh;
 
-        background: #ffffff;
-        border-radius: 16px 16px 0 0;
-        padding: 16px;
-
-        z-index: 9999;
-        box-shadow: 0 -10px 30px rgba(0,0,0,.25);
-        overflow-y: auto;
-
-        transition: transform .25s ease;
+        transform: translate(-50%, -50%);
+        border-radius: 12px;
+        box-shadow: 0 20px 40px rgba(0,0,0,.25);
     }
 
-    /* 非表示 */
     .flow-overlay.hidden {
-        transform: translateY(100%);
+        transform: translate(-50%, -30%);
+        opacity: 0;
+        pointer-events: none;
     }
 
-    /* =============================
-       タイトル周り
-    ============================= */
-
-    .flow-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
-    }
-
-    .flow-title {
-        font-size: 17px;
-        font-weight: bold;
-        margin: 0;
-    }
-
-    /* =============================
-       概要
-    ============================= */
-
-    .flow-overview {
-        font-size: 13px;
-        color: #6c757d;
-        margin-bottom: 14px;
-    }
-
-    /* =============================
-       ステップ
-    ============================= */
-
-    .flow-steps {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .flow-step {
-        padding: 12px;
-        margin-bottom: 12px;
-        border-radius: 8px;
-        font-size: 14px;
-    }
-
-    .flow-step.required {
-        border-left: 5px solid #dc3545;
-        background: #fff5f5;
-    }
-
-    .flow-step.optional {
-        border-left: 5px solid #0dcaf0;
-        background: #f5fbff;
-    }
-
-    .flow-step-title {
-        font-weight: bold;
-        margin-bottom: 6px;
-    }
-
-    .flow-step-desc {
-        font-size: 13px;
-        color: #333;
-    }
-
-    /* =============================
-       開くボタン
-    ============================= */
-
-    .flow-open-btn {
-        position: fixed;
-        right: 16px;     /* モバイル：右 */
-        bottom: 16px;
-        z-index: 9998;
-    }
-
-    /* =============================
-       PC表示（768px以上）
-    ============================= */
-
+    /* PC表示 */
     @media (min-width: 768px) {
-        .flow-overlay {
-            top: 50%;
-            left: 50%;
+        .flow-open-btn {
+            left: 288px;  /* PC：左 */
+            right: auto;
+            top: 90px;   /* Voyager ヘッダー下 */
             bottom: auto;
-
-            width: 680px;
-            max-height: 80vh;
-
-            transform: translate(-50%, -50%);
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0,0,0,.25);
-        }
-
-        .flow-overlay.hidden {
-            transform: translate(-50%, -30%);
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* PC表示 */
-        @media (min-width: 768px) {
-            .flow-open-btn {
-                left: 500px;  /* PC：左 */
-                right: auto;
-                top: 95px;   /* Voyager ヘッダー下 */
-                bottom: auto;
-            }
         }
     }
-        /* ヘッダー右側アクション */
+}
+    /* ヘッダー右側アクション */
+    .flow-actions {
+        display: flex;
+        gap: 6px;
+    }
+
+    /* ===== 印刷時 ===== */
+    @media print {
+
+        /* 画面の他要素を消す */
+        body * {
+            visibility: hidden;
+        }
+
+        /* Flowだけ表示 */
+        #flowOverlay,
+        #flowOverlay * {
+            visibility: visible;
+        }
+
+        #flowOverlay {
+            position: static !important;
+            width: 100% !important;
+            max-height: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            padding: 20px !important;
+        }
+
+        /* ボタンは不要 */
         .flow-actions {
-            display: flex;
-            gap: 6px;
+            display: none;
         }
-
-        /* ===== 印刷時 ===== */
-        @media print {
-
-            /* 画面の他要素を消す */
-            body * {
-                visibility: hidden;
-            }
-
-            /* Flowだけ表示 */
-            #flowOverlay,
-            #flowOverlay * {
-                visibility: visible;
-            }
-
-            #flowOverlay {
-                position: static !important;
-                width: 100% !important;
-                max-height: none !important;
-                box-shadow: none !important;
-                border-radius: 0 !important;
-                padding: 20px !important;
-            }
-
-            /* ボタンは不要 */
-            .flow-actions {
-                display: none;
-            }
-        }
+    }
 
 </style>
 
@@ -713,37 +752,5 @@
         }
     });
 </script>
-<!-- 条件チェック用の例ボタン -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const toggle = document.querySelector('input[name="status"]');
-        const checkBtn = document.getElementById('checkConditionBtn');
 
-        // 初期状態で無効化
-        toggle.disabled = true;
-
-        // 条件判定ボタン
-        checkBtn.addEventListener('click', function() {
-            // ここで条件を判定（例：Ajaxや入力値など）
-            const conditionMet = confirm("条件が満たされましたか？");
-
-            if(conditionMet){
-                toggle.disabled = false; // 有効化
-
-                // Voyagerのtoggleswitchの表示も更新
-                if(typeof $(toggle).bootstrapToggle === "function"){
-                    $(toggle).bootstrapToggle('enable');
-                }
-
-                alert("トグルが操作可能になりました！");
-            } else {
-                toggle.disabled = true;
-                if(typeof $(toggle).bootstrapToggle === "function"){
-                    $(toggle).bootstrapToggle('disable');
-                }
-                alert("まだ条件を満たしていません。");
-            }
-        });
-    });
-</script>
 @stop

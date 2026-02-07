@@ -15,7 +15,7 @@
             &nbsp;
         @else
             <div class="alert alert-warning mt-3">
-                初回の注文がないため、クーポンを作成できません。
+                初回の注文がないため、クーポンとキャンペーンを作成できません。
             </div>
             
 

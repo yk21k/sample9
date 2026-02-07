@@ -513,6 +513,9 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin/product/import', [App\Http\Controllers\ProductImportController::class, 'showForm'])->name('products.import.form');
     Route::post('/admin/product/import', [App\Http\Controllers\ProductImportController::class, 'import'])->name('products.import');
+
+    Route::get('/admin/product/import/csv-template', [App\Http\Controllers\ProductImportController::class, 'downloadTemplate'])
+    ->name('products.csv.template');
 });
 
 use App\Models\FAQ;
@@ -559,38 +562,7 @@ function handleBotman($target)
 }
 
 
-// Route::match(['get','post'], '/botman', function () {
-//     $config = [];
-//     DriverManager::loadDriver(\BotMan\Drivers\Web\WebDriver::class);
-//     $botman = BotManFactory::create($config);
 
-//     $botman->hears('{message}', function ($bot, $message) {
-//         $faqs = FAQ::where('is_approved', true)->get();
-
-//         foreach ($faqs as $faq) {
-//             // keywords を配列化（カンマ or スペース区切り対応）
-//             $keywords = preg_split('/[\s,]+/u', $faq->keywords, -1, PREG_SPLIT_NO_EMPTY);
-
-//             foreach ($keywords as $keyword) {
-//                 if (mb_strpos($message, $keyword) !== false) {
-//                     $bot->reply($faq->answer);
-//                     return; // 最初に見つかったものを返答
-//                 }
-//             }
-
-//             // 質問文も部分一致チェック
-//             if (mb_strpos($message, $faq->question) !== false) {
-//                 $bot->reply($faq->answer);
-//                 return;
-//             }
-//         }
-
-//         // どれにもマッチしなかった場合
-//         $bot->reply('すみません、よく分かりませんでした。FAQページをご覧ください。もしくは、「購入」などカギ括弧なしで入力ください');
-//     });
-
-//     $botman->listen();
-// });
 
 
 Route::get('/test', function(){

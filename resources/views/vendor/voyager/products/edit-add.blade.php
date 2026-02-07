@@ -70,12 +70,14 @@
                                         $dataTypeContent->{$row->field} = $dataTypeContent->{$row->field.'_'.($edit ? 'edit' : 'add')};
                                     }
                                 @endphp
-                                
+                                <div id="stripe-warning" class="alert alert-warning" style="display:none;">
+                                    Stripe連携が完了していないため、Statusを有効化できません。
+                                </div>
 
                                 @if (isset($row->details->legend) && isset($row->details->legend->text))
                                     <legend class="text-{{ $row->details->legend->align ?? 'center' }}" style="background-color: {{ $row->details->legend->bgcolor ?? '#f0f0f0' }};padding: 5px;">{{ $row->details->legend->text }}</legend>
                                 @endif
-
+                                
                                 <div class="form-group @if($row->type == 'hidden') hidden @endif col-md-{{ $display_options->width ?? 12 }} {{ $errors->has($row->field) ? 'has-error' : '' }}" @if(isset($display_options->id)){{ "id=$display_options->id" }}@endif>
                                     {{ $row->slugify }}
                                     <label class="control-label" for="name">{{ $row->getTranslatedAttribute('display_name') }}</label>
@@ -106,9 +108,14 @@
                                         @else
                                             :　0 if it is a newly registered product, or the setting value after creating a campaign
                                         @endif
-                                        
+                                    
+                                    
+
                                     @else
+
+                                        
                                         {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!}
+                                        
                                     @endif
 
                                     @foreach (app('voyager')->afterFormFields($row, $dataType, $dataTypeContent) as $after)
@@ -217,6 +224,8 @@
 @stop
 
 @section('javascript')
+
+
     <script>
         var params = {};
         var $file;
@@ -290,7 +299,6 @@
         });
     </script>
 
-    
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const priceInput = document.querySelector('input[name="price"]');
@@ -347,6 +355,56 @@
             });
         });
     </script>
+
+    <!-- 条件チェック用の例ボタン -->
+    @php
+        // StripeアカウントIDを取得
+        $stripeAccountId = auth()->user()->stripe_account_id;
+    @endphp
+
+    <script>
+    $(function(){
+        const statusToggle = $('input[name="status"]');
+
+        if(statusToggle.length){
+            // 初期無効化
+            statusToggle.bootstrapToggle('disable');
+
+            // Blade で取得した stripeAccountId を JS で利用
+            const stripeAccountId = "{{ $stripeAccountId }}";
+
+            if(stripeAccountId){ 
+                // Stripe連携済みならトグルを有効化
+                statusToggle.bootstrapToggle('enable');
+            }
+        }
+    });
+    </script>
+
+    <script>
+        $(function(){
+
+            setTimeout(function(){
+
+                const statusToggle = $('input.toggleswitch');
+                if(!statusToggle.length) return;
+
+                const stripeAccountId = @json(auth()->user()->stripe_account_id);
+
+                if(!stripeAccountId){
+                    // Stripe未連携
+                    statusToggle.bootstrapToggle('disable');
+                    $('#stripe-warning').show();
+                }else{
+                    // Stripe連携済み
+                    statusToggle.bootstrapToggle('enable');
+                    $('#stripe-warning').hide();
+                }
+
+            }, 300); // Voyagerのtoggle初期化待ち
+        });
+    </script>
+
 
     @php
         $isTaxable = !empty(auth()->user()->shop->invoice_number); 

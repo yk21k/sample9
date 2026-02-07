@@ -33,7 +33,7 @@ class ProductController extends Controller
             // dd($products);
             // dd($category);
         }else{
-            $products = Product::take(10)->get();
+            $products = Product::take(100)->get();
         }
 
         return view('products.index', compact('products', 'categoryName'));
