@@ -227,6 +227,9 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="card-body">
+                            <a href="{{ route('cart.add', $attr->id) }}" class="card-link">Add to cart</a>
+                        </div>
                     @endforeach
                 </div>
             </section>
@@ -255,6 +258,9 @@
                         <div class="overlay-btn video-overlay-button">
                             🔥 商品を見る
                         </div>
+                    </div>
+                    <div class="card-body">
+                        <a href="{{ route('cart.add', $attr->id) }}" class="card-link">Add to cart</a>
                     </div>
                 @endforeach
             </article>
