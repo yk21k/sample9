@@ -128,6 +128,7 @@
 	                @endif	
 	                <td>
 					    ¥{{ number_format($lowestPrice) }}<br>
+					    					    
 					    <small class="text-muted">税抜: ¥{{ number_format($originalPriceEx) }}</small><br>
 					    @if($isTaxable)
 					        <small class="text-warning">消費税: ¥{{ number_format($taxAmount) }}</small><br>
@@ -223,56 +224,99 @@
 	 </div>
 　　<div class="buffer"></div>
 	<br>
-	@php
-	    $originalTotal = \Cart::session(auth()->id())->getSubTotalWithoutConditions();
-        $tax_rate = App\Models\TaxRate::current()?->rate;
 
-	    $shippingTotal = $cartItems->sum(function ($item) use ($tax_rate){
-		    $shippingFee = (float) ($item->associatedModel->shipping_fee*($tax_rate+1) ?? 0);
-		    return $shippingFee * $item->quantity;
-		});
+@php
+	use Illuminate\Support\Facades\Log;
 
-	    $originalTotalWithShipping = $originalTotal + $shippingTotal + $originalTotal*$tax_rate;
+	$tax_rate = App\Models\TaxRate::current()?->rate ?? 0;
 
-	    
+	$originalTotal = \Cart::session(auth()->id())->getSubTotalWithoutConditions();
 
-	    $discountAmount = floor($originalTotalWithShipping) - floor($totalAll);
-	    $discountPercent = $originalTotal > 0 ? round(($discountAmount / $originalTotal) * 100) : 0;
+	// ===== 初期化 =====
+	$subtotalEx = 0;   // 商品合計（税抜）
+	$shippingEx = 0;   // 送料合計（税抜）
+	$taxTotal   = 0;   // 消費税合計
 
-	    $cartCampaigns = $cartItems->pluck('campaign')->filter()->unique('id');
-	    $endingSoon = $cartCampaigns->sortBy('end_date')->first();
-	    $remainingHours = $endingSoon ? now()->diffInHours(\Carbon\Carbon::parse($endingSoon->end_date), false) : null;
+	// ===== カート行単位計算 =====
+	foreach ($cartItems as $item) {
+	    $price    = $item->price * $item->quantity;
+	    $shipping = ($item->associatedModel->shipping_fee ?? 0) * $item->quantity;
 
-	    session(['total_and_shipping' => $totalAll]); 
-	    Log::info('total_and_shipping: ' . session('total_and_shipping')); 
-	@endphp
+	    $subtotalEx += $price;
+	    $shippingEx += $shipping;
 
+	    // 課税業者のみ（商品＋送料）に税
+	    if ($item->associatedModel->shop->invoice_number == true) {
+	        $taxTotal += floor(($price + $shipping) * $tax_rate);
+	    }
+	}
 
+	// ===== 割引前合計 =====
+	$originalTotalEx = $subtotalEx + $shippingEx;
+	$originalTotalWithTax = $originalTotalEx + $taxTotal;
+
+	// ===== 割引後合計 =====
+	// $totalAll は既存ロジックで計算済み（税込・送料込）
+	$discountAmount = floor($originalTotalWithTax) - floor($totalAll);
+	$discountPercent = $originalTotalEx > 0
+	    ? round(($discountAmount / $originalTotalEx) * 100)
+	    : 0;
+
+	// ===== キャンペーン情報（既存）=====
+	$cartCampaigns = $cartItems->pluck('campaign')->filter()->unique('id');
+	$endingSoon = $cartCampaigns->sortBy('end_date')->first();
+	$remainingHours = $endingSoon
+	    ? now()->diffInHours(\Carbon\Carbon::parse($endingSoon->end_date), false)
+	    : null;
+
+	// ===== 表示制御 =====
+	$hasDiscount = $discountAmount > 0;
+
+	// ===== ★必須：session & log =====
+	session(['total_and_shipping' => $totalAll]);
+	Log::info('total_and_shipping: ' . session('total_and_shipping'));
+
+	// ===== デバッグ =====
+	foreach ($cartItems as $item) {
+	    Log::info([
+	        'item_id' => $item->id,
+	        'price' => $item->price,
+	        'shipping_fee' => $item->associatedModel->shipping_fee ?? null,
+	        'shop' => $item->associatedModel->shop_name ?? null,
+	        'is_taxable' => $item->associatedModel->is_taxable ?? 'undefined',
+	        'item->associatedModel' => $item->associatedModel,
+
+	    ]);
+	}
+@endphp
 	<h3 style="color: #b0c4de;">ご注文金額
-
 	    <div class="price-line">
+		@if($hasDiscount)
+		    通常合計:
+		    <p class="original-price">
+		        ¥{{ number_format($originalTotalWithTax) }}
+		    </p>
+		    →
+		    <p class="discounted-price">
+		        割引適用後合計: ¥{{ number_format($totalAll) }}
+		    </p>
+		@else
+		    合計:
+		    <p class="fw-bold">
+		        ¥{{ number_format($totalAll) }}
+		    </p>
+		@endif
 
-	    	@if(ceil($totalAll)===ceil($originalTotalWithShipping))
-	    		合計:
-				<p class="text-body fw-bold">
-				    &nbsp;¥{{ number_format(ceil($originalTotalWithShipping)) }}
-				</p>
-	    	@else
-	    		通常合計:
-	    		<p class="original-price">
-	            	&nbsp;¥{{ ceil($originalTotalWithShipping) }}
-		        </p>
-		        →
-		        <p class="discounted-price">
-		            割引適用後合計:　¥{{ number_format($totalAll) }}
-		        </p>
-	    	@endif
 	    </div>
-	    <br>
-	    @if($discountAmount > 0)
+	    @if($hasDiscount)
 	        <div class="save-note" style="color:tomato;">
-	            🎉 ¥{{ ceil($originalTotalWithShipping - $totalAll)  }} お得になりました！
+	            🎉 ¥{{ number_format($originalTotalWithTax - $totalAll)  }} お得になりました！
+	        	
 	        </div>
+	    @else
+	    	<div class="save-note" style="color:tomato;">
+	            カート内にはクーポンやキャンペーン対象商品は、ありません
+	        </div>   
 	    @endif
 
 	    @if(!is_null($remainingHours))
@@ -297,7 +341,7 @@
 	<button class="btn btn-primary" id="submitButton" onclick="location.href='{{ route('cart.checkout') }}' " role="button">Proceed to Checkout</button>
 		
 
-		<script>
+	<script>
 	    const totalAmount = {{ session('total_and_shipping', 0) }};  // または $totalAll
 	</script>
 	<script>

@@ -1,5 +1,7 @@
 {{-- footer css --}}
 <link rel="stylesheet" href="{{ asset('front/css/footer.css') }}">
+<!-- フッター直前にダミー要素 -->
+<div id="footer-trigger" aria-hidden="true"></div>
 
 <footer class="site-footer">
     <div class="footer-inner">
@@ -35,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('scroll', () => {
 		const scrollBottom = window.scrollY + window.innerHeight;
 
-		if (scrollBottom >= document.body.scrollHeight - 100) {
+		if (scrollBottom >= document.body.scrollHeight - 10) {
 		    footer.classList.add('show');
 		} else {
 		    footer.classList.remove('show');
