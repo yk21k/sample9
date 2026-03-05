@@ -11,116 +11,167 @@ use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Carbon\Carbon;
 
+use App\Models\TaxRate;
+
 class FullOrderExport implements FromCollection
 {
     public function collection()
     {
         $today = Carbon::today();
         $rows = collect();
-        $rows->push(['出力日: ' . now()->format('Y-m-d')]); // ✅ 1行目に追加
+        $rows->push(['出力日: ' . now()->format('Y-m-d')]);
 
-        // ✅ ヘッダー行（1行目）
-        $rows->push([
-            // 注文情報
-            'オーダーNo.', 'ID', '状況', '注文日', '宛名', '電話番号', '郵便番号', '宛先',
-
-            // 商品情報
-            '商品名', '個数', '通常価格(配送料なし)', '配送料', '手数料対象額', '支払手数料', '入金額(予定も含む)',
-
-            // 価格関連
-            '通常価格(配送料込)', 'キャンペーン価格', 'クーポン価格', '最終価格', '適用(２つ目以降は適用なし)'
-        ]);
-
-        // ✅ 対象の SubOrder 取得（管理者 or セラー）
         $user = auth()->user();
-        \Log::info('現在のログインユーザー', ['id' => $user->id, 'name' => $user->name]);
-        $subOrders = $user->id == 1
-            ? SubOrder::with(['order', 'items'])->get()
-            : SubOrder::with(['order', 'items'])->where('seller_id', $user->id)->get();
+
+        // 🔹 店舗取得（1回のみ）
+        $shop = Shop::where('user_id', $user->id)->first();
+        $isTaxableBusiness = !empty($shop?->invoice_number);
+
+        // 🔹 税率取得（1回のみ）
+        $taxRate = TaxRate::current()?->rate ?? 0;
+
+        // 🔹 手数料設定取得（1回のみ）
+        $commission = Commition::first();
+        $feeRate = $commission->rate ?? 0;
+        $feeFixed = $commission->fixed ?? 0;
+
+        // ✅ ヘッダー分岐
+        if ($isTaxableBusiness) {
+            $rows->push([
+                'オーダーNo.', 'ID', '状況', '注文日',
+                '宛名', '電話番号', '郵便番号', '宛先',
+                '事業者区分',
+                '商品名', '個数',
+                '通常価格(配送料なし)',
+                '消費税(商品分)',
+                '配送料',
+                '消費税(送料分)',
+                '手数料対象額', '支払手数料',
+                '入金額(予定も含む)',
+                '通常価格(配送料込)',
+                'キャンペーン価格',
+                'クーポン価格',
+                '最終価格', '適用'
+            ]);
+        } else {
+            $rows->push([
+                'オーダーNo.', 'ID', '状況', '注文日',
+                '宛名', '電話番号', '郵便番号', '宛先',
+                '事業者区分',
+                '商品名', '個数',
+                '通常価格(配送料なし)',
+                '配送料',
+                '手数料対象額', '支払手数料',
+                '入金額(予定も含む)',
+                '通常価格(配送料込)',
+                'キャンペーン価格',
+                'クーポン価格',
+                '最終価格', '適用'
+            ]);
+        }
+
+        // 🔹 SubOrder取得（eager load）
+        $subOrders = SubOrder::with(['order', 'items'])
+            ->where('seller_id', $user->id)
+            ->get();
 
         foreach ($subOrders as $subOrder) {
-            $order = $subOrder->order;
-            $items = $subOrder->items;
 
-            foreach ($items as $item) {
-                // === 基本価格情報 ===
+            foreach ($subOrder->items as $item) {
+
                 $quantity = $item->pivot->quantity ?? 1;
                 $basePrice = (float) $item->price;
                 $shippingFee = (float) $item->shipping_fee;
-                $originalPriceWithShipping = $basePrice + $shippingFee;
-                $rate_and_fixed = Commition::first();
-                $feeRate = $rate_and_fixed->rate;
-                $feeFixed = $rate_and_fixed->fixed;
 
+                $originalPriceWithShipping = $basePrice + $shippingFee;
+
+                // 🔹 手数料
                 $fee = (int) ($basePrice * $quantity * $feeRate + $feeFixed);
 
-                // === 店舗・クーポン・キャンペーン取得 ===
-                $shop = Shop::where('user_id', $subOrder->seller_id)->first();
-                $coupon = ShopCoupon::where('code', $subOrder->coupon_code)->first();
-                $campaign = Campaign::where('shop_id', $shop->id ?? null)
-                    ->where('status', 1)
-                    ->where('start_date', '<=', $today)
-                    ->where('end_date', '>=', $today)
-                    ->orderByDesc('dicount_rate1')
-                    ->first();
+                // 🔹 税計算（課税業者のみ）
+                $productTax = 0;
+                $shippingTax = 0;
 
-                // === 割引計算 ===
-                $campaignPrice = $campaign
-                    ? ceil($basePrice - $basePrice * $campaign->dicount_rate1)
-                    : $basePrice;
-                $campaignPriceWithShipping = $campaignPrice + $shippingFee;
-
-                $couponPrice = $coupon
-                    ? max($basePrice + $coupon->value, 0)
-                    : $basePrice;
-                $couponPriceWithShipping = $couponPrice + $shippingFee;
-
-                $lowestUnitPrice = min($originalPriceWithShipping, $campaignPriceWithShipping, $couponPriceWithShipping);
-
-                $expectedTotal = ceil($lowestUnitPrice + $basePrice * max($quantity - 1, 0) + $shippingFee * $quantity - $fee);
-
-                // === 適用ラベル ===
-                $appliedLabel = '適用なし';
-                if ($campaign && $campaignPriceWithShipping <= $couponPriceWithShipping) {
-                    $appliedLabel = 'キャンペーン適用';
-                } elseif ($coupon) {
-                    $appliedLabel = 'クーポン適用';
+                if ($isTaxableBusiness) {
+                    $productTax = floor($basePrice * $quantity * $taxRate);
+                    $shippingTax = floor($shippingFee * $quantity * $taxRate);
                 }
 
-                // === Excel 1行分 push ===
-                $rows->push([
-                    // 注文情報
-                    $order->order_number ?? '',
-                    $subOrder->id,
-                    $subOrder->status,
-                    optional($subOrder->created_at)->format('Y-m-d H:i:s'),
-                    $order->shipping_fullname ?? '',
-                    $order->shipping_phone ?? '',
-                    $order->shipping_zipcode ?? '',
-                    $order->shipping_address ?? '',
+                $lowestUnitPrice = $originalPriceWithShipping;
 
-                    // 商品情報
-                    $item->name ?? '',
-                    $quantity,
-                    $basePrice,
-                    $shippingFee,
-                    $basePrice * $quantity,
-                    $fee,
-                    $expectedTotal,
+                $expectedTotal = ceil(
+                    $lowestUnitPrice * $quantity - $fee
+                );
 
-                    // 金額計算
-                    $originalPriceWithShipping,
-                    $campaignPriceWithShipping,
-                    $couponPriceWithShipping,
-                    $lowestUnitPrice,
-                    $appliedLabel
-                ]);
+                // ✅ 行データ分岐
+                if ($isTaxableBusiness) {
+
+                    $rows->push([
+                        $subOrder->order->order_number ?? '',
+                        $subOrder->id,
+                        $subOrder->status,
+                        optional($subOrder->created_at)->format('Y-m-d H:i:s'),
+                        $subOrder->order->shipping_fullname ?? '',
+                        $subOrder->order->shipping_phone ?? '',
+                        $subOrder->order->shipping_zipcode ?? '',
+                        $subOrder->order->shipping_address ?? '',
+
+                        '課税業者',
+
+                        $item->name ?? '',
+                        $quantity,
+                        $basePrice,
+                        $productTax,
+                        $shippingFee,
+                        $shippingTax,
+                        $basePrice * $quantity,
+                        $fee,
+                        $expectedTotal,
+
+                        $originalPriceWithShipping,
+                        $originalPriceWithShipping,
+                        $originalPriceWithShipping,
+                        $lowestUnitPrice,
+                        '適用なし'
+                    ]);
+
+                } else {
+
+                    $rows->push([
+                        $subOrder->order->order_number ?? '',
+                        $subOrder->id,
+                        $subOrder->status,
+                        optional($subOrder->created_at)->format('Y-m-d H:i:s'),
+                        $subOrder->order->shipping_fullname ?? '',
+                        $subOrder->order->shipping_phone ?? '',
+                        $subOrder->order->shipping_zipcode ?? '',
+                        $subOrder->order->shipping_address ?? '',
+
+                        '非課税業者',
+
+                        $item->name ?? '',
+                        $quantity,
+                        $basePrice,
+                        $shippingFee,
+                        $basePrice * $quantity,
+                        $fee,
+                        $expectedTotal,
+
+                        $originalPriceWithShipping,
+                        $originalPriceWithShipping,
+                        $originalPriceWithShipping,
+                        $lowestUnitPrice,
+                        '適用なし'
+                    ]);
+                }
             }
         }
 
         return $rows;
     }
-}
+
+
+}   
 
 
 

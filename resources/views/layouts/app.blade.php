@@ -223,7 +223,9 @@
     </main>
 
     {{-- footer --}}
-    @include('layouts.footer')
+    @if (!isset($hideFooter))
+      @include('layouts.footer')
+    @endif
 
     <!--====== Noscript ======-->
     <style>

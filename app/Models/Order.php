@@ -249,7 +249,8 @@ class Order extends Model
                     $subtotal = $discountedUnitPrice * $quantity;
                 }
 
-                Log::info("Test {$coupon->value} | {$normalPrice} | {$couponPrice} | {$campaignPrice} | {$couponApplied}");
+                Log::info("Test " . ($coupon->value ?? 'no-coupon') ." | {$normalPrice} | {$couponPrice} | {$campaignPrice} | {$couponApplied}");
+
 
                 // --- 税額
                 if ($isTaxable) {

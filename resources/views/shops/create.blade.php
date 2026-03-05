@@ -1,6 +1,8 @@
 
 @extends('layouts.app')
 
+@php $hideFooter = true; @endphp
+
 
 @section('content')
 <style>
@@ -33,6 +35,15 @@
         </ul>
     </div>
 @endif
+
+@error('identification_3')
+    <div class="text-danger">{{ $message }}</div>
+@enderror
+
+@if ($errors->any())
+    <pre>{{ print_r($errors->all(), true) }}</pre>
+@endif
+
 
 <div class="container mt-3">
   <form class="h-adr" id="shopForm" action="{{route('shops.store')}}" method="post" enctype="multipart/form-data">@csrf
@@ -256,6 +267,7 @@
         <input type="email" class="form-control" name="email" id="email" aria-describedby="helpId" value="{{ old('email', $shop_sets->email ?? '') }}" required>
     </div>
     <br>
+    
     <div id="idGroup1" style="display: none;">
         <label for="identification_1" class="form-label"><h3>ID card (運転免許証　or パスポート) *</h3></label>
         {{-- ❓ ヘルプ --}}
@@ -281,15 +293,15 @@
         &nbsp;
         <div id="fileGroup1" class="form-group">
             <div class="form-group">
-                <label for="file_1">  <div id="output1" style="font-size:20pt">上記の内容をアップロード</div></label>
-                <input type="file" class="form-control" id="file_1" name="file_1" class="form-control" multiple>
+                <label for="photo_1">  <div id="output1" style="font-size:20pt">上記の内容をアップロード</div></label>
+                <input type="file" class="form-control" id="photo_1" name="photo_1" class="form-control" multiple>
             </div>
         </div>
         <br><br>
         <div id="fileGroup5" class="form-group">
             <div class="form-group">
-                <label for="photo_4">  <div id="" style="font-size:20pt">上記の内容をアップロード(運転免許証の場合の裏面）</div></label>
-                <input type="file" class="form-control" id="photo_4" name="photo_4" class="form-control" multiple>
+                <label for="photo_2">  <div id="" style="font-size:20pt">上記の内容をアップロード(運転免許証の場合の裏面）</div></label>
+                <input type="file" class="form-control" id="photo_2" name="photo_2" class="form-control" multiple>
             </div>
         </div>
         <br><br>
@@ -307,8 +319,13 @@
             ?
         </button>
         @endif
-        <input class="form-control" type="date" name="license_expiry" id="license_expiry" value="{{ old('license_expiry', optional($shop_sets)->license_expiry ? \Carbon\Carbon::parse($shop_sets->license_expiry)->format('Y-m-d') : '') }}"
-        ><br><br>
+        <input class="form-control"
+       type="date"
+       name="license_expiry"
+       id="license_expiry"
+       min="{{ now()->format('Y-m-d') }}"
+       value="{{ old('license_expiry', optional($shop_sets)->license_expiry ? \Carbon\Carbon::parse($shop_sets->license_expiry)->format('Y-m-d') : '') }}"><br><br>
+
         <div id="fileGroup1" class="form-group">
             <div class="form-group">
                 <label for="file_1">
@@ -331,15 +348,16 @@
                 <input
                     type="file"
                     class="form-control"
-                    id="identification_3"
-                    name="identification_3"
+                    id="file_1"
+                    name="file_1"
                     accept="application/pdf"
                     required
                 >
             </div>
         </div>
     </div> 
-    &nbsp;  
+    &nbsp; 
+
     <div id="identificationGroup1" style="display: none;">
       <label for="identification_2_1" class="form-label">
         <h3>個人事業開始届出証明書 *
@@ -360,12 +378,14 @@
         @endif
       <br>
       
-      <!-- identificationGroup1 -->
-    　<input class="form-control" list="identification_list_1" name="identification_2_1" id="identification_2_1" value="個人事業開始届出証明書" readonly required>
+    　<input class="form-control" list="identification_list_1" name="identification_2_1" id="identification_2_1" value="個人事業開始届出証明書" readonly>
       
       <datalist id="identification_list_1">
         <option value="個人事業開始届出証明書">
       </datalist>
+      <br>
+    　<label for="file_2">  <h3>個人事業開始届出証明書</h3></label>
+    　<input type="file" class="form-control" id="file_2" name="file_2" class="form-control" multiple>
     </div>
     &nbsp;
 
@@ -406,10 +426,10 @@
      
         <br>
 
-        <div id="fileGroup2" style="display: none;">
+        <div id="" style="">
             <div class="form-group">
-                <label for="file_2">  <div id="output2" style="font-size:20pt">上記の内容のアップロード *</div></label>
-                <input type="file" class="form-control" id="file_2" name="file_2" class="form-control" multiple>
+                <label for="file_3">  <div id="output2" style="font-size:20pt">上記の内容のアップロード *</div></label>
+                <input type="file" class="form-control" id="file_3" name="file_3" class="form-control" multiple>
             </div>
         </div>
         <br>
@@ -446,7 +466,6 @@
                 name="corporate_number"
                 placeholder="法人番号（13桁）"
                 value="{{ old('corporate_number', isset($shop) ? $shop->corporate_number : '') }}"
-                required
                 pattern="\d{13}"
                 inputmode="numeric"
             >
@@ -482,21 +501,17 @@
             ?
         </button>
         @endif
-        <select class="form-control" name="id_1_1" id="id_1_1" required>
+        <select class="form-control" name="id_1_1" id="id_1_1">
             <option value="選択して下さい">選択して下さい</option>
-            <option value="運転免許証">運転免許証</option>
-            <option value="パスポート">パスポート</option>
             <option value="社員証">社員証</option>
             <option value="名刺">名刺</option>
             <option value="労働契約書">労働契約書</option>
         </select>
         <br>
-        <label for="photo_1">  <h3>(上記内容のアップロード) *</h3></label>
-        <input type="file" class="form-control" id="photo_1" name="photo_1" class="form-control" multiple>
+        <label for="photo_3">  <h3>(上記内容のアップロード) *</h3></label>
+        <input type="file" class="form-control" id="photo_3" name="photo_3" class="form-control" multiple>
         <br>
 
-        <label for="photo_5">  <h3>上記の内容をアップロード(運転免許証の場合の裏面）</h3></label>
-        <input type="file" class="form-control" id="photo_5" name="photo_5" class="form-control" multiple>
     </div>
     
 
@@ -527,20 +542,16 @@
             ?
         </button>
         @endif
-        <select class="form-control" name="id_2_1" id="id_2_1" required>
+        <select class="form-control" name="id_2_1" id="id_2_1">
             <option value="選択して下さい">選択して下さい</option>
-            <option value="運転免許証">運転免許証</option>
-            <option value="パスポート">パスポート</option>
             <option value="社員証">社員証</option>
             <option value="名刺">名刺</option>
             <option value="労働契約書">労働契約書</option>
         </select>
         <br>
-        <label for="photo_2">  <h3>(上記内容のアップロード) </h3></label>
-        <input type="file" class="form-control" id="photo_2" name="photo_2" class="form-control" multiple>
+        <label for="photo_5">  <h3>(上記内容のアップロード) </h3></label>
+        <input type="file" class="form-control" id="photo_5" name="photo_5" class="form-control" multiple>
         <br>
-        <label for="photo_6">  <h3>上記の内容をアップロード(運転免許証の場合の裏面）</h3></label>
-        <input type="file" class="form-control" id="photo_6" name="photo_6" class="form-control" multiple>
         <br>
     </div>
     &nbsp;
@@ -573,36 +584,24 @@
             ?
         </button>
         @endif
-        <select class="form-control" name="id_3_1" id="id_3_1" required>
+        <select class="form-control" name="id_3_1" id="id_3_1">
             <option value="選択して下さい">選択して下さい</option>
-            <option value="運転免許証">運転免許証</option>
-            <option value="パスポート">パスポート</option>
             <option value="社員証">社員証</option>
             <option value="名刺">名刺</option>
+            <option value="労働契約書">労働契約書</option>
+
         </select>
         <br>
-        <label for="photo_3">  <h3>(上記内容のアップロード) </h3></label>
-        <input type="file" class="form-control" id="photo_3" name="photo_3" class="form-control" multiple>
-        <br>
-        <label for="photo_7">  <h3>上記の内容をアップロード(運転免許証の場合の裏面）</h3></label>
+        <label for="photo_7">  <h3>(上記内容のアップロード) </h3></label>
         <input type="file" class="form-control" id="photo_7" name="photo_7" class="form-control" multiple>
         <br>
+        <br>
     </div>
 
-    <div id="fileGroup3" style="display: none;">
-        <div class="form-group">
-            <label for="file_3"> <div id="output3" style="font-size:20pt">file_3 * (Compatible with jpg, jpeg, png, pdf)</div></label>
-            <input type="file" class="form-control" id="" name="" class="form-control" multiple>
-        </div>
-    </div>
+
     <br>
 
-    <div id="fileGroup4" style="display: none;">
-        <div class="form-group">
-            <label for="file_4">  <h3>file_4 (Compatible with PDF only)　例：代表以外の担当者がいる場合は、担当者全員の集合写真など</h3></label>
-            <input type="file" class="form-control" id="" name="" class="form-control" multiple>
-        </div>
-    </div> 
+
  
     <div id="extraFields" style="display: none;">
         <div class="form-group">
@@ -676,114 +675,96 @@
             <input type="text" class="form-control" name="note" id="" aria-describedby="helpId" value="{{ old('note', $shop_sets->note ?? '') }}">
         </div>
         &nbsp;
-        
-
-        <button type="submit" name="save_type" value="submit" class="btn btn-primary">申請する</button>
-        <button type="button" id="saveDraftBtn" class="btn btn-secondary">下書き保存</button>
-    </div>    
+    </div>  
+    <button type="submit" name="save_type" value="submit" class="btn btn-primary">申請する</button>
+    <button type="button" id="saveDraftBtn" class="btn btn-secondary">下書き保存</button>  
   </form>
 </div>
 &nbsp;
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const registrationRadios = {
-      individual: document.getElementById('individual'),
-      soleProprietor: document.getElementById('sole_proprietor'),
-      corporation: document.getElementById('corporation'),
-      outsourcing: document.getElementById('outsourcing'),
-    };
+    document.addEventListener("DOMContentLoaded", function () {
 
-    const idGroup1 = document.getElementById('idGroup1');
-    const identificationGroup1 = document.getElementById('identificationGroup1');
-    const identificationGroup2 = document.getElementById('identificationGroup2');
+        const groups = {
+            idGroup1: document.getElementById('idGroup1'),
+            identificationGroup1: document.getElementById('identificationGroup1'),
+            identificationGroup2: document.getElementById('identificationGroup2'),
+            extraFields: document.getElementById('extraFields'),
+        };
 
-    const fileGroup2 = document.getElementById('fileGroup2');
-    const fileGroup3 = document.getElementById('fileGroup3');
-    const fileGroup4 = document.getElementById('fileGroup4');
-    const extraFields = document.getElementById('extraFields');
+        const id1Select = document.getElementById('id_1_1');
+        const id2Select = document.getElementById('id_2_1');
+        const id3Select = document.getElementById('id_3_1');
 
-    const id1Select = document.getElementById('id_1_1');
-    const id2Select = document.getElementById('id_2_1');
-    const id3Select = document.getElementById('id_3_1');
+        function hideAll() {
+            Object.values(groups).forEach(g => {
+                if (g) g.style.display = 'none';
+            });
+        }
 
-    const identificationInput1 = document.getElementById('identification_2_1');
-    const identificationInput2 = document.getElementById('identification_2_2');
+        function updateSelectOptions(selectElement, options) {
+            if (!selectElement) return;
 
-    function updateSelectOptions(selectElement, options) {
-      selectElement.innerHTML = '';
+            selectElement.innerHTML = '<option value="">選択して下さい</option>';
 
-      const defaultOption = document.createElement('option');
-      defaultOption.value = "選択して下さい";
-      defaultOption.textContent = "選択して下さい";
-      selectElement.appendChild(defaultOption);
+            options.forEach(value => {
+                const opt = document.createElement('option');
+                opt.value = value;
+                opt.textContent = value;
+                selectElement.appendChild(opt);
+            });
+        }
 
-      options.forEach(value => {
-        const opt = document.createElement('option');
-        opt.value = value;
-        opt.textContent = value;
-        selectElement.appendChild(opt);
-      });
-    }
+        function updateForm() {
 
-    function updateForm() {
-      const selectedType = document.querySelector('input[name="registration_type"]:checked')?.value;
+            const selected = document.querySelector('input[name="registration_type"]:checked');
+            const selectedType = selected ? selected.value : null;
 
-      // 初期化
-      idGroup1.style.display = 'none';
-      identificationGroup1.style.display = 'none';
-      identificationGroup2.style.display = 'none';
-      fileGroup2.style.display = 'none';
-      fileGroup3.style.display = 'none';
-      fileGroup4.style.display = 'none';
-      extraFields.style.display = 'block';
+            hideAll();
 
-      // requiredも初期化
-      if (identificationInput1) identificationInput1.required = false;
-      if (identificationInput2) identificationInput2.required = false;
+            if (!selectedType) return;
 
-      // 個人
-      if (selectedType === "個人") {
-        idGroup1.style.display = 'block';
-        extraFields.style.display = 'block';
-        updateSelectOptions(id1Select, ['運転免許証', 'パスポート']);
-        updateSelectOptions(id2Select, ['運転免許証', 'パスポート']);
-        updateSelectOptions(id3Select, ['運転免許証', 'パスポート']);
-      }
+            // 🔹 全員共通
+            if (groups.idGroup1) groups.idGroup1.style.display = 'block';
+            if (groups.extraFields) groups.extraFields.style.display = 'block';
 
-      // 個人事業主
-      else if (selectedType === "個人事業主") {
-        idGroup1.style.display = 'block';
-        identificationGroup1.style.display = 'block';
-        fileGroup2.style.display = 'block';
-        extraFields.style.display = 'block';
-        identificationInput1.required = true;
-        updateSelectOptions(id1Select, ['運転免許証', 'パスポート']);
-        updateSelectOptions(id2Select, ['運転免許証', 'パスポート']);
-        updateSelectOptions(id3Select, ['運転免許証', 'パスポート']);
-      }
+            // 🔹 個人
+            if (selectedType === "個人") {
 
-      // 法人 or 業務請負（同じ扱い）
-      else if (selectedType === "法人" || selectedType === "業務請負") {
-        idGroup1.style.display = 'block';
-        identificationGroup2.style.display = 'block';
-        fileGroup2.style.display = 'block';
-        extraFields.style.display = 'block';
-        identificationInput2.required = true;
-        updateSelectOptions(id1Select, ['社員証', '名刺', '労働契約書']);
-        updateSelectOptions(id2Select, ['社員証', '名刺', '労働契約書']);
-        updateSelectOptions(id3Select, ['社員証', '名刺', '労働契約書']);
-      }
-    }
+                updateSelectOptions(id1Select, ['運転免許証', 'パスポート']);
+                updateSelectOptions(id2Select, ['運転免許証', 'パスポート']);
+                updateSelectOptions(id3Select, ['運転免許証', 'パスポート']);
+            }
 
-    // イベントリスナー登録
-    Object.values(registrationRadios).forEach(radio => {
-      radio.addEventListener('change', updateForm);
+            // 🔹 個人事業主
+            else if (selectedType === "個人事業主") {
+
+                if (groups.identificationGroup1)
+                    groups.identificationGroup1.style.display = 'block';
+
+                updateSelectOptions(id1Select, ['運転免許証', 'パスポート']);
+                updateSelectOptions(id2Select, ['運転免許証', 'パスポート']);
+                updateSelectOptions(id3Select, ['運転免許証', 'パスポート']);
+            }
+
+            // 🔹 法人・業務請負
+            else if (selectedType === "法人" || selectedType === "業務請負") {
+
+                if (groups.identificationGroup2)
+                    groups.identificationGroup2.style.display = 'block';
+
+                updateSelectOptions(id1Select, ['社員証', '名刺', '労働契約書']);
+                updateSelectOptions(id2Select, ['社員証', '名刺', '労働契約書']);
+                updateSelectOptions(id3Select, ['社員証', '名刺', '労働契約書']);
+            }
+        }
+
+        document.querySelectorAll('input[name="registration_type"]').forEach(radio => {
+            radio.addEventListener('change', updateForm);
+        });
+
+        updateForm(); // 初期表示
     });
-
-    // 初期表示
-    updateForm();
-  });
 </script>
 
 <script>

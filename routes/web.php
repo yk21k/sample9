@@ -314,7 +314,7 @@ Route::middleware(['passed.entrance'])->group(function () {
 
     Route::resource('shops', ShopController::class)->middleware('auth');
 
-    Route::get('shops/{id}', [App\Http\Controllers\ShopController::class, 'show'])->name('shops.overview');
+    // Route::get('shops/{id}', [App\Http\Controllers\ShopController::class, 'show'])->name('shops.overview');
 
 
     Route::resource('users',UsersController::class)->middleware('auth');
@@ -412,6 +412,10 @@ Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', '
     Route::post('/shop_setting', 'ShopSettingController@shopUpdate')->name('shop.shop_setting.update');
 
     Route::get('/seller/orders/export/full', [OrderController::class, 'exportFullOrders'])->name('orders.export.full');
+
+    Route::get('/seller/orders/csv/export', [OrdersController::class, 'exportSubOrdersCsv'])
+    ->name('suborders.csv.export');
+
 
 
     Route::get('/shop_auction_orders', 'AuctionOrderController@index')->name('auction.shop_auction_orders');
@@ -576,29 +580,44 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 use App\Models\Shop;
 
-Route::get('/admin/shop-license/{shop}/{file}', function($shopId, $fileName) {
-    $shop = Shop::findOrFail($shopId);
 
-    // 管理者のみアクセス可能
+Route::get('/admin/shop-license/{shop}/{column}', function ($shopId, $column) {
+
     if (!auth()->user() || !auth()->user()->hasRole('admin')) {
         abort(403);
     }
 
-    // ファイルパス
-    $filePath = "licenses/{$shop->created_at->format('Ymd')}/{$shop->user->email}/{$fileName}";
+    $allowedColumns = [
+        'photo_1','photo_2','photo_3','photo_4','photo_5','photo_6','photo_7',
+        'file_1','file_2','file_3','file_4'
+    ];
 
-    if (!Storage::exists($filePath)) {
+    if (!in_array($column, $allowedColumns)) {
         abort(404);
     }
 
-    $file = Storage::get($filePath);
-    $type = Storage::mimeType($filePath);
+    $shop = \App\Models\Shop::findOrFail($shopId);
 
-    return Response::make($file, 200, [
-        'Content-Type' => $type,
-        'Content-Disposition' => 'inline; filename="'.$fileName.'"'
-    ]);
+    $fileName = $shop->{$column};
+
+    if (!$fileName) {
+        abort(404);
+    }
+
+    $path = storage_path("app/shops/{$shop->id}/{$fileName}");
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($path);
+    
 })->name('admin.shop-license.show')->middleware('auth');
+
+
+
+
+
 
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {

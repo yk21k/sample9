@@ -28,26 +28,114 @@
             </div>
 
             @php
-                $files = [
-                    'photo_1','photo_2','photo_3','photo_4','photo_5','photo_6','photo_7',
+                $photoFields = [
+                    'photo_1','photo_2','photo_3','photo_4',
+                    'photo_5','photo_6','photo_7','photo_8'
+                ];
+
+                $fileFields = [
                     'file_1','file_2','file_3','file_4'
                 ];
             @endphp
 
-            @foreach($files as $file)
-                <div>
-                    @if($dataTypeContent->{$file} && auth()->user()->hasRole('admin'))
-                        <a class="btn btn-sm btn-primary" 
-                           href="{{ route('admin.shop-license.show', [$dataTypeContent->id, $dataTypeContent->{$file}]) }}" 
-                           target="_blank">
-                            {{ $file }} 確認
-                        </a>
-                    @else
-                        <span class="text-muted">{{ $file }} 非表示</span>
-                    @endif
-                </div>
-                <small>開業届や...はfile2</small>
-            @endforeach
+            <style>
+                .file-row {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 16px;
+                }
+
+                .file-card {
+                    width: 130px;
+                    text-align: center;
+                }
+
+                .thumb-box {
+                    width: 130px;
+                    height: 130px;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    border: 1px solid #ddd;
+                    background: #f8f9fa;
+                }
+
+                .thumb-box img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+
+                .pdf-box {
+                    width: 90px;
+                    height: 110px;
+                    margin: 0 auto;
+                    border-radius: 6px;
+                    background: #dc3545;
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: bold;
+                }
+            </style>
+
+            {{-- =========================
+                 📷 写真
+            ========================= --}}
+            <h4 class="mt-4">📷 写真</h4>
+
+            <div class="file-row">
+                @foreach($photoFields as $file)
+                    <div class="file-card">
+
+                        @if($dataTypeContent->{$file})
+                            <a href="{{ route('admin.shop-license.show', [$dataTypeContent->id, $file]) }}" target="_blank">
+
+                                <div class="thumb-box">
+                                    <img src="{{ route('admin.shop-license.show', [$dataTypeContent->id, $file]) }}">
+                                </div>
+
+                            </a>
+                        @else
+                            <div class="thumb-box d-flex align-items-center justify-content-center">
+                                <small class="text-muted">未提出</small>
+                            </div>
+                        @endif
+
+                        <small class="d-block mt-1 text-muted">{{ $file }}</small>
+
+                    </div>
+                @endforeach
+            </div>
+
+            {{-- =========================
+                 📄 書類
+            ========================= --}}
+            <h4 class="mt-4">📄 書類</h4>
+
+            <div class="file-row">
+                @foreach($fileFields as $file)
+                    <div class="file-card">
+
+                        @if($dataTypeContent->{$file})
+                            <a href="{{ route('admin.shop-license.show', [$dataTypeContent->id, $file]) }}" target="_blank">
+
+                                <div class="pdf-box">
+                                    PDF
+                                </div>
+
+                            </a>
+                        @else
+                            <div class="pdf-box" style="background:#ccc;">
+                                未提出
+                            </div>
+                        @endif
+
+                        <small class="d-block mt-1 text-muted">{{ $file }}</small>
+
+                    </div>
+                @endforeach
+            </div>
 
             <div class="col-md-12">
 

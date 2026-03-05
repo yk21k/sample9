@@ -163,28 +163,71 @@
                             </thead>
                             <tbody>
 
-                                @php $calculatedTotal = 0; @endphp
+                                @php 
+                                    $productSubtotal = 0;
+                                    $commissionTotal = 0;
+                                    $calculatedTotal = 0;
+                                    $shippingSubtotal = 0;
+                                    $shippingTax = 0;
+                                    $taxTotal = 0;
+                                    $taxRate = App\Models\TaxRate::value('rate') ?? 0;
+                                    $rate = App\Models\Commition::value('rate') ?? 0;
+                                    // 商品税（SubOrderから合計）
+                                    $taxTotal = App\Models\SubOrder::where('order_id', $dataTypeContent->id)->where('is_taxable', 1)->sum('tax_amount');
+                                @endphp
+
                                 @foreach($dataTypeContent->items as $item)
                                     @php
-                                        $lineTotal = ($item->pivot->price+$item->shipping_fee) * $item->pivot->quantity;
+                                        $quantity = $item->pivot->quantity;
+                                        $price = $item->pivot->price;
+                                        $shipping = $item->shipping_fee;
+
+                                        // 商品税抜
+                                        $baseProduct = $price * $quantity;
+                                        $productSubtotal += $baseProduct;
+
+                                        // 手数料計算
+                                        $commissionTotal += floor($baseProduct * $rate);
+
+                                        // 税抜商品＋送料
+                                        $lineTotal = ($price + $shipping) * $quantity;
                                         $calculatedTotal += $lineTotal;
-                                        $payment = App\Models\Order::where('id', $item->pivot->order_id)->first();
-                                        $fee = App\Models\Commition::first();
+
+                                        // 送料税抜
+                                        $baseShipping = $shipping * $quantity;
+                                        $shippingSubtotal += $baseShipping;
+
+                                        // 課税送料
+                                        if ($item->shop->invoice_number) {
+                                            $shippingTax += floor($baseShipping * $taxRate);
+                                        }
+
                                     @endphp
+
                                     <tr>
                                         <td>{{ $item->name }}</td>
-                                        <td>{{ $item->pivot->quantity }}</td>
-                                        <td>{{ number_format($item->pivot->price) }}</td>
-                                        <td>{{ number_format($item->shipping_fee) }}</td>
-                                            
+                                        <td>{{ $quantity }}</td>
+                                        <td>{{ number_format($price) }}</td>
+                                        <td>{{ number_format($shipping) }}</td>
                                     </tr>
                                 @endforeach
+
+                                @php
+                                    $shippingTotal = $shippingSubtotal + $shippingTax;
+                                    $grandTotal = $calculatedTotal + $shippingTax;
+                                @endphp
+
                             </tbody>
                         </table>
-                        <p>Note: {{ $dataTypeContent->notes }}</p>
-                        <p><strong>Total: $ {{ number_format($calculatedTotal) }}</strong></p>
-                        <p><strong>手数料: $ {{ $fee->fixed+(int)($calculatedTotal*$fee->rate) }}</strong></p>
-                        <p><strong>決済金額: $ {{ number_format($payment->grand_total) }}</strong></p>
+
+                            <p><strong>税抜合計: ￥ {{ number_format($calculatedTotal) }}</strong></p>
+
+                            <p><strong>受取手数料: ￥ {{ number_format($commissionTotal) }}</strong></p>
+
+                            <p><strong>税金合計: ￥ {{ number_format($taxTotal + $shippingTax) }}</strong></p>
+
+                            <p><strong>決済金額: ￥ {{ number_format($dataTypeContent->grand_total) }}</strong></p>
+
                     </div>
                 </div> 
             </div>

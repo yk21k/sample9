@@ -9,10 +9,15 @@ class Shop extends Model
 {
     use HasFactory;
 
+    const STATUS_PENDING  = 0; // 審査中
+    const STATUS_APPROVED = 1; // 承認
+    const STATUS_REJECTED = 2; // 差戻し
+
     protected $fillable=['name', 'is_active', 'is_draft', 'description', 'invoice_number', 'representative', 'location_1', 'location_2', 'telephone', 'email', 'identification_1', 'identification_2', 'identification_3','photo_1', 'photo_2', 'photo_3', 'photo_4', 'photo_5', 'photo_6', 'photo_7', 'file_1', 'file_2', 'file_3',  'file_4', 'manager', 'product_type', 'volume', 'note', 'license_expiry', 'corporate_number', 'person_1', 'person_2', 'person_3'];
 
     protected $casts = [
         'is_draft' => 'boolean',
+        'status' => 'integer',
     ];
 
     public function owner()
@@ -81,6 +86,16 @@ class Shop extends Model
         return $this->hasMany(SubOrder::class, 'seller_id');    
     }
 
+    public function scopeApproved($query)
+    {
+        return $query->where('status', self::STATUS_APPROVED);
+    }
+
+
+    public function scopePending($query)
+    {
+        return $query->where('status', self::STATUS_PENDING);
+    }
 
 
 }

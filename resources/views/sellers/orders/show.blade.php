@@ -2,6 +2,16 @@
 
 @section('content')
 <h3>Order Summary</h3>
+<form method="GET" action="{{ route('seller.suborders.csv.export') }}" class="d-flex gap-2">
+
+    <input type="date" name="start_date" value="{{ request('start_date') }}">
+    <input type="date" name="end_date" value="{{ request('end_date') }}">
+
+    <button type="submit" class="btn btn-primary">
+        CSV出力
+    </button>
+
+</form>
 
 <table class="table table-bordered">
     <thead>
@@ -90,6 +100,7 @@
             @if($isTaxable==1)
 
                 <tr>
+
                     <td>{{ $item->name }} <span class="badge bg-danger">課税業者</span></td>
                     <td>{{ $quantity }}</td>
                     <td>¥{{ number_format($totalOriginal) }}</td>
@@ -99,7 +110,7 @@
                     <td>¥{{ number_format($displayCouponPrice + $unitPrice * ($quantity -1)) }}</td>
 
                     <td>¥{{ number_format($subtotal) }}</td>
-                    <td>¥{{ number_format($subtotal * $tax_rate) }}</td>
+                    <td>¥{{ number_format($finalLineTotal * $tax_rate) }}</td><!-- 2026/02/15 -->
                     <td>
                         @if(trim($appliedLabel) === 'キャンペーン適用')
                             <span class="badge bg-success">キャンペーン</span>
@@ -113,9 +124,9 @@
                 
                 {{-- 商品行 --}}
                 <tr>
-                    <td>{{ $item->name }}</td>
+                    <td>決済金額</td>
                     <td>
-                        ¥{{ number_format(($discountedUnitPrice + $unitPrice) * ($tax_rate + 1) + $shippingFee * $quantity * ($tax_rate + 1)) }}
+                        ¥{{ number_format(($finalLineTotal) * ($tax_rate + 1)) }}
                         <button class="toggle-details btn btn-sm btn-link" data-target="details-{{ $item->id }}">
                             詳細を表示
                         </button>
@@ -126,7 +137,8 @@
                 <tr id="details-{{ $item->id }}" class="details-row" style="display: none; background-color: #f9f9f9;">
                     <td colspan="9">
                         <strong>決済内訳（{{ $item->name }}）:</strong><br>
-                        1個目（割引適用）: ¥{{ number_format($discountedUnitPrice) }}<br>
+                        配送料を除いた商品価格<br>
+                        1個目（適用）: ¥{{ number_format($discountedUnitPrice) }}<br>
                         1個目（消費税）: ¥{{ number_format($discountedUnitPrice * $tax_rate) }}
 
                         @if($quantity > 1)
@@ -134,34 +146,33 @@
                             ¥{{ number_format($unitPrice * ($quantity - 1)) }}
                             <br>2個目以降(消費税): ¥{{ number_format($unitPrice * ($quantity - 1) * $tax_rate) }}
                         @endif
-
-                        <br><strong>小計:</strong> ¥{{ number_format(($discountedUnitPrice + $unitPrice) * ($tax_rate + 1)) }}
                         <br><strong>送料:</strong> ¥{{ number_format($totalShipping) }}
                         <br><strong>送料(消費税):</strong> ¥{{ number_format($totalShipping * $tax_rate) }}
+                        <br><strong>小計:</strong> ¥{{ number_format(($finalLineTotal) * ($tax_rate + 1)) }}
                         <br><strong>最終合計:</strong> 
-                        ¥{{ number_format(($discountedUnitPrice + $unitPrice) * ($tax_rate + 1) + $shippingFee * $quantity * ($tax_rate + 1)) }}
+                        ¥{{ number_format(($finalLineTotal) * ($tax_rate + 1)) }}
 
                         <br><p>通常価格合計:（キャンペーンやクーポン適用なし）
                             ¥{{ number_format(($unitPrice + $shippingFee) * $quantity * ($tax_rate + 1)) }}
                         </p>
 
                         <p><strong>決済金額合計（お客様からの入金）:</strong>
-                            ¥{{ number_format(($discountedUnitPrice + $unitPrice) * ($tax_rate + 1) + $shippingFee * $quantity * ($tax_rate + 1)) }} 
+                            ¥{{ number_format(($finalLineTotal) * ($tax_rate + 1)) }}
                             <small>（クーポンまたはキャンペーン適用後）</small>
                         </p>
-
                         <p>
                             当サイトへの支払(消費税込)：¥{{ number_format($fee) }} 
                         </p>
                         <p>
-                            Shopへの入金：¥{{ number_format(($discountedUnitPrice + $unitPrice) * ($tax_rate + 1) + $shippingFee * $quantity * ($tax_rate + 1) - $fee) }} 
+
+                            Shopへの入金：¥{{ number_format(($finalLineTotal) * ($tax_rate + 1) - $fee) 
+                             }} 
                         </p>
                     </td>
                 </tr>
 
             @else
-                <tr>
-                               
+                <tr>        
                     <td>{{ $item->name }}</td>
                     <td>{{ $quantity }}</td>
                     <td>¥{{ number_format($totalOriginal) }}</td>
@@ -193,17 +204,18 @@
                         </button>
                     </td>
                 </tr>
-
+                
                 {{-- 折りたたみ用の詳細行 --}}
                 <tr id="details-{{ $item->id }}" class="details-row" style="display: none; background-color: #f9f9f9;">
                     <td colspan="9">
                         <strong>決済内訳（{{ $item->name }}）:</strong><br>
-                        1個目（割引適用）: ¥{{ number_format($discountedUnitPrice) }}
+                        1個目（適用）: ¥{{ number_format($discountedUnitPrice) }}
                         @if($quantity > 1)
                             <br>2個目以降（{{ $quantity - 1 }}個 × ¥{{ number_format($unitPrice) }}) = ¥{{ number_format($unitPrice * ($quantity - 1)) }}
                         @endif
-                        <br><strong>小計:</strong> ¥{{ number_format($subtotal) }}
+                        
                         <br><strong>送料:</strong> ¥{{ number_format($totalShipping) }}
+                        <br><strong>小計:</strong> ¥{{ number_format($subtotal) }}
                         <br><strong>最終合計:</strong> ¥{{ number_format($finalLineTotal) }}
                         <br><p>通常価格合計:（キャンペーンやクーポン適用なし）
                             ¥{{ number_format(($unitPrice + $shippingFee) * $quantity) }}
@@ -218,7 +230,10 @@
                             当サイトへの支払い(消費税込)：¥{{ number_format($fee) }} 
                         </p>
                         <p>
-                            Shopへの入金：¥{{ number_format(($discountedUnitPrice + $unitPrice) + $shippingFee * $quantity - $fee) }} 
+                            
+
+                            Shopへの入金：¥{{ number_format($finalLineTotal - $fee) }} 
+                            
                         </p>
                     </td>
                 </tr>
