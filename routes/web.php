@@ -46,7 +46,9 @@ use App\Http\Controllers\ShopCouponsController;
 use App\Http\Controllers\SubOrderController;
 use App\Http\Controllers\BotManController;
 
+
 use App\Http\Controllers\Admin\StripePayController;
+use App\Http\Controllers\Admin\ProductReviewController;
 
 use App\Http\Controllers\Admin\StripeTransferController;
 use App\Http\Controllers\StripeOnboardingController;
@@ -354,7 +356,11 @@ Route::group([
 
     Route::post('/shop/send-pickup-confirmation/{item}', [AuthController::class, 'sendPickupConfirmation'])->name('shop.sendPickupConfirmation');
 
+    Route::get('product-review', [ProductReviewController::class,'index'])->name('product.review');
 
+    Route::post('product-review/{product}/approve', [ProductReviewController::class,'approve'])->name('product.approve');
+
+    Route::post('product-review/{product}/reject', [ProductReviewController::class,'reject'])->name('product.reject');
 
 });
 

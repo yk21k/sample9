@@ -90,12 +90,15 @@ class Product extends Model
         return $this->hasMany(InventoryLog::class); // 商品に関連する在庫ログ
     }
 
-
+    public function scopePending($query)
+    {
+        return $query->where('status', 1);
+    }
  
-
-
-
-
+    public function reviews()
+    {
+        return $this->hasMany(ProductReview::class);
+    }
 
 
 }
