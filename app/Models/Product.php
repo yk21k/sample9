@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\ProductReviewQueue;
 
 class Product extends Model
 {
@@ -18,6 +19,10 @@ class Product extends Model
         'stock',
         'shop_id',
         'campaigns_rate1',
+        'review_comment',
+        'reviewed_by',
+        'reviewed_at',
+        'review_status'
     ];
 
     protected $guarded = ['id'];
@@ -30,11 +35,84 @@ class Product extends Model
 
     protected static function booted()
     {
-        static::saving(function($product){
+        static::saving(function ($product) {
 
-            // dd($request);
-            $product->product_attributes = json_encode(request('product_attributes'));
+            if (request()->has('product_attributes')) {
+                $product->product_attributes = json_encode(request('product_attributes'));
+            }
+
         });
+
+        static::created(function ($product) {
+
+            try {
+
+                \App\Models\ProductReviewQueue::create([
+                    'product_id' => $product->id,
+                    'status' => 'pending',
+                    'risk_score' => 0
+                ]);
+
+            } catch (\Throwable $e) {
+
+                \Log::error('ProductReviewQueue create error: '.$e->getMessage());
+
+            }
+
+        });
+
+        static::updated(function ($product) {
+
+            if($product->wasChanged([
+                'cover_img',
+                'cover_img2',
+                'cover_img3',
+                'movie'
+            ])){
+
+                $product->updateQuietly([
+                    'review_status' => 'pending'
+                ]);
+
+                ProductReviewQueue::updateOrCreate(
+                    ['product_id' => $product->id],
+                    [
+                        'status' => 'pending',
+                        'reviewer_id' => null,
+                        'review_started_at' => null
+                    ]
+                );
+            }
+
+        });
+
+        static::updating(function ($product) {
+
+            $changes = $product->getDirty();
+
+            if(!$changes){
+                return;
+            }
+
+            ProductVersion::create([
+
+                'product_id' => $product->id,
+
+                'user_id' => auth()->id(),
+
+                'before_data' => array_intersect_key(
+                    $product->getOriginal(),
+                    $changes
+                ),
+
+                'after_data' => $changes,
+
+                'change_type' => 'edit'
+
+            ]);
+
+        });
+
     }
 
     public function shop()
@@ -100,5 +178,24 @@ class Product extends Model
         return $this->hasMany(ProductReview::class);
     }
 
+    public function violations()
+    {
+        return $this->hasMany(ProductViolation::class);
+    }
+
+    public function reviewQueue()
+    {
+        return $this->hasOne(ProductReviewQueue::class);
+    }
+
+    public function reviewLogs()
+    {
+        return $this->hasMany(ProductReviewLog::class);
+    }
+
+    public function versions()
+    {
+        return $this->hasMany(ProductVersion::class);
+    }
 
 }

@@ -61,6 +61,15 @@
         ])
     @endif
 
+    <style>
+        .btn-add-new.disabled{
+            pointer-events:none;
+            opacity:0.4;
+        }
+    </style>
+
+
+
 <div class="page-content browse container-fluid">
     @include('voyager::alerts')
     <div class="row">
@@ -69,14 +78,24 @@
                 <a href="{{url('/seller/orders')}}" class="">Order Management</a>
             </div>
             {{-- browse.blade.php のどこかに追加（例：上部ツールバー） --}}
-            <a href="{{ route('products.import.form') }}" class="btn btn-primary" style="margin-right: 10px;">
-                <i class="voyager-upload"></i> CSV一括登録
+            <a href="/admin/product/import" class="btn btn-primary csv-import-button" style="margin-right:10px;">
+                <i class="voyager-upload"></i>
+                CSV一括登録
             </a>
 
-            <a href="{{ route('products.csv.template') }}"
-               class="btn btn-outline-primary">
+            <a href="/admin/product/import/csv-template" class="btn btn-outline-primary csv-template-download">
                 📥 CSV雛形をダウンロード
             </a>
+
+            <div id="stripe-warning" class="alert alert-danger" style="display:none;">
+
+                Stripe連携が必要です。<br>
+
+                <a href="/seller/stripe/connect" class="btn btn-primary">
+                    Stripeを連携する
+                </a>
+
+            </div>
 
             <div class="panel panel-bordered">
                 <div class="panel-body">
@@ -744,6 +763,64 @@
                 alert("まだ条件を満たしていません。");
             }
         });
+    });
+</script>
+
+<script>
+    $(function(){
+
+        setTimeout(function(){
+
+            const stripeAccountId = @json(auth()->user()->stripe_account_id);
+
+            const addButton = $('.btn-add-new');
+            const csvTemplateButton = $('.csv-template-download');
+            const csvImportButton = $('.csv-import-button');
+
+            if(!stripeAccountId){
+
+                // Add New 無効
+                addButton.addClass('disabled').css({
+                    'pointer-events':'none',
+                    'opacity':'0.5'
+                });
+
+                // CSV雛形ダウンロード無効
+                csvTemplateButton.addClass('disabled').css({
+                    'pointer-events':'none',
+                    'opacity':'0.5'
+                });
+
+                // CSV一括登録無効
+                csvImportButton.addClass('disabled').css({
+                    'pointer-events':'none',
+                    'opacity':'0.5'
+                });
+
+                $('#stripe-warning').show();
+
+            }else{
+
+                addButton.removeClass('disabled').css({
+                    'pointer-events':'auto',
+                    'opacity':'1'
+                });
+
+                csvTemplateButton.removeClass('disabled').css({
+                    'pointer-events':'auto',
+                    'opacity':'1'
+                });
+
+                csvImportButton.removeClass('disabled').css({
+                    'pointer-events':'auto',
+                    'opacity':'1'
+                });
+
+                $('#stripe-warning').hide();
+            }
+
+        },300);
+
     });
 </script>
 @stop

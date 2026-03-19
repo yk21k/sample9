@@ -16,5 +16,19 @@ class AdminMiddleware
         }
 
         return $next($request);
+
+
+        // $user = Auth::user();
+
+        // if (!$user || $user->role->name !== 'admin') {
+        //     abort(403, '管理者のみアクセス可能です');
+        // }
+
+        // return $next($request);
+        
+
+        // if (!$user || $user->role_id != 1) {
+        //     abort(403, '管理者のみアクセス可能です');
+        // }
     }
 }

@@ -67,7 +67,9 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'otp' => \App\Http\Middleware\RequireOtp::class,
         'passed.entrance' => \App\Http\Middleware\PassedEntrance::class,
+        'stripe.connected' => \App\Http\Middleware\RequireStripeAccount::class,
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        'reviewer.only' => \App\Http\Middleware\ReviewerOnly::class,
 
 
     ];

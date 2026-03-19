@@ -71,6 +71,7 @@ use App\Http\Controllers\ShopLicenseController;
 
 Route::redirect('/', '/home');
 
+require base_path('routes/review.php');
 
 Auth::routes();
 
@@ -340,6 +341,7 @@ Route::middleware(['passed.entrance'])->group(function () {
 Route::group([
     'prefix' => 'admin',
     // 'middleware' => ['auth', 'otp'],//これだけ追加
+    'middleware' => ['stripe.connected'],
     ], function () {
     Voyager::routes();
 
@@ -356,11 +358,7 @@ Route::group([
 
     Route::post('/shop/send-pickup-confirmation/{item}', [AuthController::class, 'sendPickupConfirmation'])->name('shop.sendPickupConfirmation');
 
-    Route::get('product-review', [ProductReviewController::class,'index'])->name('product.review');
 
-    Route::post('product-review/{product}/approve', [ProductReviewController::class,'approve'])->name('product.approve');
-
-    Route::post('product-review/{product}/reject', [ProductReviewController::class,'reject'])->name('product.reject');
 
 });
 
@@ -520,7 +518,7 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'stripe.connected'])->group(function () {
     Route::get('/admin/product/import', [App\Http\Controllers\ProductImportController::class, 'showForm'])->name('products.import.form');
     Route::post('/admin/product/import', [App\Http\Controllers\ProductImportController::class, 'import'])->name('products.import');
 

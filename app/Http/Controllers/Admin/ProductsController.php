@@ -206,4 +206,59 @@ class ProductsController extends VoyagerBaseController
             'showCheckboxColumn'
         ));
     }
+
+    public function update(Request $request, $id)
+    {
+        $product = \App\Models\Product::findOrFail($id);
+
+        // ★更新前バックアップ
+        $this->backupFiles($product, $request);
+
+        return parent::update($request, $id);
+    }
+
+    private function backupFiles($product, $request)
+    {
+        $fields = ['cover_img', 'cover_img2', 'cover_img3', 'movie'];
+
+        foreach ($fields as $field) {
+
+            // requestに変更が無ければスキップ
+            if (!$request->has($field)) continue;
+
+            $original = $product->getOriginal($field);
+
+            if (empty($original)) continue;
+
+            // ▼ データ統一
+            if (is_string($original)) {
+                $decoded = json_decode($original, true);
+                $files = (json_last_error() === JSON_ERROR_NONE)
+                    ? $decoded
+                    : [$original];
+            } elseif (is_array($original)) {
+                $files = $original;
+            } else {
+                continue;
+            }
+
+            foreach ($files as $file) {
+
+                $path = is_array($file)
+                    ? ($file['download_link'] ?? null)
+                    : $file;
+
+                if (!$path) continue;
+
+                if (\Storage::disk('public')->exists($path)) {
+
+                    $newPath = 'versions/' . $path;
+
+                    if (!\Storage::disk('public')->exists($newPath)) {
+                        \Storage::disk('public')->copy($path, $newPath);
+                    }
+                }
+            }
+        }
+    }
 }

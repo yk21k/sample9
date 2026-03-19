@@ -5,8 +5,16 @@ namespace App\Jobs;
 use App\Models\DailyQrCode;
 use Illuminate\Support\Facades\URL;
 
-class GenerateDailyQrCodeJob extends Job
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+
+class GenerateDailyQrCodeJob implements ShouldQueue
 {
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
     public function handle()
     {
         // 24時間だけ有効な署名URL
@@ -25,4 +33,5 @@ class GenerateDailyQrCodeJob extends Job
         ]);
     }
 }
+
 

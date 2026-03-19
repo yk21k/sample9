@@ -29,7 +29,6 @@ class ProductObserver
             $product->generateStockHistories();
         }
 
-
     }
 
     /**

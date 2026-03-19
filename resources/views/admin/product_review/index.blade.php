@@ -2,64 +2,51 @@
 
 @section('content')
 
-<div class="container">
+@if(session('error'))
 
-<h2>商品審査</h2>
+<div class="alert alert-danger">
 
-<table class="table">
-
-<thead>
-<tr>
-<th>ID</th>
-<th>商品名</th>
-<th>価格</th>
-<th>操作</th>
-</tr>
-</thead>
-
-<tbody>
-
-@foreach($products as $product)
-
-<tr>
-
-<td>{{ $product->id }}</td>
-<td>{{ $product->name }}</td>
-<td>{{ $product->price }}</td>
-
-<td>
-
-<form method="POST"
-action="{{ route('product.approve',$product) }}">
-@csrf
-<button class="btn btn-success">
-承認
-</button>
-</form>
-
-<form method="POST"
-action="{{ route('product.reject',$product) }}">
-@csrf
-
-<input type="text"
-name="review_comment"
-placeholder="否認理由">
-
-<button class="btn btn-danger">
-否認
-</button>
-
-</form>
-
-</td>
-
-</tr>
-
-@endforeach
-
-</tbody>
-</table>
+	{{ session('error') }}
 
 </div>
 
-@endsection
+@endif
+
+
+<div class="page-content container-fluid">
+
+<h2>商品審査キュー</h2>
+
+@foreach($queues as $queue)
+
+<div class="panel panel-bordered">
+
+<div class="panel-body">
+
+<h3>{{ $queue->product->name }}</h3>
+
+<p>価格 : {{ number_format($queue->product->price) }}円</p>
+
+<img src="{{ $queue->product->cover_img ? asset('storage/'.$queue->product->cover_img) : asset('images/no_image.jpg') }}" width="200">
+
+<img src="{{ $queue->product->cover_img2 ? asset('storage/'.$queue->product->cover_img2) : asset('images/no_image.jpg') }}" width="200">
+
+<img src="{{ $queue->product->cover_img3 ? asset('storage/'.$queue->product->cover_img3) : asset('images/no_image.jpg') }}" width="200">
+
+<br><br>
+
+<a href="{{ route('product.review.show',$queue->product_id)
+}}"
+class="btn btn-primary">
+審査する
+</a>
+
+</div>
+
+</div>
+
+@endforeach
+
+</div>
+
+@stop
