@@ -136,7 +136,7 @@ class ShopSettingController extends Controller
                 'identification_2' => $identification_2,
             ], $uploadedData));
         });
-        dd($request->input('save_type'));
+        // dd($request->input('save_type'));
         /*
         |--------------------------------------------------------------------------
         | 管理者通知（下書きでない場合）

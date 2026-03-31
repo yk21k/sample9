@@ -2,12 +2,29 @@
 
 @section('content')
 
+{{-- エラーメッセージ --}}
 @if ($errors->has('csv_error'))
 <div class="alert alert-danger">
     {{ $errors->first('csv_error') }}
 </div>
+
 @endif
 
+{{-- CSV詳細エラー --}}
+@if(session('import_failures'))
+    <div class="alert alert-danger">
+        <strong>CSVエラーがあります：</strong>
+        <ul>
+            @foreach(session('import_failures') as $failure)
+                <li>
+                    行 {{ $failure->row() }}：
+                    データ {{ json_encode($failure->values(), JSON_UNESCAPED_UNICODE) }}<br>
+                    エラー：{{ implode(', ', $failure->errors()) }}
+                </li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 
 <div class="container-fluid">
     <h2>商品一括登録（CSV）</h2>
@@ -23,4 +40,7 @@
         <button class="btn btn-primary">アップロードして登録</button>
     </form>
 </div>
+
+
+
 @endsection

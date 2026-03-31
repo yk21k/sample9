@@ -97,6 +97,7 @@
 
             </div>
 
+
             <div class="panel panel-bordered">
                 <div class="panel-body">
                     @if ($isServerSide)

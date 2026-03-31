@@ -92,7 +92,7 @@ class UpdateShopRequest extends FormRequest
             }
 
             if (in_array($type, ['法人', '業務請負'])) {
-                $rules['identification_2_2'] = 'required|string|in:商業・法人登記簿（履歴事項全部証明書）';
+                $rules['identification_2_2'] = 'required|string|in:名刺';
             }
 
             $rules['file_1'] = 'required_if:registration_type,個人,個人事業主|file|mimes:jpg,jpeg,png,pdf|max:5120';

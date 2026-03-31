@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use TCG\Voyager\Database\Schema\SchemaManager;
 use TCG\Voyager\Http\Controllers\VoyagerBaseController;
+use App\Jobs\AnalyzeProductImageJob;
+
 
 class ProductsController extends VoyagerBaseController
 {
@@ -207,14 +209,162 @@ class ProductsController extends VoyagerBaseController
         ));
     }
 
+    // public function update(Request $request, $id)
+    // {
+    //     $product = \App\Models\Product::findOrFail($id);
+
+    //     // 🔥 更新前
+    //     $before = $product->getAttributes();
+
+    //     // ★バックアップ
+    //     $this->backupFiles($product, $request);
+
+    //     // ★ S3アップロード処理（追加部分）
+    //     $fields = ['cover_img', 'cover_img2', 'cover_img3'];
+    //     foreach ($fields as $field) {
+    //         if ($request->hasFile($field)) {
+    //             \Log::info("Uploading field: $field");
+    //             $path = $request->file($field)->store('products/' . date('FY'), 's3');
+    //             \Log::info("Saved to S3: $path");
+    //             $product->{$field} = $path;
+    //         } else {
+    //             \Log::info("No file for field: $field");
+    //         }
+    //     }
+    //     $product->save(); // DB更新
+
+
+    //     // ★Voyager更新（元の処理）
+    //     $response = parent::update($request, $id);
+
+    //     // 🔥 更新後
+    //     $product->refresh();
+    //     $after = $product->getAttributes();
+
+    //     // ===== 差分チェック =====
+    //     $ignoreFields = ['updated_at','created_at'];
+    //     $changed = false;
+
+    //     foreach ($after as $key => $value) {
+    //         if (in_array($key, $ignoreFields)) continue;
+
+    //         $beforeValue = $before[$key] ?? null;
+    //         $afterValue  = $value;
+
+    //         if ($beforeValue != $afterValue) {
+    //             // JSON比較対応
+    //             if (is_string($beforeValue) && is_string($afterValue)) {
+    //                 $b = json_decode($beforeValue, true);
+    //                 $a = json_decode($afterValue, true);
+    //                 if (json_last_error() === JSON_ERROR_NONE && $b == $a) {
+    //                     continue;
+    //                 }
+    //             }
+    //             $changed = true;
+    //             break;
+    //         }
+    //     }
+
+    //     // ===== 🔥 審査ステータス＆キュー連動 =====
+    //     if ($changed) {
+    //         // ① 審査ステータス戻す
+    //         $product->update([
+    //             'review_status' => 'pending'
+    //         ]);
+
+    //         // ② 審査キューを自動連動
+    //         \App\Models\ProductReviewQueue::updateOrCreate(
+    //             ['product_id' => $product->id],
+    //             [
+    //                 'user_id' => auth()->id(),
+    //                 'status' => 'pending',
+    //                 'requested_at' => now()
+    //             ]
+    //         );
+    //     }
+
+    //     return $response;
+    // }
+
     public function update(Request $request, $id)
     {
         $product = \App\Models\Product::findOrFail($id);
 
-        // ★更新前バックアップ
+        // 🔥 更新前
+        $before = $product->getAttributes();
+
+        // ★バックアップ
         $this->backupFiles($product, $request);
 
-        return parent::update($request, $id);
+        // ★ 先にVoyager更新
+        $response = parent::update($request, $id);
+
+        // 🔥 最新取得
+        $product->refresh();
+
+        // ★ S3アップロード（後にやる！）
+        $fields = ['cover_img', 'cover_img2', 'cover_img3'];
+
+        foreach ($fields as $field) {
+
+            if ($request->hasFile($field)) {
+
+                \Log::info("Uploading field: $field");
+
+                $path = $request->file($field)->store('products/' . date('FY'), 's3');
+
+                \Log::info("Saved to S3: $path");
+
+                // 🔥 最終的な正解で上書き
+                $product->{$field} = $path;
+            }
+        }
+
+        // $product->save(); // ← ここが最終確定
+
+        // 🔥 再取得
+        // $product->refresh();
+
+        $after = $product->getAttributes();
+
+        // ===== 差分チェック（そのままでOK）=====
+        $ignoreFields = ['updated_at','created_at'];
+        $changed = false;
+
+        foreach ($after as $key => $value) {
+            if (in_array($key, $ignoreFields)) continue;
+
+            $beforeValue = $before[$key] ?? null;
+            $afterValue  = $value;
+
+            if ($beforeValue != $afterValue) {
+                $changed = true;
+                break;
+            }
+        }
+
+        // ===== 審査連動 =====
+        if ($changed) {
+
+            $product->update([
+                'review_status' => 'pending'
+            ]);
+
+            \App\Models\ProductReviewQueue::updateOrCreate(
+                ['product_id' => $product->id],
+                [
+                    'user_id' => auth()->id(),
+                    'status' => 'pending',
+                    'requested_at' => now()
+                ]
+            );
+        }
+
+        \Log::info('DISPATCH START', ['product_id' => $product->id]);
+        AnalyzeProductImageJob::dispatch($product);
+
+
+        return $response;
     }
 
     private function backupFiles($product, $request)

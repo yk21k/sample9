@@ -144,7 +144,9 @@
                             <a href="/seller" class="list-group-item list-group-item-action active">Dashboard</a>
 
                             <a href=" {{ route('seller.shop.shop_setting') }} " class="list-group-item list-group-item-action">Your Shop</a>
-                            
+
+                            <a href=" {{ route('seller.seller.dashboard') }} " class="list-group-item list-group-item-action">Product Review</a>
+
                             <a href=" {{url('/seller/orders')}} " class="list-group-item list-group-item-action">Orders</a>
 
                             <a href=" {{ url('/seller/shop_auction_orders') }} " class="list-group-item list-group-item-action">Auction Orders</a>
@@ -268,6 +270,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/js/widget.js"></script>
 @endif
+
+
 
 </html>
 

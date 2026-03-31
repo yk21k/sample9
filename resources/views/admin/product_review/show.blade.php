@@ -777,7 +777,7 @@
 	</div>		
 </div>
 
-<!-- 画像モーダル -->
+{{-- 画像と動画モーダル --}}
 
 <div id="imageModal" class="image-modal">
 

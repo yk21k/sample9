@@ -18,7 +18,6 @@ class ProductImportController extends Controller
         return view('admin.product.import');
     }
 
-
     public function import(Request $request)
     {
         $request->validate([
@@ -44,11 +43,14 @@ class ProductImportController extends Controller
             // ★ CSV Validation エラー
             DB::rollBack();
 
+             // ★ ここ重要：failures取得
+            $failures = $e->failures();
+
             return back()
-                ->with('import_failures', $e->failures())
+                ->with('import_failures', $failures)
                 ->withErrors([
                     'csv_error' => 'CSVに不正な行があるため、インポートを中止しました',
-                ]);
+                ])->with('download_template', true);
 
         } catch (\Throwable $e) {
 
@@ -62,39 +64,46 @@ class ProductImportController extends Controller
         }
     }
 
-
-
     public function downloadTemplate()
     {
         $headers = [
-            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename=product_csv_template.csv',
         ];
 
         $callback = function () {
             $handle = fopen('php://output', 'w');
 
-            // ★ Excel 文字化け防止（UTF-8 BOM）
+            // BOM（Excel対策）
             fwrite($handle, "\xEF\xBB\xBF");
 
-            // ヘッダー
+            // ★ ヘッダー（絶対これ）
             fputcsv($handle, [
                 'name',
                 'description',
-                'status',        // 1=Active / 0=InActive
+                'status',
                 'price',
                 'shipping_fee',
                 'stock',
             ]);
 
-            // サンプル行（1件のみ）
+            // ★ サンプル（複数）
             fputcsv($handle, [
-                'サンプル商品',
-                '商品説明を入力してください',
-                0,          // InActive（初期登録推奨）
+                'サンプル商品A',
+                '商品説明A',
+                0,
                 1000,
-                500,
+                250,
                 10,
+            ]);
+
+            fputcsv($handle, [
+                'サンプル商品B',
+                '商品説明B',
+                0,
+                2000,
+                500,
+                5,
             ]);
 
             fclose($handle);
@@ -102,7 +111,6 @@ class ProductImportController extends Controller
 
         return response()->stream($callback, 200, $headers);
     }
-
 
 
 }

@@ -5,21 +5,40 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
+// ★ コマンド追加
+use App\Console\Commands\ReviewReset;
+
 class Kernel extends ConsoleKernel
 {
     /**
-     * Define the application's command schedule.
+     * Artisanコマンドの手動登録（←重要）
+     */
+    protected $commands = [
+        ReviewReset::class,
+    ];
+
+    /**
+     * スケジュール定義
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
-        $schedule->command('licenses:check-expiry')->dailyAt('01:00');
-        $schedule->job(new \App\Jobs\GenerateDailyQrCodeJob)->dailyAt('00:00'); // 毎日0時
-        $schedule->command('review:reset')->everyFiveMinutes();
+        // ライセンス期限チェック（毎日1時）
+        $schedule->command('licenses:check-expiry')
+            ->dailyAt('01:00');
+
+        // QRコード生成（毎日0時）
+        $schedule->job(new \App\Jobs\GenerateDailyQrCodeJob)
+            ->dailyAt('00:00');
+
+        // 🔥 審査ロック解除（5分ごと）
+        $schedule->command('review:reset')
+            ->everyFiveMinutes()
+            ->withoutOverlapping() // 多重起動防止
+            ->runInBackground();   // 他処理と並列実行
     }
 
     /**
-     * Register the commands for the application.
+     * コマンド自動読み込み
      */
     protected function commands(): void
     {

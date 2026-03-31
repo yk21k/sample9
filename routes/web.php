@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Http;
 
+use App\Http\Controllers\TestController;
+use App\Http\Controllers\AwsTestController;
+
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\ShopController;
@@ -35,7 +38,7 @@ use App\Http\Controllers\Seller\PickupLocationController;
 use App\Http\Controllers\Seller\PickupOtpController;
 use App\Http\Controllers\Seller\StaffRegisterController;
 use App\Http\Controllers\Seller\AdminQrController;
-
+use App\Http\Controllers\Seller\ProductReviewSellerController;
 
 use App\Http\Controllers\Otp\AdminOtpController;
 use App\Http\Controllers\Shop\AuthController;
@@ -358,7 +361,24 @@ Route::group([
 
     Route::post('/shop/send-pickup-confirmation/{item}', [AuthController::class, 'sendPickupConfirmation'])->name('shop.sendPickupConfirmation');
 
+    Route::get('notification/{id}', function($id){
 
+        $n = auth()->user()
+            ->notifications()
+            ->findOrFail($id);
+
+        // 既読化
+        if(is_null($n->read_at)){
+            $n->markAsRead();
+        }
+
+        // 商品へ遷移
+        return redirect()->route(
+            'products.edit',
+            $n->data['product_id']
+        );
+
+    })->name('notification.read');
 
 });
 
@@ -463,6 +483,13 @@ Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', '
     // ▼ 毎日更新される QR コードページ
     Route::get('/staff-qr', 'AdminQrController@show')->name('admin.staff.qr');
 
+    // 商品個別審査
+    Route::get('/seller/dashboard', 'ProductReviewSellerController@index')->name('seller.dashboard');
+
+    Route::post('/product/{product}/request', 'ProductReviewController@requestReview')->name('product.request');
+
+    Route::get('seller/product/{product}/fix', 'ProductReviewSellerController@fixForm')->name('product.fix');
+
 });
 
 
@@ -519,11 +546,13 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware(['auth', 'stripe.connected'])->group(function () {
+
     Route::get('/admin/product/import', [App\Http\Controllers\ProductImportController::class, 'showForm'])->name('products.import.form');
     Route::post('/admin/product/import', [App\Http\Controllers\ProductImportController::class, 'import'])->name('products.import');
 
     Route::get('/admin/product/import/csv-template', [App\Http\Controllers\ProductImportController::class, 'downloadTemplate'])
     ->name('products.csv.template');
+
 });
 
 use App\Models\FAQ;
@@ -571,14 +600,6 @@ function handleBotman($target)
 
 
 
-
-
-Route::get('/test', function(){
-    $o = Order::find(144);
-
-    $o->generateSubOrders();
-});
-
 // shop licenses
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
@@ -618,14 +639,37 @@ Route::get('/admin/shop-license/{shop}/{column}', function ($shopId, $column) {
     
 })->name('admin.shop-license.show')->middleware('auth');
 
-
-
-
-
-
-
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('shop-license/{shop}/{file}', [ShopLicenseController::class, 'show'])
         ->name('shop-license.show');
 });
+
+
+// テスト
+Route::get('/test', function(){
+    $o = Order::find(144);
+
+    $o->generateSubOrders();
+});
+
+// AIテスト　20260329
+
+Route::get('/test/ai-update/{product}', [TestController::class, 'aiTest'])
+    ->middleware('auth');
+
+Route::get('/ai-judge/{product}', [TestController::class, 'aiJudge']);
+
+Route::get('/aws-test/s3', [AwsTestController::class, 's3Test']); 
+
+Route::get('/aws-test/upload', [AwsTestController::class, 'uploadTestImage']);
+
+Route::get('/aws-test/put', [AwsTestController::class, 's3PutTest']);
+
+Route::get('/aws-test/rekognition', [AwsTestController::class, 'rekognitionTest']);   
+
+
+
+
+
+
 

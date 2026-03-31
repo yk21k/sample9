@@ -192,7 +192,7 @@
           class="form-control"
           name="identification_2_2"
           id="identification_2_2"
-          value="business_card"
+          value="名刺"
           readonly
           required
         >  

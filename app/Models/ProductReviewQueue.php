@@ -9,12 +9,25 @@ class ProductReviewQueue extends Model
 {
     protected $fillable = [
         'product_id',
+        'user_id',
         'status',
+        'requested_at',
+        'review_started_at',
+        'reviewed_at',
         'reviewer_id',
+        'fix_fields',
         'risk_score',
         'comment',
-        'review_started_at',
-        'reviewed_at'
+        'ai_result',
+        'ai_score',
+        'ai_status',
+        'ai_checked_at',
+    ];
+
+    protected $casts = [
+        'fix_fields' => 'array',
+        'ai_result' => 'array',
+        'ai_checked_at' => 'datetime',
     ];
 
     public function product()

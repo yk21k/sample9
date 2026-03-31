@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\ProductReviewQueue;
+// use App\Jobs\RunAiReviewJob;
+use App\Jobs\AnalyzeProductImageJob;
+use Illuminate\Support\Facades\Log;
 
 class Product extends Model
 {
@@ -47,11 +50,16 @@ class Product extends Model
 
             try {
 
-                \App\Models\ProductReviewQueue::create([
-                    'product_id' => $product->id,
-                    'status' => 'pending',
-                    'risk_score' => 0
-                ]);
+                ProductReviewQueue::firstOrCreate(
+                    ['product_id' => $product->id],
+                    [
+                        'user_id'    => $product->shop->user_id ?? auth()->id(),
+                        'status'     => 'pending',
+                        'risk_score' => 0
+                    ]
+                );
+
+                // AnalyzeProductImageJob::dispatch($product);コントローラーで行う二重になっているため
 
             } catch (\Throwable $e) {
 
@@ -63,29 +71,43 @@ class Product extends Model
 
         static::updated(function ($product) {
 
-            if($product->wasChanged([
+            Log::info('UPDATED EVENT FIRED', [
+                'changed' => $product->wasChanged([
+                    'cover_img',
+                    'cover_img2',
+                    'cover_img3',
+                ])
+            ]);
+
+            if ($product->wasChanged([
                 'cover_img',
                 'cover_img2',
                 'cover_img3',
                 'movie'
-            ])){
+            ])) {
 
+                // ステータス戻す
                 $product->updateQuietly([
                     'review_status' => 'pending'
                 ]);
 
+                // Queue更新
                 ProductReviewQueue::updateOrCreate(
                     ['product_id' => $product->id],
                     [
+                        'user_id' => $product->shop->user_id ?? auth()->id(),
                         'status' => 'pending',
                         'reviewer_id' => null,
                         'review_started_at' => null
                     ]
                 );
+
+                // 🔥 AI再実行（これが正解）
+                // AnalyzeProductImageJob::dispatch($product);
             }
 
         });
-
+        
         static::updating(function ($product) {
 
             $changes = $product->getDirty();
@@ -197,5 +219,17 @@ class Product extends Model
     {
         return $this->hasMany(ProductVersion::class);
     }
+
+    public function getFixFieldsAttribute()
+    {
+        return $this->reviewQueue->fix_fields ?? [];
+    }
+
+    public function getFixCommentAttribute()
+    {
+        return $this->reviewQueue->comment ?? null;
+    }
+
+
 
 }

@@ -13,7 +13,15 @@ class ProductReview extends Model
         'reviewer_id',
         'status',
         'comment',
-        'ai_result'
+        'ai_result',
+        'ai_score',
+        'ai_status',
+        'ai_checked_at',
+    ];
+
+    protected $casts = [
+        'ai_result' => 'array',
+        'ai_checked_at' => 'datetime',
     ];
 
     public function product()

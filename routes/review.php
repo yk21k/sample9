@@ -19,12 +19,29 @@ Route::prefix('admin')
     Route::get('product-review/{id}', [ProductReviewController::class,'show'])
         ->name('product.review.show');
 
-    Route::post('product-review/{id}',[ProductReviewController::class,'review']);
+    Route::post('product-review/{id}',[ProductReviewController::class,'review'])->name('product.review.review');
+
+    Route::post('product-review/{product}/fix', [ProductReviewController::class,'fix'])->name('product.review.fix');
 
     Route::post('product-review/{product}/approve', [ProductReviewController::class,'approve'])
         ->name('product.approve');
 
     Route::post('product-review/{product}/reject', [ProductReviewController::class,'reject'])
         ->name('product.reject');
+
+
+});
+
+/*
+|--------------------------------------------------------------------------
+| 出品者（審査依頼する側）
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['web','auth'])
+    ->group(function () {
+
+    Route::post('product-review/{product}/request',
+        [ProductReviewController::class, 'requestReview']
+    )->name('product.request');
 
 });

@@ -30,7 +30,8 @@ class ProductImport implements
         return [
             'name' => ['required'],
             'description' => ['required'],
-            'status' => ['in:0'], // status=1 NG
+            // 'status' => ['in:0'], // status=1 NG
+            'status' => ['required', 'integer', 'in:0'],
             'price' => ['required','numeric','min:1'],
             'shipping_fee' => ['required','numeric'],
             'stock' => ['required','integer','min:0'],
@@ -54,7 +55,7 @@ class ProductImport implements
                 $price = $row['price'] ?? null;
                 $shippingFee = $row['shipping_fee'] ?? null;
 
-                if (!$price || !$shippingFee) {
+                if ($price === null || $shippingFee === null){
                     continue;
                 }
 
@@ -76,6 +77,10 @@ class ProductImport implements
      */
     public function model(array $row)
     {
+        if (empty(array_filter($row))) {
+            return null;
+        }
+
         return new Product([
             'name'         => $row['name'],
             'description'  => $row['description'],
