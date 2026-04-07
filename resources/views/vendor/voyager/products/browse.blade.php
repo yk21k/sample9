@@ -186,8 +186,6 @@
 
                                         @if (isset($row->details->view))
 
-                                            
-
                                         @include($row->details->view, ['row' => $row, 'dataType' => $dataType,
                                         'dataTypeContent' => $dataTypeContent, 'content' => $data->{$row->field},
                                         'action' => 'browse', 'view' => 'browse', 'options' => $row->details])

@@ -41,13 +41,12 @@
 
 				<p>価格 : {{ number_format($queue->product->price) }}円</p>
 
-				<img src="{{ $queue->product->cover_img ? asset('storage/'.$queue->product->cover_img) : asset('images/no_image.jpg') }}" width="200">
-
-				<img src="{{ $queue->product->cover_img2 ? asset('storage/'.$queue->product->cover_img2) : asset('images/no_image.jpg') }}" width="200">
-
-				<img src="{{ $queue->product->cover_img3 ? asset('storage/'.$queue->product->cover_img3) : asset('images/no_image.jpg') }}" width="200">
-
-				<br><br>
+				@foreach(['cover_img','cover_img2','cover_img3'] as $field)
+				    <img 
+				        src="{{ $queue->product->$field ? mediaUrl($queue->product->$field) : asset('images/no_image.jpg') }}"
+				        width="200"
+				    >
+				@endforeach
 
 				<a href="{{ route('product.review.show',$queue->product_id)
 				}}" class="btn btn-primary">

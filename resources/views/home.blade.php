@@ -306,43 +306,43 @@
 
 <script src="https://vjs.zencdn.net/7.21.1/video.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.my-video').forEach((videoEl) => {
-        const wrapper = videoEl.closest('.video-wrapper');
-        if (!wrapper) return;
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.my-video').forEach((videoEl) => {
+            const wrapper = videoEl.closest('.video-wrapper');
+            if (!wrapper) return;
 
-        const overlayBtn = wrapper.querySelector('.overlay-btn');
-        const productId = wrapper.dataset.productId;
+            const overlayBtn = wrapper.querySelector('.overlay-btn');
+            const productId = wrapper.dataset.productId;
 
-        /* ===== Video.js 初期化（1回だけ）===== */
-        const player = videojs(videoEl, {
-            fluid: false,          // ← CSSで高さ管理するので false
-            responsive: false,
-            controls: true,
-            preload: 'metadata',
-        });
+            /* ===== Video.js 初期化（1回だけ）===== */
+            const player = videojs(videoEl, {
+                fluid: false,          // ← CSSで高さ管理するので false
+                responsive: false,
+                controls: true,
+                preload: 'metadata',
+            });
 
-        player.ready(() => {
-            player.on('play', () => {
-                setTimeout(() => {
-                    if (overlayBtn) {
-                        overlayBtn.style.display = 'block';
+            player.ready(() => {
+                player.on('play', () => {
+                    setTimeout(() => {
+                        if (overlayBtn) {
+                            overlayBtn.style.display = 'block';
+                        }
+                    }, 1000);
+                });
+            });
+
+            if (overlayBtn) {
+                overlayBtn.addEventListener('click', () => {
+                    if (productId) {
+                        window.location.href = `/product/${productId}`;
+                    } else {
+                        alert("商品IDが見つかりませんでした。");
                     }
-                }, 1000);
-            });
+                });
+            }
         });
-
-        if (overlayBtn) {
-            overlayBtn.addEventListener('click', () => {
-                if (productId) {
-                    window.location.href = `/product/${productId}`;
-                } else {
-                    alert("商品IDが見つかりませんでした。");
-                }
-            });
-        }
     });
-});
 </script>
 
 @endsection

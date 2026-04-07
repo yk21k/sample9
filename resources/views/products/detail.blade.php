@@ -14,13 +14,15 @@
 
   <div class="mySlides">
     <div class="numbertext">1 / 3</div>
-		   <div class="text">Caption Text {{ $productDetails['name'] }}</div>
+		   <div class="text">Caption 1 {{ $productDetails['name'] }}</div>
 
     	<div class="content-detail1">
     		<div class="base_img_box1">
 
 		    	@if($productDetails['cover_img'])
-		    		<img class="base_img1" src="{{ asset( 'storage/'.$productDetails['cover_img']  ) }}" style="width:430px; height:430px">
+                    <img class="base_img1"
+                     src="{{ $productDetails['cover_img'] ? asset(mediaUrl($productDetails['cover_img'])) : asset('images/no_image.jpg') }}" 
+                     alt="Card image cap" style="width:430px; height:430px">
 		    	@else
 		    		<img class="base_img1" src="{{ asset('images/no_image.jpg') }}" style="width:430px; height:430px">		
 		    	@endif
@@ -31,13 +33,15 @@
 
   <div class="mySlides">
     <div class="numbertext">2 / 3</div>
-		   <div class="text">Caption Two {{ $productDetails['name'] }}</div>
+		   <div class="text">Caption 2 {{ $productDetails['name'] }}</div>
 
     	<div class="content-detail2">
     		<div class="base_img_box2">
 
 		    	@if($productDetails['cover_img2'])
-		    		<img class="base_img2" src="{{ asset( 'storage/'.$productDetails['cover_img2']  ) }}" style="width:430px; height:430px">
+		    		<img class="base_img2"
+                     src="{{ $productDetails['cover_img2'] ? asset(mediaUrl($productDetails['cover_img2'])) : asset('images/no_image.jpg') }}" 
+                     alt="Card image cap" style="width:430px; height:430px">
 		    	@else
 		    		<img class="base_img2" src="{{ asset('images/no_image.jpg') }}" style="width:430px; height:430px">
 		    	@endif
@@ -48,13 +52,15 @@
 
   <div class="mySlides">
     <div class="numbertext">3 / 3</div>
-		   <div class="text">Caption Two {{ $productDetails['name'] }}</div>
+		   <div class="text">Caption 3 {{ $productDetails['name'] }}</div>
 
     	<div class="content-detail3">
     		<div class="base_img_box3">
 		    
 		    	@if($productDetails['cover_img3'])
-		    		<img class="base_img3" src="{{ asset( 'storage/'.$productDetails['cover_img3']  ) }}" style="width:430px; height:430px">
+		    		<img class="base_img3"
+                     src="{{ $productDetails['cover_img3'] ? asset(mediaUrl($productDetails['cover_img3'])) : asset('images/no_image.jpg') }}" 
+                     alt="Card image cap" style="width:430px; height:430px">
 		    	@else
 		    		<img class="base_img3" src="{{ asset('images/no_image.jpg') }}" style="width:430px; height:430px">
 		    	@endif

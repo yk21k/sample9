@@ -38,17 +38,6 @@ class RekognitionService
         }
 
         try {
-            // 画像として ModerationLabels を取得
-            // $result = $this->client->detectModerationLabels([
-            //     'Image' => [
-            //         'S3Object' => [
-            //             'Bucket' => $this->bucket,
-            //             'Name' => $s3Key,
-            //         ],
-            //     ],
-            //     'MinConfidence' => 50,
-            // ]);
-
             $result = $this->client->detectModerationLabels([
                 'Image' => [
                     'S3Object' => [

@@ -320,7 +320,7 @@ Route::middleware(['passed.entrance'])->group(function () {
 
     Route::resource('shops', ShopController::class)->middleware('auth');
 
-    // Route::get('shops/{id}', [App\Http\Controllers\ShopController::class, 'show'])->name('shops.overview');
+    Route::get('shops/{id}', [App\Http\Controllers\ShopController::class, 'show'])->name('shops.overview');
 
 
     Route::resource('users',UsersController::class)->middleware('auth');
@@ -486,7 +486,9 @@ Route::group(['prefix' => 'seller', 'middleware' => 'auth', 'as' => 'seller.', '
     // 商品個別審査
     Route::get('/seller/dashboard', 'ProductReviewSellerController@index')->name('seller.dashboard');
 
-    Route::post('/product/{product}/request', 'ProductReviewController@requestReview')->name('product.request');
+    Route::post('/product/{product}/request', [ProductReviewController::class, 'requestReview'])->name('product.request');
+
+    
 
     Route::get('seller/product/{product}/fix', 'ProductReviewSellerController@fixForm')->name('product.fix');
 

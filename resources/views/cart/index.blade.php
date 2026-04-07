@@ -119,7 +119,9 @@
 	            <tr>
 	                <td>
 	                    <img style="width: 96px; height: 65px;" class="card-img-top"
-	                        src="{{ asset('storage/' . $item->associatedModel->cover_img) }}" alt="商品画像">
+	                    	 src="{{ $item->associatedModel ? asset(mediaUrl($item->associatedModel->cover_img)) : asset('images/no_image.jpg') }}"
+                     		 alt="商品画像">
+    
 	                </td>
                     @if($item->associatedModel->shop->invoice_number)
 	                	<td>{{ $item->name }} <span class="badge bg-danger ms-2">課税事業者</span></td>

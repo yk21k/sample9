@@ -39,7 +39,9 @@
                         
                     </div>
                     <div class="text-muted mt-1">
-                        A.　{!! nl2br(e($faq->answer)) !!}
+
+                        A.　{!! nl2br(strip_tags($faq->answer, '<a>')) !!}
+                            
                     </div>
                 </div>
             @endforeach

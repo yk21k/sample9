@@ -21,9 +21,11 @@
         <div class="card-body change-border01__inner">
             <a href="{{ route('products.detail', ['id'=>$product->id]) }}">
                 <img class="card-img-top" 
-                     src="{{ $product->cover_img ? asset('storage/'.$product->cover_img) : asset('images/no_image.jpg') }}" 
+                     src="{{ $product->cover_img ? asset(mediaUrl($product->cover_img)) : asset('images/no_image.jpg') }}" 
                      alt="Card image cap">
             </a>
+                
+
 
             <div class="card-body change-border01__inner">
                 <h4 class="card-title">{{ $product->name }}</h4>

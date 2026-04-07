@@ -33,7 +33,7 @@ class ProductController extends Controller
             // dd($products);
             // dd($category);
         }else{
-            $products = Product::take(100)->get();
+            $products = Product::where('status', 1)->where('review_status', 'approved')->take(100)->get();
         }
 
         return view('products.index', compact('products', 'categoryName'));

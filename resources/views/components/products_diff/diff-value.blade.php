@@ -1,16 +1,15 @@
-
-
 @php
-use Illuminate\Support\Str;
+    use Illuminate\Support\Str;
 
-$decoded = is_string($value) ? json_decode($value, true) : null;
-$isJson = is_array($decoded);
+    $decoded = is_string($value) ? json_decode($value, true) : null;
+    $isJson = is_array($decoded);
 
-$isBefore = ($diffType ?? '') === 'before';
+    $isBefore = ($diffType ?? '') === 'before';
 
-$basePath = $isBefore
-    ? 'storage/versions/'
-    : 'storage/';
+    $basePath = $isBefore
+        ? 'storage/versions/'
+        : 'storage/';
+      
 @endphp
 
 
@@ -33,8 +32,7 @@ $basePath = $isBefore
 
             {{-- 画像 --}}
             @elseif(is_string($item))
-                <img src="{{ asset($basePath.$item) }}"
-                     class="review-image">
+                <img src="{{ mediaUrl($item, $isBefore) }}" class="review-image">
             @endif
 
         @endforeach
@@ -53,8 +51,7 @@ $basePath = $isBefore
             @if(!empty($line))
 
                 @if(Str::endsWith($line, ['.jpg','.jpeg','.png','.webp']))
-                    <img src="{{ asset($basePath.$line) }}"
-                         class="review-image">
+                    <img src="{{ mediaUrl($line, $isBefore) }}">
 
                 @elseif(Str::endsWith($line, ['.mp4','.mov','.webm']))
                     <video class="review-video" controls>
@@ -77,8 +74,7 @@ $basePath = $isBefore
 
 {{-- 単体画像 --}}
 @elseif(is_string($value) && Str::endsWith($value, ['.jpg','.jpeg','.png','.webp']))
-    <img src="{{ asset($basePath.$value) }}"
-         class="review-image">
+    <img src="{{ mediaUrl($value, $isBefore) }}" class="review-image">
 
 {{-- 単体動画 --}}
 @elseif(is_string($value) && Str::endsWith($value, ['.mp4','.mov','.webm']))
