@@ -11,139 +11,128 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Models\ProductImageReview;
+use App\Helpers\Audit;
+use App\Services\ProductReviewFlowService;
 
 
 class AnalyzeProductImageJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable;
 
-    public $product; 
+    public $reviewId;
 
-    public function __construct(Product $product)
+    public function __construct(int $reviewId)
     {
-        $this->product = $product;
+        $this->reviewId = $reviewId;
     }
 
     public function handle()
     {
-        Log::info('🔥 JOB START');
+        $review = ProductImageReview::findOrFail(
+            $this->reviewId
+        );
 
-        try {
-            $product = $this->product;
-            $product->refresh(); // DBの最新状態を取得
+        $before = $review->toArray();
 
-            Log::info('PRODUCT ID: '.$product->id);
+        Audit::log(
 
-            Log::info('DB IMAGE VALUES', [
-                'cover_img' => $product->cover_img,
-                'cover_img2' => $product->cover_img2,
-                'cover_img3' => $product->cover_img3,
-                'movie' => $product->movie,
+            action: 'ai_image_review_started',
+
+            target: $review,
+
+            before: null,
+
+            after: [
+
+                'image_type' => $review->image_type,
+
+                'image_path' => $review->image_path,
+
+            ],
+
+            description: 'AI画像審査開始'
+
+        );
+
+
+        $s3Key = $review->image_path;
+
+        $rekognition = new RekognitionService();
+
+        $result = $rekognition->analyze(
+            $s3Key
+        );
+
+        if (empty($result)) {
+
+            $review->update([
+
+                'status' => 'approved',
+
+                'risk_score' => 0,
+
+                'reviewed_at' => now(),
             ]);
 
-            // 審査キュー作成 or 取得
-            $queue = ProductReviewQueue::firstOrCreate(
-                ['product_id' => $product->id],
-                [
-                    'user_id' => $product->shop->user_id ?? 1,
-                    'status' => 'pending'
-                ]
+            $review->refresh();
+
+            Audit::log(
+
+                action: 'ai_image_review_completed',
+
+                target: $review,
+
+                before: $before,
+
+                after: $review->toArray(),
+
+                description: 'AI画像審査OK'
+
             );
 
-            // 画像フィールド＋動画フィールドをループ
-            $fields = ['cover_img', 'cover_img2', 'cover_img3'];
-            $rekognition = new RekognitionService();
-            $combinedResult = [];
+        } else {
 
-            foreach ($fields as $field) {
+            $review->update([
 
-                $s3Key = $product->{$field};
+                'status' => 'rejected',
 
-                // ① まず空チェック
-                if (!$s3Key) {
-                    Log::info("No file for field: {$field}");
-                    continue;
-                }
+                'risk_score' => collect($result)
+                    ->max('Confidence'),
 
-                // 🔥 ② ここに入れる（超重要）
-                if (!\Storage::disk('s3')->exists($s3Key)) {
-                    Log::error("❌ S3に存在しない: {$s3Key}");
-                    continue;
-                }
+                'moderation_labels' => json_encode($result),
 
-                Log::info("✅ S3存在確認OK: {$s3Key}");
-
-                // ③ Rekognition実行
-                try {
-                    $labels = $rekognition->analyze($s3Key);
-
-                    
-                    foreach ($labels as $label) {
-                        Log::info('DETECTED', [
-                            'Name' => $label['Name'] ?? null,
-                            'Confidence' => $label['Confidence'] ?? null,
-                            'Parent' => $label['ParentName'] ?? null
-                        ]);
-                    }
-
-                    if (!empty($labels)) {
-                        $combinedResult = array_merge($combinedResult, $labels);
-                    }
-
-                } catch (\Throwable $e) {
-                    Log::error("🔥 JOB ERROR for {$field}: ".$e->getMessage());
-                }
-            }
-
-            // AI 判定
-            // =========================
-            // AI解析後
-            // =========================
-
-            $maxConfidence = collect($combinedResult)->max('Confidence') ?? 0;
-
-            // ★ AI状態だけ管理
-            // $aiStatus = empty($combinedResult) ? 'error' : 'done';
-            // $aiStatus = count($combinedResult) === 0 ? 'no_issue' : 'detected';
-            // $aiStatus = count($combinedResult) === 0 ? 'safe' : 'detected';
-
-            $hasError = false;
-
-            foreach ($fields as $field) {
-                try {
-                    $labels = $rekognition->analyze($s3Key);
-
-                    if (!empty($labels)) {
-                        $combinedResult = array_merge($combinedResult, $labels);
-                    }
-
-                } catch (\Throwable $e) {
-                    $hasError = true;
-                    Log::error("Rekognition error for {$s3Key}: ".$e->getMessage());
-                }
-            }
-
-            $aiStatus = $hasError ? 'partial_error' : 'done';
-
-            // =========================
-            // 🔥 ここが重要（status触らない）
-            // =========================
-
-            $queue->update([
-                'ai_result' => $combinedResult,
-                'ai_score' => $maxConfidence,
-                'ai_status' => $aiStatus,
-                'ai_checked_at' => now()
+                'reviewed_at' => now(),
             ]);
 
-            Log::info('AI保存完了', [
-                'score' => $maxConfidence,
-                'status' => $aiStatus
-            ]);
+            $review->refresh();
 
-        } catch (\Throwable $e) {
-            Log::error('🔥 JOB ERROR: '.$e->getMessage());
+            Audit::log(
+
+                action: 'ai_image_review_rejected',
+
+                target: $review,
+
+                before: $before,
+
+                after: $review->toArray(),
+
+                description: 'AI画像審査NG'
+
+            );
+
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | AI画像レビュー集約
+        |--------------------------------------------------------------------------
+        */
+        app(ProductReviewFlowService::class)
+            ->checkImageReviews(
+                $review->draft
+            );
     }
+
 
 }

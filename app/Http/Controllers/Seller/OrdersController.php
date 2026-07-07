@@ -36,15 +36,49 @@ class OrdersController extends Controller
 
     public function index(Request $request)
     {
-        // 初期クエリ（ユーザーによって分岐）
-        if (auth()->user()->id == 1) {
+        // // 初期クエリ（ユーザーによって分岐）
+        // if (auth()->user()->id == 1) {
+        //     $query = SubOrder::with('order');
+        //     $coupons = ShopCoupon::get()->toArray();
+        //     $campaigns = Campaign::get()->toArray();
+        // } else {
+        //     $query = SubOrder::with('order')->where('seller_id', auth()->id());
+        //     $coupons = ShopCoupon::where('shop_id', auth()->user()->currentShop()?->id)->get()->toArray();
+        //     $campaigns = Campaign::where('shop_id', auth()->user()->currentShop()?->id)->get()->toArray();
+        // }
+
+        $shop = auth()->user()->currentShop();
+
+        // ========================================
+        // admin（運営）!$shopだけで絞れないのでは？
+        // ========================================
+        if (!$shop) {
+
             $query = SubOrder::with('order');
-            $coupons = ShopCoupon::get()->toArray();
-            $campaigns = Campaign::get()->toArray();
-        } else {
-            $query = SubOrder::with('order')->where('seller_id', auth()->id());
-            $coupons = ShopCoupon::where('shop_id', auth()->user()->shop->id)->get()->toArray();
-            $campaigns = Campaign::where('shop_id', auth()->user()->shop->id)->get()->toArray();
+
+            $coupons = ShopCoupon::all()->toArray();
+
+            $campaigns = Campaign::all()->toArray();
+
+        }
+
+        // ========================================
+        // owner / manager / staff
+        // ========================================
+        else {
+
+            $query = SubOrder::with('order')
+                ->where('seller_id', $shop->user_id);
+
+            $coupons = ShopCoupon::where(
+                'shop_id',
+                $shop->id
+            )->get()->toArray();
+
+            $campaigns = Campaign::where(
+                'shop_id',
+                $shop->id
+            )->get()->toArray();
         }
 
         // 🔍 検索処理
@@ -159,7 +193,7 @@ class OrdersController extends Controller
         if(auth()->user()->id == 1){
             return view('sellers.orders.show', compact('items'));
         } else {
-            $shopMane = auth()->user()->shop->id;
+            $shopMane = auth()->user()->currentShop()?->id;
             return view('sellers.orders.show', compact('items', 'shopMane', 'suborder'));
         }
     }
@@ -841,7 +875,7 @@ class OrdersController extends Controller
         ])->orderByDesc('id')->get();
 
         // 必要なリレーションをまとめて取得
-        $finalOrders = FinalOrder::where('shop_id', auth()->user()->shop->id)->orderByDesc('id')->get();
+        $finalOrders = FinalOrder::where('shop_id', auth()->user()->currentShop()?->id)->orderByDesc('id')->get();
 
         // dd($subOrders->first()->coupon_code);
         // dd($finalOrders);
@@ -974,7 +1008,7 @@ class OrdersController extends Controller
 
                 // --- キャンペーン適用 ---
                 $campaign_set_price = null;
-                $shop_campaign = Campaign::where('shop_id', auth()->user()->shop->id)
+                $shop_campaign = Campaign::where('shop_id', auth()->user()->currentShop()?->id)
                     ->where('start_date','<=',$row->purchase_date)
                     ->where('end_date','>=',$row->purchase_date)
                     ->orderByDesc('dicount_rate1')->first();

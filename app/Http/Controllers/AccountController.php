@@ -27,6 +27,8 @@ class AccountController extends Controller
 {
     public function index()
     {
+        // dd(auth()->user()->can_purchase);
+
         $profiles = User::where('id', Auth::user()->id)->first();
 
         $order_histories = SubOrder::where('user_id', Auth::user()->id)->orderBy('created_at', 'desc')->get();

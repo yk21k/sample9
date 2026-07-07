@@ -49,7 +49,10 @@
                         </button>
                     </a>
                 </li>
-
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit">Logout</button>
+                </form>
                 @guest
                     @if (Route::has('login'))
                         <li class="nav-item">

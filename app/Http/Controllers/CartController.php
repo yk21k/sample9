@@ -26,12 +26,6 @@ use Carbon\Carbon;
 
 class CartController extends Controller
 {
-    // public function add($productId)
-    // {
-    //     dd($productId);
-    //     $product = Product::find($productId);
-    // }
-
     public function add(Product $product)
     {
         // dd($product);
@@ -79,29 +73,13 @@ class CartController extends Controller
             }
 
         }
-        // $product_stocks->update(['stock' => $product_stocks->stock - $first_stock->quantity]);
-        // Product::where('id', '=', $product->id)->update(['stock' => $product_stocks->stock - $first_stock->quantity]);
+
         DB::commit();
         // dd($first_stock->quantity);
 
 
         return redirect()->route('cart.index');
     }
-
-    // public function addAuction(Auction $auction)
-    // {
-    //     // add the auction to cart
-    //     \Cart::session(auth()->id())->add(array(
-    //         'id' => $auction->id,
-    //         'name' => $auction->name,
-    //         'price' => $auction->spot_price,
-    //         'quantity' => 1,
-    //         'attributes' => array(),
-    //         'associatedModel' => $auction
-
-    //     ));
-    //     return redirect()->route('cart.index');
-    // }
 
     public function addAuction(Auction $auction)
     {
@@ -110,6 +88,9 @@ class CartController extends Controller
 
     public function index()
     {   
+        // dd(!auth()->user()->can_purchase);
+
+
         $cartItems = \Cart::session(auth()->id())->getContent();
 
         $today = Carbon::today();
@@ -225,9 +206,6 @@ class CartController extends Controller
         // dd($item->associatedModel->shipping_fee);
         session(['cart_total' => $total]);
 
-
-
-
         // ✅ 5. ビューに渡す
 
         $cartItems = collect(session('cart_items'))->map(function ($item) {
@@ -251,18 +229,7 @@ class CartController extends Controller
     {   
         // dd($itemId);
 
-        // $first_stocks = \Cart::session(auth()->id())->getContent($itemId);
-        // // dd($first_stocks);
 
-        // foreach($first_stocks as $first_stock)
-        // {
-        //     $first_stock->quantity;
-        //     // dd($first_stock->id);
-        //     $product_stocks = Product::find($itemId);
-        //     // dd($product_stocks->stock, $first_stock->quantity);
-
-        // }
-        // Product::where('id', '=', $itemId)->update(['stock' => $product_stocks->stock + $first_stock->quantity]);
         \Cart::session(auth()->id())->remove($itemId);
 
         
@@ -309,8 +276,7 @@ class CartController extends Controller
 
 
         }
-        // $product_stocks->update(['stock' => $product_stocks->stock - $first_stock->quantity]);
-        // Product::where('id', '=', $first_stock->id)->update(['stock' => $product_stocks->stock - $first_stock->quantity]);
+
         DB::commit();
         // dd($first_stock->quantity);
 
@@ -360,16 +326,6 @@ class CartController extends Controller
             }
             $couponPrice = ($productPrice - $couponDiscount)*1.1;
 
-
-            // $couponDiscount = 0;
-            // foreach ((array) $item->getConditions() as $condition) {
-            //     $value = $condition->getValue();
-
-            //     // 金額割引だけを想定（マイナス符号や通貨記号を考慮）
-            //     if (is_string($value)) {
-            //         $couponDiscount += abs(floatval($value));
-            //     }
-            // }
 
             // 割引後の価格に消費税を加算
             $couponPrice = ($productPrice - $couponDiscount) * 1.1;

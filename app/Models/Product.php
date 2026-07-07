@@ -8,33 +8,54 @@ use App\Models\ProductReviewQueue;
 // use App\Jobs\RunAiReviewJob;
 use App\Jobs\AnalyzeProductImageJob;
 use Illuminate\Support\Facades\Log;
+use App\Models\ActivityLog;
 
 class Product extends Model
 {
     use HasFactory;
 
+    const STATUS_DRAFT = 'draft';
+    const STATUS_MANAGER_PENDING = 'manager_pending';
+    const STATUS_PENDING = 'pending';
+    const STATUS_APPROVED = 'approved';
+    const STATUS_REJECTED = 'rejected';
+
     protected $fillable = [
         'name',
-        'description',
         'status',
-        'price',
-        'shipping_fee',
-        'stock',
-        'shop_id',
-        'campaigns_rate1',
         'review_comment',
         'reviewed_by',
         'reviewed_at',
-        'review_status'
+        'description',
+        'price',
+        'shipping_fee',
+        'stock',
+        'campaigns_rate1',
+        'shop_id',
+        'draft_id',
+        'submitted_by',
+        'owner_reviewed_by',
+        'owner_reviewed_at',
+        'owner_note',
+        'admin_note',
+        'category_id',
+        'created_at',
+        'updated_at',
+        'product_attributes',
+        'review_status',
+        'cover_img',
+        'cover_img2',
+        'cover_img3',
+        'movie',
+        'movie_file',
+        'review_status',
+        'approved_by',
+        'approved_at',
+        'original_created_by',
+        'last_submitted_by',
     ];
 
     protected $guarded = ['id'];
-
-
-    // protected $casts = 
-    // [
-    //     'product_attributes'=>'array'
-    // ];
 
     protected static function booted()
     {
@@ -79,12 +100,16 @@ class Product extends Model
                 ])
             ]);
 
-            if ($product->wasChanged([
-                'cover_img',
-                'cover_img2',
-                'cover_img3',
-                'movie'
-            ])) {
+            if (
+                $product->wasChanged([
+                    'cover_img',
+                    'cover_img2',
+                    'cover_img3',
+                    'movie'
+                ])
+                &&
+                $product->review_status !== 'approved'
+            ) {
 
                 // ステータス戻す
                 $product->updateQuietly([
@@ -228,6 +253,51 @@ class Product extends Model
     public function getFixCommentAttribute()
     {
         return $this->reviewQueue->comment ?? null;
+    }
+
+    public function editDrafts()
+    {
+        return $this->hasMany(
+            ProductEditDraft::class
+        );
+    }
+
+    public function draft()
+    {
+        return $this->belongsTo(
+            ProductDraft::class,
+            'draft_id'
+        );
+    }
+
+    public function drafts()
+    {
+        return $this->hasMany(
+            ProductDraft::class
+        );
+    }
+
+    public function imageReviews()
+    {
+        return $this->hasMany(
+            ProductImageReview::class
+        );
+    }
+
+    public function originalCreator()
+    {
+        return $this->belongsTo(
+            User::class,
+            'original_created_by'
+        );
+    }
+
+    public function lastSubmitter()
+    {
+        return $this->belongsTo(
+            User::class,
+            'last_submitted_by'
+        );
     }
 
 

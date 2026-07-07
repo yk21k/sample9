@@ -36,19 +36,29 @@
 
                 <ul class="nav navbar-nav">
 
+                    
+
                     <li>
-                        <a href="{{ route('admin.review.dashboard') }}">
+                        <a href="{{ route('admin.shop-review.dashboard') }}">
                             <i class="voyager-check"></i>
-                            <span>審査ダッシュボード</span>
+                            <span>店舗審査ダッシュボード</span>
                         </a>
                     </li>
 
                     <li>
-                        <a href="{{ route('product.review') }}">
+                        <a href="">
+                            <i class="voyager-eye"></i>
+                            <span>店舗審査</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ route('admin.review.index') }}">
                             <i class="voyager-eye"></i>
                             <span>商品審査</span>
                         </a>
                     </li>
+
 
                 </ul>
 

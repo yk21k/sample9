@@ -4,13 +4,17 @@ namespace App\Policies;
 
 use App\Models\Product;
 use App\Models\User;
+use App\Models\ShopMember;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ProductPolicy
 {
-use HandlesAuthorization;
+    use HandlesAuthorization;
 
+    /**
+     * adminは全許可
+     */
     public function before($user, $ability)
     {
         if ($user->hasRole('admin')) {
@@ -18,62 +22,72 @@ use HandlesAuthorization;
         }
     }
 
+    /**
+     * 共通：メンバー取得
+     */
+    private function member(User $user, Product $product)
+    {
+        return ShopMember::where('shop_id', $product->shop_id)
+            ->where('user_id', $user->id)
+            ->first();
+    }
+
+    /**
+     * 一覧表示（Voyager browse）
+     */
     public function browse(User $user)
     {
-        return $user->hasRole('seller');
+        return ShopMember::where('user_id', $user->id)->exists();
     }
 
-
+    /**
+     * 閲覧（Voyager read / view）
+     */
     public function read(User $user, Product $product)
     {
-        if (empty($product->shop)) {
-            return false;
-        }
-
-        return $user->id == $product->shop->user_id;
+        return $this->member($user, $product) !== null;
     }
 
-    /**
-     * Determine whether the user can update the Product.
-     *
-     * @param  \App\User  $user
-     * @param  \App\Product  $product
-     * @return mixed
-     */
-    public function edit(User $user, Product $product)
+    public function view(User $user, Product $product)
     {
-        if(empty($product->shop)) {
-            return false;
-        }
-
-        return $user->id == $product->shop->user_id;
+        return $this->read($user, $product);
     }
 
-
     /**
-     * Determine whether the user can create Products.
-     *
-     * @param  \App\User  $user
-     * @return mixed
+     * 作成（Voyager add）
      */
     public function add(User $user)
     {
-        return $user->hasRole('seller');
+        return ShopMember::where('user_id', $user->id)
+            ->whereIn('role', ['owner', 'manager'])
+            ->exists();
     }
 
     /**
-     * Determine whether the user can delete the Product.
-     *
-     * @param  \App\User  $user
-     * @param  \App\Product  $product
-     * @return mixed
+     * 編集（Voyager edit）
+     */
+    public function edit(User $user, Product $product)
+    {
+        $member = $this->member($user, $product);
+
+        return $member && $member->canEditProduct();
+    }
+
+    /**
+     * 更新（API / Controller用）
+     */
+    public function update(User $user, Product $product)
+    {
+        return $this->edit($user, $product);
+    }
+
+    /**
+     * 削除（ownerのみ）
      */
     public function delete(User $user, Product $product)
     {
-        if (empty($product->shop)) {
-            return false;
-        }
+        $member = $this->member($user, $product);
 
-        return $user->id == $product->shop->user_id;
+        return $member && $member->role === 'owner';
     }
 }

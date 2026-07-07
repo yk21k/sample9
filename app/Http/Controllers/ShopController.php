@@ -43,6 +43,12 @@ class ShopController extends Controller
         $shop_sets = Shop::where('user_id', Auth::user()->id)->first();
         // dd($shop_sets);
 
+        // 🔥 既にショップがある場合はブロック
+        if ($shop_sets) {
+            return redirect()->route('home')
+                ->with('error', '既にショップが登録されています。新規申請はできません。');
+        }
+
         // ショップ未作成時
         $shop_sets = null;
 
@@ -57,10 +63,6 @@ class ShopController extends Controller
      */
 
     // store メソッド　validatorは、Requestにある。
-
-
-
-
 
     /**
      * Display the specified resource.
@@ -126,6 +128,11 @@ class ShopController extends Controller
                 'photo_1','photo_2','photo_3','photo_4'
             ]));
 
+            // 🔥 型保証
+            // $shop->tax_calculation = is_null($request->tax_calculation)
+            //     ? null
+            //     : (int)$request->tax_calculation;
+
             $shop->is_draft = $isDraft ? 1 : 0;
 
             if (!$isDraft) {
@@ -158,6 +165,11 @@ class ShopController extends Controller
                 'photo_7',
                 'photo_8',
             ];
+
+            // foreach ($fileColumns as $column) {
+            //     dump($column, $request->hasFile($column));
+            // }
+            // dd($request->file());
 
             foreach ($fileColumns as $column) {
 

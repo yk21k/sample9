@@ -22,6 +22,7 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
 
+
     ];
 
     /**
@@ -70,7 +71,9 @@ class Kernel extends HttpKernel
         'stripe.connected' => \App\Http\Middleware\RequireStripeAccount::class,
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
         'reviewer.only' => \App\Http\Middleware\ReviewerOnly::class,
-
+        'shop.member' => \App\Http\Middleware\EnsureShopMember::class,
+        'manager' => \App\Http\Middleware\EnsureManager::class,
+        'block.staff.manager' => \App\Http\Middleware\BlockStaffAndManager::class,
 
     ];
 }

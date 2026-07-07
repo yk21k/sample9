@@ -20,6 +20,9 @@ class AuctionController extends Controller
 {
     public function auction_index($id = null){
 
+        if (auth()->user()->can_purchase) {
+            abort(403, 'ご利用いただけません');
+        }
         $auction_items = Auction::where('status', 1)->get();
         $auction_photo_movies = Auction::where('status', 1)->get('cover_img1', 'cover_img2', 'cover_img3', 'cover_img4', 'cover_img5', 'cover_img6', 'cover_img7', 'movie', 'spot_price');
 

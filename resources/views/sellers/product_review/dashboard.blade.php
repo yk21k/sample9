@@ -62,6 +62,8 @@
 
 <div class="container">
 
+     
+
     <h2>📦 出品者ダッシュボード</h2>
 
     {{-- 使用回数 --}}
@@ -92,6 +94,7 @@
                         <td>{{ $product->name }}</td>
                         <td>
                             <img src="{{ asset('storage/'.$product->cover_img) }}" alt="{{ $product->name }}" style="width:80px;">
+                            
                         </td>
                         <td>承認済</td>
                     </tr>

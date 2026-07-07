@@ -32,7 +32,7 @@ use App\Actions\SendStripeTransfer;
 use App\Actions\ImportCsvProducts;
 use App\Actions\PayToSeller;
 use App\Actions\SendPickupConfirmation;
-
+use Illuminate\Support\Facades\DB;
 
 
 
@@ -55,6 +55,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        DB::listen(function ($query) {
+            logger($query->sql, $query->bindings);
+        });
         Desplay::observe(DesplayObserver::class);
         Campaign::observe(CampaignObserver::class);
         Shop::observe(ShopObserver::class);

@@ -109,6 +109,49 @@ class User extends \TCG\Voyager\Models\User
         return $this->hasMany(Mails::class, 'user_id');
     }
 
+    // public function shopMember()
+    // {
+    //     return $this->hasOne(ShopMember::class);
+    // }
+
+    public function shopMember()
+    {
+        return $this->hasOne(
+            ShopMember::class,
+            'user_id', // shop_members側
+            'id'       // users側
+        );
+    }
+
+    public function currentShop()
+    {
+        // ========================================
+        // owner の shop
+        // ========================================
+        if ($this->shop) {
+            return $this->shop;
+        }
+
+        // ========================================
+        // manager / staff の shop
+        // ========================================
+        if ($this->shopMember) {
+            return $this->shopMember->shop;
+        }
+
+        // ========================================
+        // 運営(admin)
+        // ========================================
+        return null;
+    }
+
+    public function productEditDrafts()
+    {
+        return $this->hasMany(
+            ProductEditDraft::class,
+            'created_by'
+        );
+    }
 
 
 }

@@ -44,9 +44,14 @@
     <pre>{{ print_r($errors->all(), true) }}</pre>
 @endif
 
+@error('members.0.file1')
+    <div class="text-danger">{{ $message }}</div>
+@enderror
+
 
 <div class="container mt-3">
-  <form class="h-adr" id="shopForm" action="{{route('shops.store')}}" method="post" enctype="multipart/form-data">@csrf
+   <form class="h-adr" id="shopForm" action="{{route('shop.apply.form')}}" method="post" enctype="multipart/form-data">@csrf 
+  
     {{-- {{ csrf_field() }} --}}
     {{-- {{ helpModal }} --}}
     <div class="modal fade" id="helpModal" tabindex="-1">
@@ -146,6 +151,14 @@
         <input type="text" id="invoiceFormField" name="invoice_number" placeholder="T1234567890123"
        pattern="^[A-Za-z]\d{13}$"
        title="先頭は英字1文字、その後に数字13桁で入力してください。">
+    </div><br><br>
+
+    <div class="form-group" id="tax_calculation_group">
+        <label for="tax_calculation">消費税計算方法</label> 
+        <select name="tax_calculation" id="tax_calculation" class="form-control">
+            <option value="1"> 自動計算（tax_rate使用） </option> 
+            <option value="0"> 手動（価格に含める） </option>
+       </select>
     </div><br><br>
 
     <div class="form-group">
@@ -269,7 +282,7 @@
     <br>
     
     <div id="idGroup1" style="display: none;">
-        <label for="identification_1" class="form-label"><h3>ID card (運転免許証　or パスポート) *</h3></label>
+        <label for="identification_1" class="form-label"><h3>ID card (運転免許証 or パスポート or マイナンバーカード) *</h3></label>
         {{-- ❓ ヘルプ --}}
         @if(isset($help['license_expiry']))
         <button
@@ -285,11 +298,10 @@
         <input class="form-control" list="identification1" name="identification_1" id="identification_1" value="{{ old('identification_1', $shop_sets->identification_1 ?? '') }}">
           <datalist id="identification1">
               <option value="運転免許証">
-              <option value="パスポート">
+              <option value="パスポート/マイナンバーカード">
           </datalist>
      
         <br>
-
         &nbsp;
         <div id="fileGroup1" class="form-group">
             <div class="form-group">
@@ -306,7 +318,7 @@
         </div>
         <br><br>
 
-        <label for="license_expiry" class="form-label"><h3>上記の運転免許証/パスポートの有効期限</h3></label>
+        <label for="license_expiry" class="form-label"><h3>上記の運転免許証/パスポートの有効期限/マイナンバーカードの有効期限</h3></label>
         {{-- ❓ ヘルプ --}}
         @if(isset($help['license_expiry']))
         <button
@@ -474,7 +486,7 @@
     <br>
 
     <div class="form-group">
-        <label for="person_1">  <h3>(担当者氏名１)</h3></label>
+        <label><h3>(担当者氏名１)</h3></label>
         {{-- ❓ ヘルプ --}}
         @if(isset($help['person_1']))
         <button
@@ -487,9 +499,21 @@
             ?
         </button>
         @endif
-        <input type="text" class="form-control" id="person_1" name="person_1" class="form-control" value="{{ old('person_1', $shop_sets->person_1 ?? '') }}" multiple>
-        <br>
-        <label for="id_1_1" class="form-label"><h3>担当者1の証明</h3></label>
+        <input type="text"
+               class="form-control"
+               name="members[0][name]"
+               value="{{ old('members.0.name') }}"><br>
+
+        <label><h3>担当者1の証明</h3></label>
+
+        <select class="form-control" name="members[0][type]">
+            <option value="">選択して下さい</option>
+            <option value="社員証">社員証</option>
+            <option value="名刺">名刺</option>
+            <option value="労働契約書">労働契約書</option>
+        </select><br>
+
+        <label><h3>証明ファイル1 *</h3></label>
         @if(isset($help['id_1_1']))
         <button
             type="button"
@@ -501,23 +525,15 @@
             ?
         </button>
         @endif
-        <select class="form-control" name="id_1_1" id="id_1_1">
-            <option value="選択して下さい">選択して下さい</option>
-            <option value="社員証">社員証</option>
-            <option value="名刺">名刺</option>
-            <option value="労働契約書">労働契約書</option>
-        </select>
-        <br>
-        <label for="photo_3">  <h3>(上記内容のアップロード) *</h3></label>
-        <input type="file" class="form-control" id="photo_3" name="photo_3" class="form-control" multiple>
-        <br>
 
+        <input type="file" class="form-control" name="members[0][file1]"><br>
+
+        <label><h3>証明ファイル2 *</h3></label>
+        <input type="file" class="form-control" name="members[0][file2]">
     </div>
-    
-
+    <br>
     <div class="form-group">
-        <label for="person_2">  <h3>(担当者氏名２) </h3></label>
-        {{-- ❓ ヘルプ --}}
+        <label><h3>(担当者氏名２)</h3></label>
         @if(isset($help['person_2']))
         <button
             type="button"
@@ -529,8 +545,19 @@
             ?
         </button>
         @endif
-        <input type="text" class="form-control" id="person_2" name="person_2" class="form-control" value="{{ old('person_2', $shop_sets->person_2 ?? '') }}" multiple>
-        <label for="id_2_1" class="form-label"><h3>担当者2の証明</h3></label>
+        <input type="text"
+               class="form-control"
+               name="members[1][name]"
+               value="{{ old('members.1.name') }}"><br>
+
+        <label><h3>担当者2の証明</h3></label>       
+        <select class="form-control" name="members[1][type]">
+            <option value="">選択して下さい</option>
+            <option value="社員証">社員証</option>
+            <option value="名刺">名刺</option>
+            <option value="労働契約書">労働契約書</option>
+        </select><br>
+        <label><h3>証明ファイル1 *</h3></label>
         @if(isset($help['id_2_1']))
         <button
             type="button"
@@ -542,22 +569,14 @@
             ?
         </button>
         @endif
-        <select class="form-control" name="id_2_1" id="id_2_1">
-            <option value="選択して下さい">選択して下さい</option>
-            <option value="社員証">社員証</option>
-            <option value="名刺">名刺</option>
-            <option value="労働契約書">労働契約書</option>
-        </select>
-        <br>
-        <label for="photo_5">  <h3>(上記内容のアップロード) </h3></label>
-        <input type="file" class="form-control" id="photo_5" name="photo_5" class="form-control" multiple>
-        <br>
-        <br>
-    </div>
-    &nbsp;
+        <input type="file" class="form-control" name="members[1][file1]"><br>
 
+        <label><h3>証明ファイル2 *</h3></label>
+        <input type="file" class="form-control" name="members[1][file2]">
+    </div>
+    <br>
     <div class="form-group">
-        <label for="person_3">  <h3>(担当者氏名３) </h3></label>
+        <label><h3>(担当者氏名３)</h3></label>
         {{-- ❓ ヘルプ --}}
         @if(isset($help['person_3']))
         <button
@@ -570,39 +589,40 @@
             ?
         </button>
         @endif
-        <input type="text" class="form-control" id="person_3" name="person_3" class="form-control" value="{{ old('person_3', $shop_sets->person_3 ?? '') }}" multiple>
-        <label for="id_3_1" class="form-label"><h3>担当者3の証明</h3></label>
-        {{-- ❓ ヘルプ --}}
-        @if(isset($help['id_3_1']))
+        <input type="text"
+               class="form-control"
+               name="members[2][name]"
+               value="{{ old('members.2.name') }}"><br>
+
+        <label><h3>担当者3の証明</h3></label>
+        <select class="form-control" name="members[2][type]">
+            <option value="">選択して下さい</option>
+            <option value="社員証">社員証</option>
+            <option value="名刺">名刺</option>
+            <option value="労働契約書">労働契約書</option>
+        </select><br>
+
+        <label><h3>証明ファイル1 *</h3></label>
+        @if(isset($help['person_3']))
         <button
             type="button"
             class="btn btn-sm btn-outline-secondary help-btn"
-            data-label="{{ $help['id_3_1']->label }}"
-            data-purpose="{{ e($help['id_3_1']->purpose) }}"
-            data-recommendation="{{ e($help['id_3_1']->recommendation) }}"
+            data-label="{{ $help['person_3']->label }}"
+            data-purpose="{{ e($help['person_3']->purpose) }}"
+            data-recommendation="{{ e($help['person_3']->recommendation) }}"
         >
             ?
         </button>
         @endif
-        <select class="form-control" name="id_3_1" id="id_3_1">
-            <option value="選択して下さい">選択して下さい</option>
-            <option value="社員証">社員証</option>
-            <option value="名刺">名刺</option>
-            <option value="労働契約書">労働契約書</option>
+        <input type="file" class="form-control" name="members[2][file1]"><br>
 
-        </select>
-        <br>
-        <label for="photo_7">  <h3>(上記内容のアップロード) </h3></label>
-        <input type="file" class="form-control" id="photo_7" name="photo_7" class="form-control" multiple>
-        <br>
-        <br>
+        <label><h3>証明ファイル2 *</h3></label>
+        <input type="file" class="form-control" name="members[2][file2]">
     </div>
 
 
     <br>
 
-
- 
     <div id="extraFields" style="display: none;">
         <div class="form-group">
             <label for="manager">  <h3>主な担当者 *</h3></label>

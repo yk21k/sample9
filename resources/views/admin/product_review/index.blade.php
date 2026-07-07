@@ -25,7 +25,7 @@
 		@if($queue->status === 'reviewing')
 		    <div style="color:#f39c12; font-size:12px;">
 		        👀 審査中：
-		        {{ $queue->reviewer->name ?? '不明' }}
+		        {{ $queue->reviewer?->name ?? '不明' }}
 		    </div>
 		@endif
 
@@ -35,20 +35,29 @@
 		        $isLocked = $queue->status === 'reviewing' && $queue->reviewer_id !== auth()->id();
 		    @endphp
 			<div class="panel-body">
+			    @if(!$product)
 
-				<h3>{{ $queue->product->name }}</h3>
-				<h4>{{ $queue->product->shop->name }}</h4>
+			        <div class="alert alert-danger">
+			            Queue {{ $queue->id }} :
+			            product が存在しません
+			        </div>
 
-				<p>価格 : {{ number_format($queue->product->price) }}円</p>
+			        @continue
+
+			    @endif
+				<h3>{{ $product->name }}</h3>
+				<h4>{{ $product->shop->name }}</h4>
+
+				<p>価格 : {{ number_format($product->price) }}円</p>
 
 				@foreach(['cover_img','cover_img2','cover_img3'] as $field)
 				    <img 
-				        src="{{ $queue->product->$field ? mediaUrl($queue->product->$field) : asset('images/no_image.jpg') }}"
+				        src="{{ $product->$field ? mediaUrl($product->$field) : asset('images/no_image.jpg') }}"
 				        width="200"
 				    >
 				@endforeach
 
-				<a href="{{ route('product.review.show',$queue->product_id)
+				<a href="{{ route('product.review.show',$product->id)
 				}}" class="btn btn-primary">
 					審査する
 				</a>
@@ -57,7 +66,7 @@
 				    type="button"
 				    class="btn btn-success btn-sm quick-approve"
 				    data-queue="{{ $queue->id }}"
-				    data-url="{{ route('product.approve',$product->id) }}"
+				    data-url="{{ route('product.approve', $product->id) }}"
 				    {{ $isLocked ? 'disabled' : '' }}
 				>
 				    ✔ 承認
@@ -67,7 +76,7 @@
 				    type="button"
 				    class="btn btn-danger btn-sm quick-reject"
 				    data-queue="{{ $queue->id }}"
-				    data-url="{{ route('product.reject',$product->id) }}"
+				    data-url="{{ route('product.reject', $product->id) }}"
 				    {{ $isLocked ? 'disabled' : '' }}
 				>
 				    ✖ 却下

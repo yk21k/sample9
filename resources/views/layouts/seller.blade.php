@@ -1,7 +1,10 @@
+@php
+    $member = \App\Models\ShopMember::where('user_id', auth()->id())->first();
+@endphp
 
 @if(auth()->user()===null)
     404 not found 
-@elseif(auth()->user()->role_id===2)
+@elseif(auth()->user()->role_id===2 && !isset($member->shop_id))
     <h2>404 because authentication is not possible</h2>
 @else   
 <!doctype html>
@@ -139,82 +142,175 @@
         <main class="py-4 container-fluid bg-secondary text-white">
             <div class="row">
                 <div class="col-3">
+                    @php
+                        $member = request()->attributes->get('shop_member');
+                    @endphp
+
+                    {{-- ownerだけ --}}
+                    @if($member && $member->isOwner())
+                        <button>店舗削除</button>
+                        Owner
+                    @endif
+
+                    {{-- manager以上 --}}
+                    @if($member && $member->isManagerOrOwner())
+                        <a href="/create">商品追加</a>
+                        Owner Manager
+                    @endif
+
+                    {{-- staff含む --}}
+                    @if($member)
+                        <p>閲覧可能</p>
+                        Staff
+
+                    @endif
                     <div class="sidebar_fixed">
                         <div class="list-group">
                             <a href="/seller" class="list-group-item list-group-item-action active">Dashboard</a>
 
-                            <a href=" {{ route('seller.shop.shop_setting') }} " class="list-group-item list-group-item-action">Your Shop</a>
 
-                            <a href=" {{ route('seller.seller.dashboard') }} " class="list-group-item list-group-item-action">Product Review</a>
 
-                            <a href=" {{url('/seller/orders')}} " class="list-group-item list-group-item-action">Orders</a>
 
-                            <a href=" {{ url('/seller/shop_auction_orders') }} " class="list-group-item list-group-item-action">Auction Orders</a>
-
-                            <a href=" {{ url('/seller/pickup_shop_orders') }} " class="list-group-item list-group-item-action">Pick Up Orders</a>
-
-                            <a href=" {{ route('seller.pickup.slots.create') }} " class="list-group-item list-group-item-action">Pick Up Product slot テスト</a>
-
-                            <a href=" {{ route('seller.pickup.slots.index') }} " class="list-group-item list-group-item-action">Pick Up Product Index テスト</a>
-                            
-                            <a href=" {{route('seller.order.sales_order_invoice2')}} " class="list-group-item list-group-item-action">Invoice</a>
-                            
-                            <a href=" {{route('seller.order.sales_order_invoice2')}} " class="list-group-item list-group-item-action">Invoice(Auction)</a>
-
-                            <a href=" {{url('/admin/shops')}} " class="list-group-item list-group-item-action">Go to Shop</a>
-
+                            {{-- 商品 --}}
                             @php
-                                $orders = App\Models\SubOrder::where('seller_id', auth()->id())->first();
+
+                                $currentShop = auth()->user()->currentShop();
+
+                                $member = auth()->user()->shopMember;
+
                             @endphp
-                            @if($orders)
-                                <a href=" {{ route('order.make_coupon_page') }} " class="list-group-item list-group-item-action">Create Shop Coupon</a>
-                            @else
-                                <a href="" class="list-group-item list-group-item-action">Create Shop Coupon<br>（初決済後にご利用いただけます。）</a>    
+
+                            @if(
+                                $currentShop &&
+                                $member &&
+                                in_array(
+                                    $member->role,
+                                    ['staff', 'manager', 'owner']
+                                )
+                            )
+
+                                {{-- 商品一覧 --}}
+                                <a
+                                    href="{{ route('seller.products.index') }}"
+                                    class="list-group-item list-group-item-action"
+                                >
+                                    Products
+                                </a>
+
+                                {{-- 新規商品 --}}
+                                @if(
+                                    in_array(
+                                        $member->role,
+                                        ['manager', 'owner']
+                                    )
+                                )
+
+                                    <a
+                                        href="{{ route('seller.product_drafts.index') }}"
+                                        class="list-group-item list-group-item-action"
+                                    >
+                                        Product Drafts
+                                    </a>
+
+                                    {{-- メンバー管理 --}}
+                                    @if(
+                                        $currentShop &&
+                                        auth()->user()->can('manageStaff', $currentShop)
+                                    )
+                                        <a href="{{ route('shop_members.index', $currentShop->id) }}"
+                                           class="list-group-item list-group-item-action">
+                                            Shop Members
+                                        </a>
+                                    @endif
+
+
+                                    {{-- 操作ログ --}}
+                                    <a href="{{ route('seller.activity_logs.index') }}"
+                                       class="list-group-item list-group-item-action">
+                                        操作ログ
+                                    </a>
+
+                                    <a href=" {{ route('seller.shop.shop_setting') }} " class="list-group-item list-group-item-action">Your Shop</a>
+
+                                    <a href=" {{ route('seller.seller.dashboard') }} " class="list-group-item list-group-item-action">Product Review</a>
+
+                                    <a href=" {{url('/seller/orders')}} " class="list-group-item list-group-item-action">Orders</a>
+
+                                    <a href=" {{ url('/seller/shop_auction_orders') }} " class="list-group-item list-group-item-action">Auction Orders</a>
+
+                                    <a href=" {{ url('/seller/pickup_shop_orders') }} " class="list-group-item list-group-item-action">Pick Up Orders</a>
+
+                                    <a href=" {{ route('seller.pickup.slots.create') }} " class="list-group-item list-group-item-action">Pick Up Product slot テスト</a>
+
+                                    <a href=" {{ route('seller.pickup.slots.index') }} " class="list-group-item list-group-item-action">Pick Up Product Index テスト</a>
+                                    
+                                    <a href=" {{route('seller.order.sales_order_invoice2')}} " class="list-group-item list-group-item-action">Invoice</a>
+                                    
+                                    <a href=" {{route('seller.order.sales_order_invoice2')}} " class="list-group-item list-group-item-action">Invoice(Auction)</a>
+
+                                    <a href=" {{url('/admin/shops')}} " class="list-group-item list-group-item-action">Go to Shop</a>
+
+                                    @php
+                                        $orders = App\Models\SubOrder::where('seller_id', auth()->id())->first();
+                                    @endphp
+                                    @if($orders)
+                                        <a href=" {{ route('order.make_coupon_page') }} " class="list-group-item list-group-item-action">Create Shop Coupon</a>
+                                    @else
+                                        <a href="" class="list-group-item list-group-item-action">Create Shop Coupon<br>（初決済後にご利用いただけます。）</a>    
+                                    @endif
+
+                                    <a href=" {{url('/seller/calendar')}}" class="list-group-item list-group-item-action">Shop Calendar</a>
+
+                                    <a href=" {{url('/seller/shop_desplay')}}" class="list-group-item list-group-item-action">Shop Desplay</a>
+
+                                    <a href=" {{ url('/seller/shop_charts') }} " class="list-group-item list-group-item-action">Shop Charts</a>
+
+                                    <a href=" {{ url('/seller/shop_mail') }} " class="list-group-item list-group-item-action">Shop Mail</a>
+
+                                    <a href=" {{ url('/seller/shop_setting') }} " class="list-group-item list-group-item-action">Shop Setting</a>
+
+                                    <a href=" {{ url('/seller/pickup-locations/create') }} " class="list-group-item list-group-item-action">Shop Pick Up Locations</a>
+
+                                    <a href=" {{ url('/seller/pickup-locations') }} " class="list-group-item list-group-item-action">Shop Pick Up Index</a>
+                                    <a href=" {{url('/seller/pickup./register')}} " class="list-group-item list-group-item-action">Pick Up Staff Register</a>
+
+
+
+                                    <div class="card mb-4">
+                                        <div class="card-body">
+                                            @if (auth()->user()->stripe_account_id)
+                                                <div class="alert alert-success d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <strong>Stripeに接続済み</strong><br>
+                                                        <span class="text-muted">アカウントID: {{ auth()->user()->stripe_account_id }}</span>
+                                                    </div>
+                                                    <a href="{{ route('stripe.connect') }}" class="btn btn-outline-secondary btn-sm">
+                                                        再接続
+                                                    </a>
+                                                </div>
+                                            @else
+                                                <div class="alert alert-warning d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <strong>Stripe未接続</strong><br>
+                                                        <span class="text-muted">売上の受け取りには接続が必要です。</span>
+                                                    </div>
+                                                    <a href="{{ route('stripe.connect') }}" class="btn btn-primary btn-sm">
+                                                        Stripeと接続する
+                                                    </a>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                @endif
+
+
+
                             @endif
 
-                            <a href=" {{url('/seller/calendar')}}" class="list-group-item list-group-item-action">Shop Calendar</a>
 
-                            <a href=" {{url('/seller/shop_desplay')}}" class="list-group-item list-group-item-action">Shop Desplay</a>
 
-                            <a href=" {{ url('/seller/shop_charts') }} " class="list-group-item list-group-item-action">Shop Charts</a>
-
-                            <a href=" {{ url('/seller/shop_mail') }} " class="list-group-item list-group-item-action">Shop Mail</a>
-
-                            <a href=" {{ url('/seller/shop_setting') }} " class="list-group-item list-group-item-action">Shop Setting</a>
-
-                            <a href=" {{ url('/seller/pickup-locations/create') }} " class="list-group-item list-group-item-action">Shop Pick Up Locations</a>
-
-                            <a href=" {{ url('/seller/pickup-locations') }} " class="list-group-item list-group-item-action">Shop Pick Up Index</a>
-                            <a href=" {{url('/seller/pickup./register')}} " class="list-group-item list-group-item-action">Pick Up Staff Register</a>
                             
-                            <div class="card mb-4">
-                                <div class="card-body">
-                                    @if (auth()->user()->stripe_account_id)
-                                        <div class="alert alert-success d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>Stripeに接続済み</strong><br>
-                                                <span class="text-muted">アカウントID: {{ auth()->user()->stripe_account_id }}</span>
-                                            </div>
-                                            <a href="{{ route('stripe.connect') }}" class="btn btn-outline-secondary btn-sm">
-                                                再接続
-                                            </a>
-                                        </div>
-                                    @else
-                                        <div class="alert alert-warning d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>Stripe未接続</strong><br>
-                                                <span class="text-muted">売上の受け取りには接続が必要です。</span>
-                                            </div>
-                                            <a href="{{ route('stripe.connect') }}" class="btn btn-primary btn-sm">
-                                                Stripeと接続する
-                                            </a>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                            
-                            
-
                         </div>
                     </div>
                 </div>

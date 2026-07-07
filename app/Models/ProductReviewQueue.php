@@ -9,6 +9,7 @@ class ProductReviewQueue extends Model
 {
     protected $fillable = [
         'product_id',
+        'draft_id',
         'user_id',
         'status',
         'requested_at',
@@ -38,5 +39,13 @@ class ProductReviewQueue extends Model
     public function reviewer()
     {
         return $this->belongsTo(User::class,'reviewer_id');
+    }
+
+    public function draft()
+    {
+        return $this->belongsTo(
+            ProductDraft::class,
+            'draft_id'
+        );
     }
 }

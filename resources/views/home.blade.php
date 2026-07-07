@@ -210,7 +210,7 @@
                 </header>
 
                 <div class="featured-videos">
-                    @foreach($movies as $movie)
+                    @foreach($movies ?? [] as $movie)
                         <div class="video-container">
                             <div class="video-wrapper" data-product-id="{{ $attr->id }}">
                                 <video id="video-{{ $loop->index }}"
@@ -249,7 +249,7 @@
                 <p>Price: {{ floor(($attr->price+$attr->shipping_fee)*($tax_rate+1)) }}</p>
                 <p class="product-score">Score: {{ $score }}</p>
 
-                @foreach($movies as $movie)
+                @foreach($movies ?? [] as $movie)
                     <div class="video-wrapper" data-product-id="{{ $attr->id }}">
                         <video class="video-js my-video" controls muted playsinline preload="metadata">
                             <source src="{{ asset('storage/'.$movie['download_link']) }}" type="video/mp4">

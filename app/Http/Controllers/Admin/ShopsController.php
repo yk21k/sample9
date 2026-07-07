@@ -62,10 +62,17 @@ class ShopsController extends VoyagerBaseController
             // dd($model::select($dataType->name.'.*'));
             
             // query to display seller's shop only　＊＊＊＊＊
+            // if(auth()->user()->hasRole('seller')){
+
+            //     $query->where('user_id', auth()->user()->id);
+
+            // }
             if(auth()->user()->hasRole('seller')){
 
-                $query->where('user_id', auth()->user()->id);
+                $shopIds = \App\Models\ShopMember::where('user_id', auth()->id())
+                    ->pluck('shop_id');
 
+                $query->whereIn('id', $shopIds);
             }
 
 

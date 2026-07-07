@@ -35,6 +35,10 @@ class Kernel extends ConsoleKernel
             ->everyFiveMinutes()
             ->withoutOverlapping() // 多重起動防止
             ->runInBackground();   // 他処理と並列実行
+
+        $schedule->command(
+            'shop-members:expire-invites'
+        )->daily();    
     }
 
     /**

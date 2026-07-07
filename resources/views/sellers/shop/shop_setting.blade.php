@@ -71,6 +71,13 @@
            title="先頭は英字1文字、その後に数字13桁で入力してください。">
         </div><br><br>
 
+        <div class="form-group" id="tax_calculation_group">
+         <label for="tax_calculation">消費税計算方法</label> 
+         　<select name="tax_calculation" id="tax_calculation" class="form-control">
+             <option value="1" {{ old('tax_calculation', $shop_settings->tax_calculation) == 1 ? 'selected' : '' }}> 自動計算（tax_rate使用） </option> 
+             <option value="0" {{ old('tax_calculation', $shop_settings->tax_calculation) == 0 ? 'selected' : '' }}> 手動（価格に含める） </option>
+        　 </select>
+        </div>
 
         <div class="form-group">
             <label for="description"><h3>店舗概要 *</h3></label>

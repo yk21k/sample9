@@ -44,6 +44,8 @@ class StoreShopRequest extends FormRequest
                     ->where(fn ($q) => $myDraftShopIds ? $q->whereNotIn('id', $myDraftShopIds) : null),
             ],
 
+            'tax_calculation' => ($isDraft ? 'nullable' : 'required') . '|in:0,1',
+
             'email' => ($isDraft ? 'nullable' : 'required') . '|email|max:255',
             'telephone' => ($isDraft ? 'nullable' : 'required') . '|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
             'description' => ($isDraft ? 'nullable' : 'required') . '|string|max:2000',
