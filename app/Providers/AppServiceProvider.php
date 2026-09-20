@@ -33,7 +33,7 @@ use App\Actions\ImportCsvProducts;
 use App\Actions\PayToSeller;
 use App\Actions\SendPickupConfirmation;
 use Illuminate\Support\Facades\DB;
-
+use Aws\Rekognition\RekognitionClient;
 
 
 use Illuminate\Pagination\Paginator;
@@ -48,6 +48,34 @@ class AppServiceProvider extends ServiceProvider
         Voyager::useModel('Category', \App\Models\Categories::class);
         Voyager::useModel('Menu', \App\Models\Menu::class);
 
+        $this->app->singleton(
+            RekognitionClient::class,
+            function () {
+
+                return new RekognitionClient([
+
+                    'version' => 'latest',
+
+                    'region' => env(
+                        'AWS_DEFAULT_REGION'
+                    ),
+
+                    'credentials' => [
+
+                        'key' => env(
+                            'AWS_ACCESS_KEY_ID'
+                        ),
+
+                        'secret' => env(
+                            'AWS_SECRET_ACCESS_KEY'
+                        ),
+
+                    ],
+
+                ]);
+
+            }
+        );
     }
 
     /**

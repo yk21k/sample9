@@ -40,4 +40,73 @@ return [
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
+    'google' => [
+
+        'youtube' => [
+
+            'client_id' => env(
+                'GOOGLE_YOUTUBE_CLIENT_ID'
+            ),
+
+            'client_secret' => env(
+                'GOOGLE_YOUTUBE_CLIENT_SECRET'
+            ),
+
+            'redirect_uri' => env(
+                'GOOGLE_YOUTUBE_REDIRECT_URI'
+            ),
+
+            'refresh_token' => env(
+                'GOOGLE_YOUTUBE_REFRESH_TOKEN'
+            ),
+
+        ],
+        'cloud_tts' => [
+            'project_id' => env(
+                'GOOGLE_CLOUD_PROJECT_ID'
+            ),
+        ],
+
+    ],
+
+    'openai' => [
+
+        'api_key' => env(
+            'OPENAI_API_KEY'
+        ),
+
+        'narration_model' => env(
+            'OPENAI_NARRATION_MODEL',
+            'gpt-5-mini'
+        ),
+
+    ],
+
+    'google_tts' => [
+
+        'language_code' =>
+            env(
+                'GOOGLE_TTS_LANGUAGE_CODE',
+                'ja-JP'
+            ),
+
+        'voice' =>
+            env(
+                'GOOGLE_TTS_VOICE',
+                'ja-JP-Neural2-B'
+            ),
+
+        'speaking_rate' =>
+            env(
+                'GOOGLE_TTS_SPEAKING_RATE',
+                1.0
+            ),
+
+        'pitch' =>
+            env(
+                'GOOGLE_TTS_PITCH',
+                0.0
+            ),
+
+    ],
 ];

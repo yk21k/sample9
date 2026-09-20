@@ -230,6 +230,9 @@
                                         操作ログ
                                     </a>
 
+                                    <a href=" {{ route('seller.shop-videos.index') }} " class="list-group-item list-group-item-action">Your Shop Video</a>
+
+
                                     <a href=" {{ route('seller.shop.shop_setting') }} " class="list-group-item list-group-item-action">Your Shop</a>
 
                                     <a href=" {{ route('seller.seller.dashboard') }} " class="list-group-item list-group-item-action">Product Review</a>
@@ -273,6 +276,9 @@
 
                                     <a href=" {{ url('/seller/pickup-locations') }} " class="list-group-item list-group-item-action">Shop Pick Up Index</a>
                                     <a href=" {{url('/seller/pickup./register')}} " class="list-group-item list-group-item-action">Pick Up Staff Register</a>
+
+                                    <a href=" {{ route('seller.shop-videos.index') }} " class="list-group-item list-group-item-action">Shop Movie</a>
+
 
 
 
@@ -356,15 +362,21 @@
 
 @if(!empty(Auth::user()->id))
 <script>
-  var botmanWidget = {
-      aboutText: 'よくある質問はこちらから',
-      introMessage: "✋ ログインありがとうございます。ご不明点があれば聞いてください！",
-      chatServer: '{{ request()->is("seller/*") ? url("/botman-seller") : url("/botman") }}',
-      title: 'FAQチャット'
-  };
+    var botmanWidget = {
+        aboutText: 'よくある質問はこちらから',
+        introMessage: "✋ ログインありがとうございます。ご不明点があれば聞いてください！",
+        chatServer: '{{ request()->is("seller/*") ? url("/botman-seller") : url("/botman") }}',
+        title: 'FAQチャット'
+    };
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/js/widget.js"></script>
+
+<style>
+    #botmanWidgetRoot {
+        z-index: 9999 !important;
+    }
+</style>
 @endif
 
 

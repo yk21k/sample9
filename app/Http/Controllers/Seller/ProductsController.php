@@ -9,7 +9,7 @@ use App\Services\ProductService;
 use App\Models\ProductDraft;
 use App\Helpers\Audit;
 
-// staff manager
+// staff manager用
 class ProductsController extends Controller
 {
     protected $service;
@@ -274,21 +274,7 @@ class ProductsController extends Controller
             'status' => 'owner_pending',
         ]);
 
-        // dd($validated);
 
-        // dd([
-        //     'id' => $draft->id,
-        //     'exists' => $draft->exists,
-        //     'draft' => $draft->toArray(),
-        // ]);
-
-        // dd($draft->toArray());
-
-        // dd([
-        //     'cover_img' => $validated['cover_img'] ?? null,
-        //     'cover_img2' => $validated['cover_img2'] ?? null,
-        //     'cover_img3' => $validated['cover_img3'] ?? null,
-        // ]);
 
         /*
         |--------------------------------------------------------------------------
@@ -716,11 +702,7 @@ class ProductsController extends Controller
             ]);
         }
 
-        // dd([
-        //     'draft_id' => $draft->id,
-        //     'product_id' => $draft->product_id,
-        //     'status' => $draft->status,
-        // ]);
+
 
         return redirect()->route(
             'seller.product_drafts.edit',

@@ -7,7 +7,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
 
         <h2>
-            商品申請詳細
+            商品申請詳細product_drafts
         </h2>
 
     </div>
@@ -330,7 +330,85 @@
                             >
 
                         </div>
+                        @if($product)
+                            {{-- SNS用動画 --}}
+                            <div class="mb-4">
 
+                                @php
+                                    $productVideoDraft = \App\Models\ProductVideoDraft::where(
+                                        'product_id',
+                                        $product->id
+                                    )
+                                    ->orderByDesc('id')
+                                    ->first();
+                                @endphp
+
+                                <div class="card border-0 shadow-sm">
+
+                                    <div class="card-body">
+
+                                        <h5 class="fw-bold mb-2">
+                                            SNS用動画
+                                        </h5>
+
+                                        @if($productVideoDraft)
+
+                                            <p class="text-muted mb-3">
+                                                登録済みのSNS用動画があります。
+                                            </p>
+
+                                            <div class="mb-3">
+
+                                                <div>
+                                                    <strong>
+                                                        {{ $productVideoDraft->title }}
+                                                    </strong>
+                                                </div>
+
+                                                <small class="text-muted">
+                                                    動画ID：{{ $productVideoDraft->id }}
+                                                </small>
+
+                                            </div>
+
+                                            <a
+                                                href="{{ route(
+                                                    'seller.products.youtube-video.show',
+                                                    [
+                                                        'product' => $product->id,
+                                                        'video' => $productVideoDraft->id,
+                                                    ]
+                                                ) }}"
+                                                class="btn btn-outline-primary"
+                                            >
+                                                SNS用動画を確認
+                                            </a>
+
+                                        @else
+
+                                            <p class="text-muted mb-3">
+                                                SNS・YouTube等で使用する動画を登録します。
+                                                登録後、AI審査・動画加工・Preview・出品者確認・管理者審査を行います。
+                                            </p>
+
+                                            <a
+                                                href="{{ route(
+                                                    'seller.products.youtube-video.create',
+                                                    ['product' => $product->id]
+                                                ) }}"
+                                                class="btn btn-outline-primary"
+                                            >
+                                                SNS用動画を登録
+                                            </a>
+
+                                        @endif
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        @endif
                         {{-- 価格 --}}
                         <div class="mb-4">
 

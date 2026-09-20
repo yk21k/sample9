@@ -45,7 +45,7 @@ class StaffRegiController extends Controller
         ]);
 
         // 🔥 期限チェック
-        if (!$member->invite_at || $member->invite_at->addDays(3)->isPast()) {
+        if (!$member->invite_at || $member->invited_at->addDays(3)->isPast()) {
             abort(403, '招待リンクの有効期限が切れています');
         }
 

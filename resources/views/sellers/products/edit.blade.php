@@ -5,7 +5,7 @@
 <div class="container">
 
     <h2 class="mb-4">
-        商品編集 
+        商品編集seller/products　// staff manager用？　draft編集に一本化の方がいいかも今後未定
     </h2>
 
     @if(session('success'))
@@ -265,6 +265,38 @@
         </div>
 
     </form>
+
+    {{-- 商品YouTube動画 --}}
+    <div class="mt-4">
+
+        <div class="card border-0 shadow-sm">
+
+            <div class="card-body">
+
+                <h5 class="fw-bold mb-2">
+                    商品YouTube動画
+                </h5>
+
+                <p class="text-muted mb-3">
+                    AI審査・動画加工・Preview・管理者審査を経て
+                    YouTubeへアップロードする動画を登録します。
+                </p>
+
+                <a
+                    href="{{ route(
+                        'seller.products.youtube-video.create',
+                        ['product' => $product->id]
+                    ) }}"
+                    class="btn btn-outline-primary"
+                >
+                    YouTube動画を登録
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 

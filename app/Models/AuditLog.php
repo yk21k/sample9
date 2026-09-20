@@ -9,38 +9,28 @@ class AuditLog extends Model
     protected $fillable = [
 
         'user_id',
-
         'shop_id',
 
-        'role',
-
         'product_id',
-
         'draft_id',
+
+        'target_type',
+        'target_id',
+
+        'event_group',
 
         'action',
 
-        'target_type',
-
-        'target_id',
-
         'before_data',
-
         'after_data',
+        'diff_data',
 
         'description',
 
+        'role',
+
         'ip',
-
         'user_agent',
-
-        'product_id',
-
-        'draft_id',
-
-        'order_id',
-
-        'event_group',
 
     ];
 
@@ -53,4 +43,34 @@ class AuditLog extends Model
         'diff_data' => 'array',
 
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Relations
+    |--------------------------------------------------------------------------
+    */
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function shop()
+    {
+        return $this->belongsTo(Shop::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function draft()
+    {
+        return $this->belongsTo(
+            ProductDraft::class,
+            'draft_id'
+        );
+    }
+
 }

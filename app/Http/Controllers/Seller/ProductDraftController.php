@@ -9,11 +9,12 @@ use App\Models\ProductImageReview;
 use App\Models\Product;
 use App\Models\ProductDraft;
 use App\Models\ProductReviewQueue;
-use App\Models\ActivityLog;
 use App\Models\ProductEditDraft;
 use App\Models\TaxRate;
 use Illuminate\Support\Facades\Log;
 use App\Jobs\AnalyzeProductImageJob;
+use App\Helpers\Audit;
+
 
 
 class ProductDraftController extends Controller
@@ -201,7 +202,11 @@ class ProductDraftController extends Controller
             $displayPrice + $displayShipping;
 
 
+        $before = $draft->toArray();    
+
         $draft->update($validated);
+
+        $after = $draft->fresh()->toArray();
 
         // dd([
         //     'validated_cover_img' => $validated['cover_img'] ?? null,
@@ -234,37 +239,13 @@ class ProductDraftController extends Controller
             ]);
         }
 
-        ActivityLog::create([
-
-            'user_id' => auth()->id(),
-
-            'shop_id' => $shop->id,
-
-            'product_id' => $draft->product_id,
-
-            'draft_id' => $draft->id,
-
-            'action' => 'draft_updated',
-
-            'target_type' => 'ProductDraft',
-
-            'target_id' => $draft->id,
-
-            'changes' => [
-
-                'status' => $draft->status,
-
-            ],
-
-            'role' => optional(
-                auth()->user()->shopMember
-            )->role,
-
-            'ip' => request()->ip(),
-
-            'user_agent' => request()->userAgent(),
-
-        ]);
+        Audit::log(
+            action: 'draft_updated',
+            target: $draft,
+            before: $before,
+            after: $after,
+            description: '商品申請を更新'
+        );
 
         return back()->with(
             'success',
@@ -462,6 +443,8 @@ class ProductDraftController extends Controller
             abort(403);
         }
 
+        $before = $draft->toArray();
+
         $draft->update([
 
             'status' => 'rejected',
@@ -469,26 +452,15 @@ class ProductDraftController extends Controller
             'owner_comment' => $request->owner_comment,
         ]);
 
-        ActivityLog::create([
+        $after = $draft->fresh()->toArray();
 
-            'user_id' => auth()->id(),
-
-            'action' => 'draft_rejected',
-
-            'target_type' => 'ProductDraft',
-
-            'target_id' => $draft->id,
-
-            'changes' => [
-
-                'owner_comment' =>
-                    $request->owner_comment,
-            ],
-
-            'role' => optional(
-                auth()->user()->shopMember
-            )->role,
-        ]);
+        Audit::log(
+            action: 'draft_rejected',
+            target: $draft,
+            before: $before,
+            after: $after,
+            description: '商品申請を差し戻し'
+        );
 
         return back()->with(
             'success',
@@ -525,20 +497,15 @@ class ProductDraftController extends Controller
             abort(403);
         }
 
-        ActivityLog::create([
+        $before = $draft->toArray();
 
-            'user_id' => auth()->id(),
-
-            'action' => 'draft_deleted',
-
-            'target_type' => 'ProductDraft',
-
-            'target_id' => $draft->id,
-
-            'changes' => $draft->toArray(),
-
-            'role' => $member->role,
-        ]);
+        Audit::log(
+            action: 'draft_deleted',
+            target: $draft,
+            before: $before,
+            after: null,
+            description: '商品申請を削除'
+        );
 
         $draft->delete();
 

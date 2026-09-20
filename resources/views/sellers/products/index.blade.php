@@ -6,7 +6,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
 
-        <h2>商品一覧</h2>
+        <h2>商品一覧seller/products</h2>
         {{-- 新規商品 --}}
         @php
 

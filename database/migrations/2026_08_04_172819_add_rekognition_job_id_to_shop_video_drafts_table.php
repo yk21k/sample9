@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('shop_video_drafts', function (Blueprint $table) {
+
+            $table->string('rekognition_job_id')
+                ->nullable()
+                ->after('ai_provider');
+
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('shop_video_drafts', function (Blueprint $table) {
+
+            $table->dropColumn('rekognition_job_id');
+
+        });
+    }
+};

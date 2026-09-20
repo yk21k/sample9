@@ -9,7 +9,7 @@
         <div>
 
             <h2 class="fw-bold mb-1">
-                商品追加
+                商品追加seller/products
             </h2>
 
             <p class="text-muted mb-0">

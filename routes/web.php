@@ -44,6 +44,7 @@ use App\Http\Controllers\Seller\ProductsController;
 use App\Http\Controllers\Seller\ActivityLogController;
 use App\Http\Controllers\Seller\StaffRegiController;
 use App\Http\Controllers\Seller\InviteController;
+use App\Http\Controllers\Seller\ShopVideoController;
 
 
 use App\Http\Controllers\Otp\AdminOtpController;
@@ -58,9 +59,13 @@ use App\Http\Controllers\BotManController;
 
 use App\Http\Controllers\Admin\StripePayController;
 use App\Http\Controllers\Admin\ProductReviewController;
+use App\Http\Controllers\Admin\AuditLogController;
+use App\Http\Controllers\Admin\ShopVideoReviewController;
+use App\Http\Controllers\Admin\YouTubeAuthController;
+use App\Http\Controllers\Admin\ProductVideoReviewController;
 
 use App\Http\Controllers\Admin\StripeTransferController;
-use App\Http\Controllers\Admin\ActivityLogsController;
+
 
 use App\Http\Controllers\StripeOnboardingController;
 use App\Http\Controllers\ProductImportController;
@@ -68,6 +73,11 @@ use App\Http\Controllers\ProductImportController;
 use App\Models\Order;
 
 use App\Http\Controllers\ShopLicenseController;
+
+
+
+// テスト
+use App\Jobs\UploadShopVideoToYoutubeJob;
 
 /*
 |--------------------------------------------------------------------------
@@ -91,6 +101,12 @@ require base_path('routes/review.php');
 require base_path('routes/shop-members.php');
 
 require base_path('routes/products_log.php');
+
+require base_path('routes/shop_videos.php');
+
+
+
+
 
 
 
@@ -495,6 +511,36 @@ Route::group(['prefix' => 'seller', 'middleware' => ['auth'], 'as' => 'seller.',
 
     Route::put('/products/{product}', [ProductsController::class, 'update'])->name('products.update');
 
+    // 商品YouTube動画
+    Route::get(
+        '/products/{product}/youtube-video/create',
+        [App\Http\Controllers\Seller\ProductVideoController::class, 'create']
+    )->name('products.youtube-video.create');
+
+    Route::post(
+        '/products/{product}/youtube-video',
+        [App\Http\Controllers\Seller\ProductVideoController::class, 'store']
+    )->name('products.youtube-video.store');
+
+    Route::get(
+        '/products/{product}/youtube-video/{video}',
+        [App\Http\Controllers\Seller\ProductVideoController::class, 'show']
+    )->name('products.youtube-video.show');
+
+    Route::post(
+        '/products/{product}/youtube-video/{video}/process',
+        [App\Http\Controllers\Seller\ProductVideoController::class, 'startProcessing']
+    )->name(
+        'products.youtube-video.process'
+    );
+
+    Route::post(
+        '/products/{product}/youtube-video/{video}/seller-review',
+        [App\Http\Controllers\Seller\ProductVideoController::class, 'completeSellerReview']
+    )->name(
+        'products.youtube-video.seller-review'
+    );
+
     Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity_logs.index');
 
     Route::get('/activity-logs/{id}', [ActivityLogController::class, 'show'])->name('activity_logs.show');
@@ -696,6 +742,52 @@ Route::group([
     // 'middleware' => ['auth', 'otp'],//これだけ追加
     'middleware' => ['stripe.connected', ],
     ], function () {
+
+
+
+    Route::get(
+        '/shop-video-reviews',
+        [ShopVideoReviewController::class, 'index']
+    )->name('admin.shop-video-reviews.index');
+
+    Route::get(
+        '/shop-video-reviews/{video}',
+        [ShopVideoReviewController::class, 'show']
+    )->name('admin.shop-video-reviews.show');
+
+    Route::post(
+        '/shop-video-reviews/{video}/approve',
+        [ShopVideoReviewController::class, 'approve']
+    )->name('admin.shop-video-reviews.approve');
+
+    Route::post(
+        '/shop-video-reviews/{video}/reject',
+        [ShopVideoReviewController::class, 'reject']
+    )->name('admin.shop-video-reviews.reject');
+
+
+    Route::post(
+        '/product-video-drafts/{video}/approve',
+        [ProductVideoReviewController::class, 'approve']
+    )->name('admin.product-video-drafts.approve');
+
+    Route::post(
+        '/product-video-drafts/{video}/youtube/retry',
+        [ProductVideoReviewController::class, 'retryYoutube']
+    )->name('admin.product-video-drafts.youtube.retry');
+
+    Route::get(
+        '/product-video-drafts/{video}/review',
+        [ProductVideoReviewController::class, 'review']
+    )->name('admin.product-video-drafts.review');
+
+    Route::post(
+        '/product-video-drafts/{video}/reject',
+        [ProductVideoReviewController::class, 'reject']
+    )->name('admin.product-video-drafts.reject');
+
+
+    // ２０２６０９０２以前の既存必須
     Voyager::routes();
 
     Route::get('/order/pay/{suborder}', [App\Http\Controllers\SubOrderController::class, 'pay'])->name('order.pay');
@@ -730,9 +822,54 @@ Route::group([
 
     })->name('notification.read');
 
-    Route::get('/activity-logs', [ActivityLogsController::class, 'index'])->name('admin.activity_logs.index');
+    Route::get(
+        '/youtube/connect',
+        [YouTubeAuthController::class, 'connect']
+    )->name('admin.youtube.connect');
 
-    Route::get('/activity-logs/{id}', [ActivityLogsController::class, 'show'])->name('admin.activity_logs.show');
+    Route::get(
+        '/youtube/callback',
+        [YouTubeAuthController::class, 'callback']
+    )->name('admin.youtube.callback');
+
+    Route::get(
+        '/youtube/test',
+        [YouTubeAuthController::class, 'test']
+    )->name('admin.youtube.test');
+
+    Route::get(
+        '/youtube/upload-test',
+        [YouTubeAuthController::class, 'uploadTest']
+    )->name('admin.youtube.upload-test');
+
+    Route::get('/test/youtube-job/{id}', function ($id) {
+
+        UploadShopVideoToYoutubeJob::dispatch(
+            (int) $id
+        );
+
+        return 'YouTube Job dispatched: ' . $id;
+    });
+
+    Route::get(
+        '/youtube/download-video-test',
+        [YouTubeAuthController::class, 'downloadVideoTest']
+    )->name('admin.youtube.download-video-test');
+
+    Route::get('/test/shop-video-preview/{id}', function ($id) {
+
+        $video = \App\Models\ShopVideoDraft::findOrFail(
+            (int) $id
+        );
+
+        \App\Jobs\GenerateShopVideoPreviewJob::dispatch(
+            $video
+        );
+
+        return 'Preview Job dispatched: ' . $video->id;
+    });
+
+
 
 });  
 
